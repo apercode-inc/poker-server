@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using Scellecs.Morpeh;
 
-namespace chess_server.Code.GlobalUtils
+namespace server.Code.GlobalUtils
 {
     public static class MorpehSystemsGroupExtensions
     {

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace chess_server.Code.GlobalUtils;
+namespace server.Code.GlobalUtils;
 
 public static class Time
 {

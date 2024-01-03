@@ -1,4 +1,4 @@
-namespace chess_server.Code.GlobalUtils;
+namespace server.Code.GlobalUtils;
 
 public static class Debug
 {

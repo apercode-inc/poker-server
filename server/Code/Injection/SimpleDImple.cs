@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace chess_server.Code.Injection;
+namespace server.Code.Injection;
 
 [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Field | AttributeTargets.Property)]
 public class InjectableAttribute : Attribute

@@ -1,4 +1,4 @@
-namespace chess_server.Code.Injection;
+namespace server.Code.Injection;
 
 public interface IInjectionContainer
 {

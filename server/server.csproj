@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Code" />
+      <Folder Include="Code\MorpehFeatures" />
     </ItemGroup>
 
     <ItemGroup>
