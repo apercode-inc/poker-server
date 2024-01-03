@@ -7,4 +7,13 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Code" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NetFrame" Version="1.1.3" />
+      <PackageReference Include="Scellecs.Morpeh" Version="2023.1.0" />
+    </ItemGroup>
+
 </Project>
