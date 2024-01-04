@@ -6,19 +6,29 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature;
 
 public static class RoomPokerFeature
 {
+    public static void AddStorage(World world, ref int index, SimpleDImple container)
+    {
+        var systemsGroup = world.CreateSystemsGroup();
+        
+        systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerStorageSystem>());
+        
+        world.AddSystemsGroup(index++, systemsGroup);
+    }
+    
     public static void Add(World world, ref int index, SimpleDImple container)
     {
         var systemsGroup = world.CreateSystemsGroup();
-
+        
         systemsGroup.AddInitializer(container.New<RoomPokerCreateRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerJoinRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerLeftRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerListRequestSyncSystem>());
-        
-        systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerStorageSystem>());
+
+        systemsGroup.AddSystem(container.New<RoomPokerShowTestSystem>());
 
         systemsGroup.AddSystem(container.New<RoomPokerPlayerJoinSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerLeftSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerPlayerDestroySystem>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }

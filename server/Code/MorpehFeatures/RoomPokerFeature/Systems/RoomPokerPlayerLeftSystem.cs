@@ -1,5 +1,6 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -9,6 +10,8 @@ public class RoomPokerPlayerLeftSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayerLeft> _roomPokerPlayerLeft;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
+
+    [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
 
     [Injectable] private RoomPokerStorageSystem _roomPokerStorage;
 
@@ -31,18 +34,22 @@ public class RoomPokerPlayerLeftSystem : ISystem
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(entity);
 
-            ref var roomPokerPlayerJoin = ref _roomPokerPlayerLeft.Get(entity);
+            ref var roomPokerPlayerLeft = ref _roomPokerPlayerLeft.Get(entity);
             
-            roomPokerPlayers.Players.Remove(roomPokerPlayerJoin.Player);
+            roomPokerPlayers.Players.Remove(roomPokerPlayerLeft.Player);
+
+            _playerRoomPoker.Remove(roomPokerPlayerLeft.Player);
 
             _roomPokerPlayerLeft.Remove(entity);
-            
-            if (roomPokerPlayers.Players.Count == 0)
+
+            if (roomPokerPlayers.Players.Count != 0)
             {
-                ref var roomPokerId = ref _roomPokerId.Get(entity);
-                
-                _roomPokerStorage.Remove(roomPokerId.Value);
+                continue;
             }
+            
+            ref var roomPokerId = ref _roomPokerId.Get(entity);
+                
+            _roomPokerStorage.Remove(roomPokerId.Value);
         }
     }
 

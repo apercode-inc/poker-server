@@ -6,6 +6,7 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 public struct RoomNetworkModel : IWriteable, IReadable
 {
     public int Id;
+    public byte CurrentPlayers;
     public byte MaxPlayers;
     public ulong SmallBet;
     public ulong BigBet;
@@ -13,6 +14,7 @@ public struct RoomNetworkModel : IWriteable, IReadable
     public void Write(NetFrameWriter writer)
     {
         writer.WriteInt(Id);
+        writer.WriteByte(CurrentPlayers);
         writer.WriteByte(MaxPlayers);
         writer.WriteULong(SmallBet);
         writer.WriteULong(BigBet);
@@ -21,6 +23,7 @@ public struct RoomNetworkModel : IWriteable, IReadable
     public void Read(NetFrameReader reader)
     {
         Id = reader.ReadInt();
+        CurrentPlayers = reader.ReadByte();
         MaxPlayers = reader.ReadByte();
         SmallBet = reader.ReadULong();
         BigBet = reader.ReadULong();

@@ -1,20 +1,16 @@
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerPlayerJoinSystem : ISystem
+public class RoomPokerShowTestSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
-    [Injectable] private Stash<RoomPokerPlayerJoin> _roomPokerPlayerJoin;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-
-    [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-
+    
     private Filter _filter;
     
     public World World { get; set; }
@@ -22,7 +18,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
-            .With<RoomPokerPlayerJoin>()
+            .With<RoomPokerId>()
             .With<RoomPokerStats>()
             .With<RoomPokerPlayers>()
             .Build();
@@ -32,26 +28,11 @@ public class RoomPokerPlayerJoinSystem : ISystem
     {
         foreach (var entity in _filter)
         {
+            ref var roomPokerId = ref _roomPokerId.Get(entity);
             ref var roomPokerStats = ref _roomPokerStats.Get(entity);
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(entity);
-
-            if (roomPokerStats.MaxPlayers == roomPokerPlayers.Players.Count)
-            {
-                Debug.LogError($"[RoomPokerPlayerJoinSystem.OnUpdate] trying to enter a crowded room");
-                continue;
-            }
-
-            ref var roomPokerPlayerJoin = ref _roomPokerPlayerJoin.Get(entity);
-            ref var roomPokerId = ref _roomPokerId.Get(entity);
             
-            roomPokerPlayers.Players.Add(roomPokerPlayerJoin.Player);
-            
-            _playerRoomPoker.Set(roomPokerPlayerJoin.Player, new PlayerRoomPoker
-            {
-                RoomId = roomPokerId.Value,
-            });
-
-            _roomPokerPlayerJoin.Remove(entity);
+            Debug.LogColor($"roomId: {roomPokerId.Value} maxPlayers: {roomPokerStats.MaxPlayers} smallBet: {roomPokerStats.SmallBet} bigBet: {roomPokerStats.BigBet} playerCount: {roomPokerPlayers.Players.Count}", ConsoleColor.Magenta);
         }
     }
 

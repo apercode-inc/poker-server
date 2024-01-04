@@ -3,7 +3,6 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature;
 using server.Code.MorpehFeatures.ConnectionFeature;
 using server.Code.MorpehFeatures.PlayersFeature;
-using server.Code.MorpehFeatures.RoomFeature;
 using server.Code.MorpehFeatures.RoomPokerFeature;
 
 namespace server.Code;
@@ -18,6 +17,7 @@ public static class MorpehInitializer
             
         //Storages
         PlayersFeature.AddStorage(world, ref groupIndex, container);
+        RoomPokerFeature.AddStorage(world, ref groupIndex, container);
             
         //Systems
         ConnectionFeature.Add(world, ref groupIndex, container);

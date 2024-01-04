@@ -11,6 +11,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
 {
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     
     [Injectable] private NetFrameServer _server;
 
@@ -26,6 +27,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
 
         _filter = World.Filter
             .With<RoomPokerId>()
+            .With<RoomPokerPlayers>()
             .With<RoomPokerStats>()
             .Build();
     }
@@ -46,10 +48,12 @@ public class RoomPokerListRequestSyncSystem : IInitializer
         {
             ref var roomPokerId = ref _roomPokerId.Get(entity);
             ref var roomPokerStats = ref _roomPokerStats.Get(entity);
+            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(entity);
             
             responseDataframe.Rooms.Add(new RoomNetworkModel
             {
                 Id = roomPokerId.Value,
+                CurrentPlayers = (byte) roomPokerPlayers.Players.Count,
                 MaxPlayers = roomPokerStats.MaxPlayers,
                 SmallBet = roomPokerStats.SmallBet,
                 BigBet = roomPokerStats.BigBet,

@@ -1,6 +1,7 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
+using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -11,6 +12,8 @@ public class RoomPokerStorageSystem : IInitializer
     [Injectable] private Stash<RoomPokerStats> _roomPokerData;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<Destroy> _destroy;
+
+    [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     
     private Dictionary<int, Entity> _rooms;
     private int _idCounter;
@@ -44,6 +47,11 @@ public class RoomPokerStorageSystem : IInitializer
         _roomPokerPlayers.Set(newEntity, new RoomPokerPlayers
         {
             Players = new List<Entity>{ createdPlayer }
+        });
+        
+        _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker
+        {
+            RoomId = _idCounter,
         });
         
         _rooms.Add(_idCounter, newEntity);
