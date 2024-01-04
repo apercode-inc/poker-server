@@ -4,13 +4,14 @@ using NetFrame.Utils;
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.PlayersFeature.Systems;
 
 namespace server.Code.MorpehFeatures.ConnectionFeature.Systems;
 
 public class StartServerSystem : ISystem
 {
     [Injectable] private NetFrameServer _server;
-    //[Injectable] private PlayerStorageSystem _playerStorage;
+    [Injectable] private PlayerStorageSystem _playerStorage;
 
     private const int MaxPlayers = 10;
     private const int Port = 8080;
@@ -27,22 +28,22 @@ public class StartServerSystem : ISystem
         _server.ClientConnection += OnClientConnection;
         _server.ClientDisconnect += OnClientDisconnect;
     }
+    
+    public void OnUpdate(float deltaTime)
+    {
+        _server.Run(100);
+    }
 
     private void OnClientConnection(int id)
     {
         Debug.LogColor($"connected player id = {id}", ConsoleColor.Green);
-        //_playerStorage.Add(id);
+        _playerStorage.Add(id);
     }
     
     private void OnClientDisconnect(int id)
     {
         Debug.LogColor($"disconnected player id = {id}", ConsoleColor.Yellow);
-        //_playerStorage.Remove(id);
-    }
-
-    public void OnUpdate(float deltaTime)
-    {
-        _server.Run(100);
+        _playerStorage.Remove(id);
     }
 
     public void Dispose()
