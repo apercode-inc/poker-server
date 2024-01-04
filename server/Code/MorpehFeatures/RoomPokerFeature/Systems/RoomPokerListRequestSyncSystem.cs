@@ -1,0 +1,67 @@
+using NetFrame.Server;
+using Scellecs.Morpeh;
+using server.Code.Injection;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
+
+namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
+
+public class RoomPokerListRequestSyncSystem : IInitializer
+{
+    [Injectable] private Stash<RoomPokerId> _roomPokerId;
+    [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
+    
+    [Injectable] private NetFrameServer _server;
+
+    [Injectable] private RoomPokerStorageSystem _roomPokerStorage;
+
+    private Filter _filter;
+    
+    public World World { get; set; }
+
+    public void OnAwake()
+    {
+        _server.Subscribe<RoomsListRequestDataframe>(Handler);
+
+        _filter = World.Filter
+            .With<RoomPokerId>()
+            .With<RoomPokerStats>()
+            .Build();
+    }
+
+    private void Handler(RoomsListRequestDataframe dataframe, int id)
+    {
+        if (_filter.IsEmpty())
+        {
+            return;
+        }
+        
+        var responseDataframe = new RoomsListResponseDataframe
+        {
+            Rooms = new List<RoomNetworkModel>(),
+        };
+
+        foreach (var entity in _filter)
+        {
+            ref var roomPokerId = ref _roomPokerId.Get(entity);
+            ref var roomPokerStats = ref _roomPokerStats.Get(entity);
+            
+            responseDataframe.Rooms.Add(new RoomNetworkModel
+            {
+                Id = roomPokerId.Value,
+                MaxPlayers = roomPokerStats.MaxPlayers,
+                SmallBet = roomPokerStats.SmallBet,
+                BigBet = roomPokerStats.BigBet,
+            });
+        }
+        
+        _server.Send(ref responseDataframe, id);
+    }
+
+    public void Dispose()
+    {
+        _server.Unsubscribe<RoomsListRequestDataframe>(Handler);
+        _filter = null;
+    }
+}

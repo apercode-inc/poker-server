@@ -12,10 +12,13 @@ public static class RoomPokerFeature
 
         systemsGroup.AddInitializer(container.New<RoomPokerCreateRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerJoinRequestSyncSystem>());
+        systemsGroup.AddInitializer(container.New<RoomPokerLeftRequestSyncSystem>());
+        systemsGroup.AddInitializer(container.New<RoomPokerListRequestSyncSystem>());
         
         systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerStorageSystem>());
 
         systemsGroup.AddSystem(container.New<RoomPokerPlayerJoinSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerPlayerLeftSystem>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }
