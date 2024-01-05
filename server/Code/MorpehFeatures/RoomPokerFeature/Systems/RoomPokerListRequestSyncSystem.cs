@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
@@ -12,6 +13,8 @@ public class RoomPokerListRequestSyncSystem : IInitializer
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+
+    [Injectable] private Stash<PlayerNickname> _playerNickname;
     
     [Injectable] private NetFrameServer _server;
 
@@ -38,7 +41,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
         {
             return;
         }
-        
+
         var responseDataframe = new RoomsListResponseDataframe
         {
             Rooms = new List<RoomNetworkModel>(),
@@ -49,6 +52,17 @@ public class RoomPokerListRequestSyncSystem : IInitializer
             ref var roomPokerId = ref _roomPokerId.Get(entity);
             ref var roomPokerStats = ref _roomPokerStats.Get(entity);
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(entity);
+
+            var playersInRoom = new List<RoomPlayerNetworkModel>();
+            
+            foreach (var playerEntity in roomPokerPlayers.Players)
+            {
+                ref var playerNickname = ref _playerNickname.Get(playerEntity);
+                playersInRoom.Add(new RoomPlayerNetworkModel
+                {
+                    Nickname = playerNickname.Value,
+                });
+            }
             
             responseDataframe.Rooms.Add(new RoomNetworkModel
             {
@@ -57,6 +71,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
                 MaxPlayers = roomPokerStats.MaxPlayers,
                 SmallBet = roomPokerStats.SmallBet,
                 BigBet = roomPokerStats.BigBet,
+                Players = playersInRoom,
             });
         }
         

@@ -32,22 +32,25 @@ public class RoomPokerPlayerDestroySystem : ILateSystem
         foreach (var entity in _filter)
         {
             ref var playerRoomPoker = ref _playerRoomPoker.Get(entity);
-            
-            if (!_roomPokerStorage.TryGetById(playerRoomPoker.RoomId, out var roomEntity))
-            {
-                continue;
-            }
-            
-            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            roomPokerPlayers.Players.Remove(entity);
+            foreach (var roomId in playerRoomPoker.RoomIds)
+            {
+                if (!_roomPokerStorage.TryGetById(roomId, out var roomEntity))
+                {
+                    continue;
+                }
                 
-            if (roomPokerPlayers.Players.Count != 0)
-            {
-                continue;
-            }
+                ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            _roomPokerStorage.Remove(playerRoomPoker.RoomId);
+                roomPokerPlayers.Players.Remove(entity);
+                
+                if (roomPokerPlayers.Players.Count != 0)
+                {
+                    continue;
+                }
+
+                _roomPokerStorage.Remove(roomId);
+            }
         }
     }
 

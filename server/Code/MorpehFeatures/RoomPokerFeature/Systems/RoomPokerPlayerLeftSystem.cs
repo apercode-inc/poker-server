@@ -33,12 +33,19 @@ public class RoomPokerPlayerLeftSystem : ISystem
         foreach (var entity in _filter)
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(entity);
-
             ref var roomPokerPlayerLeft = ref _roomPokerPlayerLeft.Get(entity);
-            
-            roomPokerPlayers.Players.Remove(roomPokerPlayerLeft.Player);
+            ref var roomPokerId = ref _roomPokerId.Get(entity);
 
-            _playerRoomPoker.Remove(roomPokerPlayerLeft.Player);
+            roomPokerPlayers.Players.Remove(roomPokerPlayerLeft.Player);
+            
+            ref var playerRoomPoker = ref _playerRoomPoker.Get(roomPokerPlayerLeft.Player);
+
+            playerRoomPoker.RoomIds.Remove(roomPokerId.Value);
+
+            if (playerRoomPoker.RoomIds.Count == 0)
+            {
+                _playerRoomPoker.Remove(roomPokerPlayerLeft.Player);
+            }
 
             _roomPokerPlayerLeft.Remove(entity);
 
@@ -47,9 +54,8 @@ public class RoomPokerPlayerLeftSystem : ISystem
                 continue;
             }
             
-            ref var roomPokerId = ref _roomPokerId.Get(entity);
-                
             _roomPokerStorage.Remove(roomPokerId.Value);
+   
         }
     }
 

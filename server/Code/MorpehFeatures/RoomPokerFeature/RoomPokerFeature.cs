@@ -24,7 +24,7 @@ public static class RoomPokerFeature
         systemsGroup.AddInitializer(container.New<RoomPokerLeftRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerListRequestSyncSystem>());
 
-        systemsGroup.AddSystem(container.New<RoomPokerShowTestSystem>());
+        //systemsGroup.AddSystem(container.New<RoomPokerShowTestSystem>()); //todo test
 
         systemsGroup.AddSystem(container.New<RoomPokerPlayerJoinSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerLeftSystem>());

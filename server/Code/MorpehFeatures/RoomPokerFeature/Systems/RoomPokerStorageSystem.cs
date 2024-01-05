@@ -48,12 +48,21 @@ public class RoomPokerStorageSystem : IInitializer
         {
             Players = new List<Entity>{ createdPlayer }
         });
-        
-        _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker
+
+        ref var playerRoomPoker = ref _playerRoomPoker.Get(createdPlayer, out var exist);
+
+        if (exist)
         {
-            RoomId = _idCounter,
-        });
-        
+            playerRoomPoker.RoomIds.Add(_idCounter);
+        }
+        else
+        {
+            _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker
+            {
+                RoomIds = new List<int> {_idCounter},
+            });
+        }
+
         _rooms.Add(_idCounter, newEntity);
 
         _idCounter++;

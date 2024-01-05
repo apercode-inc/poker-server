@@ -10,6 +10,7 @@ public struct RoomNetworkModel : IWriteable, IReadable
     public byte MaxPlayers;
     public ulong SmallBet;
     public ulong BigBet;
+    public List<RoomPlayerNetworkModel> Players;
 
     public void Write(NetFrameWriter writer)
     {
@@ -18,6 +19,16 @@ public struct RoomNetworkModel : IWriteable, IReadable
         writer.WriteByte(MaxPlayers);
         writer.WriteULong(SmallBet);
         writer.WriteULong(BigBet);
+        
+        writer.WriteInt(Players?.Count ?? 0);
+
+        if (Players != null)
+        {
+            foreach (var player in Players)
+            {
+                writer.Write(player);
+            }
+        }
     }
 
     public void Read(NetFrameReader reader)
@@ -27,5 +38,16 @@ public struct RoomNetworkModel : IWriteable, IReadable
         MaxPlayers = reader.ReadByte();
         SmallBet = reader.ReadULong();
         BigBet = reader.ReadULong();
+        
+        var count = reader.ReadInt();
+        
+        if (count > 0)
+        {
+            Players = new List<RoomPlayerNetworkModel>();
+            for (var i = 0; i < count; i++)
+            {
+                Players.Add(reader.Read<RoomPlayerNetworkModel>());
+            }
+        }
     }
 }

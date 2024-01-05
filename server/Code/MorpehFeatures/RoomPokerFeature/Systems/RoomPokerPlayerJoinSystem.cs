@@ -42,14 +42,29 @@ public class RoomPokerPlayerJoinSystem : ISystem
             }
 
             ref var roomPokerPlayerJoin = ref _roomPokerPlayerJoin.Get(entity);
+
+            if (roomPokerPlayers.Players.Contains(roomPokerPlayerJoin.Player))
+            {
+                continue;
+            }
+            
             ref var roomPokerId = ref _roomPokerId.Get(entity);
             
             roomPokerPlayers.Players.Add(roomPokerPlayerJoin.Player);
             
-            _playerRoomPoker.Set(roomPokerPlayerJoin.Player, new PlayerRoomPoker
+            ref var playerRoomPoker = ref _playerRoomPoker.Get(roomPokerPlayerJoin.Player, out var exist);
+
+            if (exist)
             {
-                RoomId = roomPokerId.Value,
-            });
+                playerRoomPoker.RoomIds.Add(roomPokerId.Value);
+            }
+            else
+            {
+                _playerRoomPoker.Set(roomPokerPlayerJoin.Player, new PlayerRoomPoker
+                {
+                    RoomIds = new List<int> {roomPokerId.Value},
+                });
+            }
 
             _roomPokerPlayerJoin.Remove(entity);
         }
