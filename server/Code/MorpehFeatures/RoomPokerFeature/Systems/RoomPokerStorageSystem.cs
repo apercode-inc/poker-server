@@ -14,9 +14,11 @@ public class RoomPokerStorageSystem : IInitializer
     [Injectable] private Stash<Destroy> _destroy;
 
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
+    [Injectable] private Stash<PlayerRoomCreateSend> _playerRoomCreateSend;
     
     private Dictionary<int, Entity> _rooms;
     private int _idCounter;
+    private Random _random;
 
     private Filter _filter;
 
@@ -25,6 +27,7 @@ public class RoomPokerStorageSystem : IInitializer
     public void OnAwake()
     {
         _rooms = new Dictionary<int, Entity>();
+        _random = new Random();
         
         _filter = World.Filter
             .With<RoomPokerId>()
@@ -34,6 +37,8 @@ public class RoomPokerStorageSystem : IInitializer
     public void Add(Entity createdPlayer, byte maxPlayers, ulong smallBet, ulong bigBet)
     {
         var newEntity = World.CreateEntity();
+        var seat = (byte) _random.Next(0, maxPlayers);
+        
         _roomPokerId.Set(newEntity, new RoomPokerId
         {
             Value = _idCounter,
@@ -48,7 +53,7 @@ public class RoomPokerStorageSystem : IInitializer
         {
             Players = new Dictionary<Entity, byte>()
             {
-                [createdPlayer] = 0,
+                [createdPlayer] = seat,
             }
         });
 
@@ -65,6 +70,13 @@ public class RoomPokerStorageSystem : IInitializer
                 RoomIds = new List<int> {_idCounter},
             });
         }
+        
+        _playerRoomCreateSend.Set(createdPlayer, new PlayerRoomCreateSend
+        {
+            RoomId = _idCounter,
+            MaxPlayers = maxPlayers,
+            Seat = seat,
+        });
 
         _rooms.Add(_idCounter, newEntity);
 
@@ -103,5 +115,6 @@ public class RoomPokerStorageSystem : IInitializer
     {
         _rooms = null;
         _filter = null;
+        _random = null;
     }
 }

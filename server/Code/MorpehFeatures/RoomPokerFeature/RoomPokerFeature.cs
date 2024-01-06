@@ -30,6 +30,8 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerPlayerLeftSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerDestroySystem>());
         
+        systemsGroup.AddSystem(container.New<RoomPokerPlayerCreateSendSystem>());
+        
         world.AddSystemsGroup(index++, systemsGroup);
     }
 }
