@@ -46,7 +46,10 @@ public class RoomPokerStorageSystem : IInitializer
         });
         _roomPokerPlayers.Set(newEntity, new RoomPokerPlayers
         {
-            Players = new List<Entity>{ createdPlayer }
+            Players = new Dictionary<Entity, byte>()
+            {
+                [createdPlayer] = 0,
+            }
         });
 
         ref var playerRoomPoker = ref _playerRoomPoker.Get(createdPlayer, out var exist);

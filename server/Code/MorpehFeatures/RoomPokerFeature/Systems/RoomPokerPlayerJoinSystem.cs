@@ -43,14 +43,21 @@ public class RoomPokerPlayerJoinSystem : ISystem
 
             ref var roomPokerPlayerJoin = ref _roomPokerPlayerJoin.Get(entity);
 
-            if (roomPokerPlayers.Players.Contains(roomPokerPlayerJoin.Player))
+            if (roomPokerPlayers.Players.ContainsKey(roomPokerPlayerJoin.Player))
             {
                 continue;
             }
             
             ref var roomPokerId = ref _roomPokerId.Get(entity);
+
+            byte seat = 0;
+
+            while (roomPokerPlayers.Players.ContainsValue(seat))
+            {
+                seat++;
+            }
             
-            roomPokerPlayers.Players.Add(roomPokerPlayerJoin.Player);
+            roomPokerPlayers.Players.Add(roomPokerPlayerJoin.Player, seat);
             
             ref var playerRoomPoker = ref _playerRoomPoker.Get(roomPokerPlayerJoin.Player, out var exist);
 
