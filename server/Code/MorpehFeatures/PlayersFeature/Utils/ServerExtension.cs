@@ -1,9 +1,7 @@
-using NetFrame;
-using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 
-namespace server.Code.MorpehFeatures.PlayersFeature.Utils;
+namespace NetFrame.Server;
 
 public static class ServerExtension
 {
