@@ -9,8 +9,11 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerPlayerDestroySystem : ILateSystem
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
+    [Injectable] private Stash<PlayerId> _playerId;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+
+    [Injectable] private Stash<PlayerRoomRemoteLeftSend> _playerRoomRemoteLeftSend;
 
     [Injectable] private RoomPokerStorageSystem _roomPokerStorage;
     
@@ -29,9 +32,10 @@ public class RoomPokerPlayerDestroySystem : ILateSystem
 
     public void OnUpdate(float deltaTime)
     {
-        foreach (var entity in _filter)
+        foreach (var playerEntity in _filter)
         {
-            ref var playerRoomPoker = ref _playerRoomPoker.Get(entity);
+            ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
+            ref var playerId = ref _playerId.Get(playerEntity);
 
             foreach (var roomId in playerRoomPoker.RoomIds)
             {
@@ -42,8 +46,20 @@ public class RoomPokerPlayerDestroySystem : ILateSystem
                 
                 ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-                roomPokerPlayers.Players.Remove(entity);
+                var isRemoved = roomPokerPlayers.Players.Remove(playerEntity);
                 
+                if (isRemoved)
+                {
+                    foreach (var player in roomPokerPlayers.Players)
+                    {
+                        _playerRoomRemoteLeftSend.Set(player.Key, new PlayerRoomRemoteLeftSend
+                        {
+                            PlayerId = playerId.Id,
+                            IsAll = true,
+                        });
+                    }
+                }
+
                 if (roomPokerPlayers.Players.Count != 0)
                 {
                     continue;

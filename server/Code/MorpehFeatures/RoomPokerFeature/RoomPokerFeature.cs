@@ -33,6 +33,8 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerPlayerCreateSendSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerLocalJoinSendSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerRemoteJoinSendSystem>());
+
+        systemsGroup.AddSystem(container.New<RoomPokerPlayerRemoteLeftSendSystem>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }

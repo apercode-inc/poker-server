@@ -10,8 +10,10 @@ public class RoomPokerPlayerLeftSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayerLeft> _roomPokerPlayerLeft;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
-
+    
+    [Injectable] private Stash<PlayerRoomRemoteLeftSend> _playerRoomRemoteLeftSend;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
+    [Injectable] private Stash<PlayerId> _playerId;
 
     [Injectable] private RoomPokerStorageSystem _roomPokerStorage;
 
@@ -36,15 +38,30 @@ public class RoomPokerPlayerLeftSystem : ISystem
             ref var roomPokerPlayerLeft = ref _roomPokerPlayerLeft.Get(entity);
             ref var roomPokerId = ref _roomPokerId.Get(entity);
 
-            roomPokerPlayers.Players.Remove(roomPokerPlayerLeft.Player);
+            var playerLeft = roomPokerPlayerLeft.Player;
+
+            roomPokerPlayers.Players.Remove(playerLeft);
             
-            ref var playerRoomPoker = ref _playerRoomPoker.Get(roomPokerPlayerLeft.Player);
+            ref var playerRoomPoker = ref _playerRoomPoker.Get(playerLeft);
+            ref var playerId = ref _playerId.Get(playerLeft);
 
             playerRoomPoker.RoomIds.Remove(roomPokerId.Value);
 
             if (playerRoomPoker.RoomIds.Count == 0)
             {
-                _playerRoomPoker.Remove(roomPokerPlayerLeft.Player);
+                _playerRoomPoker.Remove(playerLeft);
+            }
+
+            foreach (var pair in roomPokerPlayers.Players)
+            {
+                var player = pair.Key;
+                
+                _playerRoomRemoteLeftSend.Set(player, new PlayerRoomRemoteLeftSend
+                {
+                    RoomId = roomPokerId.Value,
+                    IsAll = false,
+                    PlayerId = playerId.Id,
+                });
             }
 
             _roomPokerPlayerLeft.Remove(entity);
