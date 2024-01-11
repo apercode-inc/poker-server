@@ -29,13 +29,11 @@ public class RoomPokerPlayerRemoteLeftSendSystem : ISystem
         {
             ref var playerRoomRemoteLeftSend = ref _playerRoomRemoteLeftSend.Get(entity);
             var roomId = playerRoomRemoteLeftSend.RoomId;
-            var isAll = playerRoomRemoteLeftSend.IsAll;
             var playerId = playerRoomRemoteLeftSend.PlayerId;
 
             var dataframe = new RoomPokerRemotePlayerLeftResponseDataframe
             {
                 RoomId = roomId,
-                IsAll = isAll,
                 PlayerId = playerId,
             };
             _server.Send(ref dataframe, entity);

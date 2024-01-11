@@ -16,9 +16,9 @@ public class RoomPokerPlayerDestroySystem : ILateSystem
     [Injectable] private Stash<PlayerRoomRemoteLeftSend> _playerRoomRemoteLeftSend;
 
     [Injectable] private RoomPokerStorageSystem _roomPokerStorage;
-    
+
     private Filter _filter;
-    
+
     public World World { get; set; }
 
     public void OnAwake()
@@ -37,36 +37,36 @@ public class RoomPokerPlayerDestroySystem : ILateSystem
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
             ref var playerId = ref _playerId.Get(playerEntity);
 
-            foreach (var roomId in playerRoomPoker.RoomIds)
+            var roomId = playerRoomPoker.RoomId;
+
+
+            if (!_roomPokerStorage.TryGetById(roomId, out var roomEntity))
             {
-                if (!_roomPokerStorage.TryGetById(roomId, out var roomEntity))
-                {
-                    continue;
-                }
-                
-                ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-                var isRemoved = roomPokerPlayers.Players.Remove(playerEntity);
-                
-                if (isRemoved)
-                {
-                    foreach (var player in roomPokerPlayers.Players)
-                    {
-                        _playerRoomRemoteLeftSend.Set(player.Key, new PlayerRoomRemoteLeftSend
-                        {
-                            PlayerId = playerId.Id,
-                            IsAll = true,
-                        });
-                    }
-                }
-
-                if (roomPokerPlayers.Players.Count != 0)
-                {
-                    continue;
-                }
-
-                _roomPokerStorage.Remove(roomId);
+                continue;
             }
+
+            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+
+            var isRemoved = roomPokerPlayers.Players.Remove(playerEntity);
+
+            if (isRemoved)
+            {
+                foreach (var player in roomPokerPlayers.Players)
+                {
+                    _playerRoomRemoteLeftSend.Set(player.Key, new PlayerRoomRemoteLeftSend
+                    {
+                        RoomId = roomId,
+                        PlayerId = playerId.Id,
+                    });
+                }
+            }
+
+            if (roomPokerPlayers.Players.Count != 0)
+            {
+                continue;
+            }
+
+            _roomPokerStorage.Remove(roomId);
         }
     }
 

@@ -40,15 +40,23 @@ public class RoomPokerPlayerJoinSystem : ISystem
         {
             ref var roomPokerStats = ref _roomPokerStats.Get(entity);
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(entity);
+            ref var roomPokerPlayerJoin = ref _roomPokerPlayerJoin.Get(entity);
+            
+            var joinPlayerEntity = roomPokerPlayerJoin.Player;
+            
+            _roomPokerPlayerJoin.Remove(entity);
+
+            if (_playerRoomPoker.Has(joinPlayerEntity))
+            {
+                Debug.LogError($"[RoomPokerPlayerJoinSystem.OnUpdate] the player is already in the room");
+                continue;
+            }
 
             if (roomPokerStats.MaxPlayers == roomPokerPlayers.Players.Count)
             {
                 Debug.LogError($"[RoomPokerPlayerJoinSystem.OnUpdate] trying to enter a crowded room");
                 continue;
             }
-
-            ref var roomPokerPlayerJoin = ref _roomPokerPlayerJoin.Get(entity);
-            var joinPlayerEntity = roomPokerPlayerJoin.Player;
 
             if (roomPokerPlayers.Players.ContainsKey(joinPlayerEntity))
             {
@@ -66,21 +74,13 @@ public class RoomPokerPlayerJoinSystem : ISystem
             
             roomPokerPlayers.Players.Add(joinPlayerEntity, seat);
             
-            ref var playerRoomPoker = ref _playerRoomPoker.Get(joinPlayerEntity, out var exist);
             ref var playerId = ref _playerId.Get(joinPlayerEntity);
             ref var playerNickname = ref _playerNickname.Get(joinPlayerEntity);
 
-            if (exist)
+            _playerRoomPoker.Set(joinPlayerEntity, new PlayerRoomPoker
             {
-                playerRoomPoker.RoomIds.Add(roomPokerId.Value);
-            }
-            else
-            {
-                _playerRoomPoker.Set(joinPlayerEntity, new PlayerRoomPoker
-                {
-                    RoomIds = new List<int> {roomPokerId.Value},
-                });
-            }
+                RoomId = roomPokerId.Value,
+            });
 
             var playersNetworkModels = new List<RoomPlayerNetworkModel>();
 
@@ -123,8 +123,6 @@ public class RoomPokerPlayerJoinSystem : ISystem
                 Seat = seat,
                 RemotePlayers = playersNetworkModels,
             });
-
-            _roomPokerPlayerJoin.Remove(entity);
         }
     }
 

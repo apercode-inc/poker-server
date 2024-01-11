@@ -42,15 +42,9 @@ public class RoomPokerPlayerLeftSystem : ISystem
 
             roomPokerPlayers.Players.Remove(playerLeft);
             
-            ref var playerRoomPoker = ref _playerRoomPoker.Get(playerLeft);
             ref var playerId = ref _playerId.Get(playerLeft);
 
-            playerRoomPoker.RoomIds.Remove(roomPokerId.Value);
-
-            if (playerRoomPoker.RoomIds.Count == 0)
-            {
-                _playerRoomPoker.Remove(playerLeft);
-            }
+            _playerRoomPoker.Remove(playerLeft);
 
             foreach (var pair in roomPokerPlayers.Players)
             {
@@ -59,7 +53,6 @@ public class RoomPokerPlayerLeftSystem : ISystem
                 _playerRoomRemoteLeftSend.Set(player, new PlayerRoomRemoteLeftSend
                 {
                     RoomId = roomPokerId.Value,
-                    IsAll = false,
                     PlayerId = playerId.Id,
                 });
             }

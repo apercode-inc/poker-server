@@ -1,4 +1,5 @@
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -36,6 +37,12 @@ public class RoomPokerStorageSystem : IInitializer
 
     public void Add(Entity createdPlayer, byte maxPlayers, ulong smallBet, ulong bigBet)
     {
+        if (_playerRoomPoker.Has(createdPlayer))
+        {
+            Debug.LogError($"[RoomPokerStorageSystem.Add] the player is already in the room");
+            return;
+        }
+        
         var newEntity = World.CreateEntity();
         var seat = (byte) _random.Next(0, maxPlayers);
         
@@ -57,19 +64,10 @@ public class RoomPokerStorageSystem : IInitializer
             }
         });
 
-        ref var playerRoomPoker = ref _playerRoomPoker.Get(createdPlayer, out var exist);
-
-        if (exist)
+        _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker
         {
-            playerRoomPoker.RoomIds.Add(_idCounter);
-        }
-        else
-        {
-            _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker
-            {
-                RoomIds = new List<int> {_idCounter},
-            });
-        }
+            RoomId = _idCounter,
+        });
         
         _playerRoomCreateSend.Set(createdPlayer, new PlayerRoomCreateSend
         {
