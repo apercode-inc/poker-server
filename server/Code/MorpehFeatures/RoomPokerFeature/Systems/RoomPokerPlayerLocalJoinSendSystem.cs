@@ -34,6 +34,7 @@ public class RoomPokerPlayerLocalJoinSendSystem : ISystem
             {
                 RoomId = playerRoomLocalJoinSend.RoomId,
                 MaxPlayers = playerRoomLocalJoinSend.MaxPlayers,
+                Seat = playerRoomLocalJoinSend.Seat,
                 RemotePlayers = playerRoomLocalJoinSend.RemotePlayers,
             };
             
