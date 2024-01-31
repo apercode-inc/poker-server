@@ -39,7 +39,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return true;
     }
 
-    public bool Remove(T value)
+    public bool Remove(T value, Dictionary<TM, T> previousMarkerValues = null)
     {
         var index = IndexOf(value);
 
@@ -48,7 +48,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
             return false;
         }
         
-        return Remove(index, out var removeValue);
+        return Remove(index, previousMarkerValues);
     }
 
     public void SetMarker(int index, TM marker)
@@ -187,11 +187,10 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return GetEnumerator();
     }
     
-    private bool Remove(int index, out MarkedItem<T, TM> value)
+    private bool Remove(int index, IDictionary<TM, T> previousValuesByMarker = null)
     {
         if (_data[index].Value == null)
         {
-            value = default;
             return false;
         }
         
@@ -214,14 +213,15 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
                 {
                     continue;
                 }
-        
+                
                 _data[currentIndex].Markers[marker.Key] = true;
                 _data[index].Markers[marker.Key] = false;
+                previousValuesByMarker?.Add(marker.Key, _data[currentIndex].Value);
+                
                 break;
             }
         }
-
-        value = _data[index];
+        
         _data[index].Value = default;
         Count--;
         
