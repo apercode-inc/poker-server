@@ -46,47 +46,6 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return Remove(index, out var removeValue);
     }
 
-    public bool Remove(int index, out MarkedItem<T, TM> value)
-    {
-        if (_data[index].Value == null)
-        {
-            value = default;
-            return false;
-        }
-        
-        foreach (var marker in _data[index].Markers)
-        {
-            if (!marker.Value)
-            {
-                continue;
-            }
- 
-            var iterationIndex = 0;
-            var currentIndex = index;
-
-            while (iterationIndex < _data.Length)
-            {
-                currentIndex = (currentIndex - 1 + _data.Length) % _data.Length;
-                iterationIndex++;
-
-                if (_data[currentIndex].Value == null)
-                {
-                    continue;
-                }
-        
-                _data[currentIndex].Markers[marker.Key] = true;
-                _data[index].Markers[marker.Key] = false;
-                break;
-            }
-        }
-
-        value = _data[index];
-        _data[index].Value = default;
-        Count--;
-        
-        return true;
-    }
-
     public void SetMarker(int index, TM marker)
     {
         if (_data[index].Value == null)
@@ -221,6 +180,47 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+    
+    private bool Remove(int index, out MarkedItem<T, TM> value)
+    {
+        if (_data[index].Value == null)
+        {
+            value = default;
+            return false;
+        }
+        
+        foreach (var marker in _data[index].Markers)
+        {
+            if (!marker.Value)
+            {
+                continue;
+            }
+ 
+            var iterationIndex = 0;
+            var currentIndex = index;
+
+            while (iterationIndex < _data.Length)
+            {
+                currentIndex = (currentIndex - 1 + _data.Length) % _data.Length;
+                iterationIndex++;
+
+                if (_data[currentIndex].Value == null)
+                {
+                    continue;
+                }
+        
+                _data[currentIndex].Markers[marker.Key] = true;
+                _data[index].Markers[marker.Key] = false;
+                break;
+            }
+        }
+
+        value = _data[index];
+        _data[index].Value = default;
+        Count--;
+        
+        return true;
     }
     
     private int IndexOf(T value)
