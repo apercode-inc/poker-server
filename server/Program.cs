@@ -4,7 +4,6 @@ using Scellecs.Morpeh;
 using server;
 using server.Code;
 using server.Code.GlobalUtils;
-using server.Code.GlobalUtils.CustomCollections;
 using server.Code.Injection;
 
 //Injection
@@ -28,9 +27,6 @@ var frameRateTimer = 0f;
 var framesPerSecond = 0;
 
 Time.Initialize();
-
-//TODO test
-//MovingMarkersDictionaryTest.TestRun();
 
 while (true)
 {

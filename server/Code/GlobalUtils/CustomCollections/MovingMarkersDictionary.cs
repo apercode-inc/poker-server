@@ -23,6 +23,11 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
 
     public bool Add(int index, T value)
     {
+        if (index < 0 || index >= _data.Length)
+        {
+            throw new IndexOutOfRangeException($"index = {index}");
+        }
+        
         if (_data[index].Value != null)
         {
             return false;
@@ -33,7 +38,14 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
 
         return true;
     }
-    
+
+    public bool Remove(T value)
+    {
+        var index = IndexOf(value);
+        
+        return Remove(index, out var removeValue);
+    }
+
     public bool Remove(int index, out MarkedItem<T, TM> value)
     {
         if (_data[index].Value == null)
@@ -151,11 +163,24 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return false;
     }
 
-    public bool Contains(int key)
+    public bool ContainsKey(int key)
     {
         foreach (var markedItem in this)
         {
             if (markedItem.Key == key)
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public bool ContainsValue(T value)
+    {
+        foreach (var markedItem in this)
+        {
+            if (markedItem.Value != null && markedItem.Value.Equals(value))
             {
                 return true;
             }
@@ -196,6 +221,23 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+    
+    private int IndexOf(T value)
+    {
+        var findIndex = -1;
+        
+        for (var index = 0; index < _data.Length; index++)
+        {
+            var findValue = _data[index].Value;
+            
+            if (findValue != null && findValue.Equals(value))
+            {
+                findIndex = index;
+            }
+        }
+
+        return findIndex;
     }
 }
 

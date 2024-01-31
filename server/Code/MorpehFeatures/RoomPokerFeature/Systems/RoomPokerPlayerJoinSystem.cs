@@ -62,7 +62,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
                 continue;
             }
 
-            if (roomPokerPlayers.Players.ContainsKey(joinPlayerEntity))
+            if (roomPokerPlayers.Players.ContainsValue(joinPlayerEntity))
             {
                 continue;
             }
@@ -73,7 +73,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
 
             for (byte index = 0; index < roomPokerStats.MaxPlayers; index++)
             {
-                if (!roomPokerPlayers.Players.ContainsValue(index))
+                if (!roomPokerPlayers.Players.ContainsKey(index))
                 {
                     freeSeats.Add(index);
                 }
@@ -82,7 +82,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
             var randomIndex = _random.Next(0, freeSeats.length);
             var seatIndex = freeSeats.data[randomIndex];
             
-            roomPokerPlayers.Players.Add(joinPlayerEntity, seatIndex);
+            roomPokerPlayers.Players.Add(seatIndex, joinPlayerEntity);
             
             ref var playerId = ref _playerId.Get(joinPlayerEntity);
             ref var playerNickname = ref _playerNickname.Get(joinPlayerEntity);
@@ -96,8 +96,8 @@ public class RoomPokerPlayerJoinSystem : ISystem
 
             foreach (var pair in roomPokerPlayers.Players)
             {
-                var otherPlayer = pair.Key;
-                var otherSeat = pair.Value;
+                var otherSeat = pair.Key;
+                var otherPlayer = pair.Value;
 
                 ref var otherPlayerNickname = ref _playerNickname.Get(otherPlayer);
                 ref var otherPlayerId = ref _playerId.Get(otherPlayer);
@@ -122,7 +122,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
                 {
                     Id = otherPlayerId.Id,
                     Nickname = otherPlayerNickname.Value,
-                    Seat = otherSeat,
+                    Seat = (byte) otherSeat,
                 });
             }
             

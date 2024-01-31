@@ -1,9 +1,11 @@
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
+using server.Code.GlobalUtils.CustomCollections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -56,12 +58,15 @@ public class RoomPokerStorageSystem : IInitializer
             SmallBet = smallBet,
             BigBet = bigBet,
         });
+
+        var players = new MovingMarkersDictionary<Entity, PokerPlayerMarkerType>(maxPlayers)
+        {
+            { seat, createdPlayer }
+        };
+
         _roomPokerPlayers.Set(newEntity, new RoomPokerPlayers
         {
-            Players = new Dictionary<Entity, byte>()
-            {
-                [createdPlayer] = seat,
-            }
+            Players = players,
         });
 
         _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker

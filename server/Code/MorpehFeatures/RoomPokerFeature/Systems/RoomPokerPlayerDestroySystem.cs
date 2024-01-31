@@ -53,7 +53,7 @@ public class RoomPokerPlayerDestroySystem : ILateSystem
             {
                 foreach (var player in roomPokerPlayers.Players)
                 {
-                    _playerRoomRemoteLeftSend.Set(player.Key, new PlayerRoomRemoteLeftSend
+                    _playerRoomRemoteLeftSend.Set(player.Value, new PlayerRoomRemoteLeftSend
                     {
                         RoomId = roomId,
                         PlayerId = playerId.Id,

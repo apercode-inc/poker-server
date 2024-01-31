@@ -1,8 +1,10 @@
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils.CustomCollections;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 public struct RoomPokerPlayers : IComponent
 {
-    public Dictionary<Entity, byte> Players; //key - player entity, value - seat
+    public MovingMarkersDictionary<Entity, PokerPlayerMarkerType> Players;
 }

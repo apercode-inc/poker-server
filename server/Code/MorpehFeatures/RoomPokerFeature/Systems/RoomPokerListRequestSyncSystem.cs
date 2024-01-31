@@ -57,11 +57,11 @@ public class RoomPokerListRequestSyncSystem : IInitializer
             
             foreach (var playerEntity in roomPokerPlayers.Players)
             {
-                ref var playerNickname = ref _playerNickname.Get(playerEntity.Key);
+                ref var playerNickname = ref _playerNickname.Get(playerEntity.Value);
                 playersInRoom.Add(new RoomPlayerNetworkModel
                 {
                     Nickname = playerNickname.Value,
-                    Seat = playerEntity.Value,
+                    Seat = (byte) playerEntity.Key,
                 });
             }
             

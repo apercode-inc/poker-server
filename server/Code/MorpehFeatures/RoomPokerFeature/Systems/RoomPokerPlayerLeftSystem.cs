@@ -48,7 +48,7 @@ public class RoomPokerPlayerLeftSystem : ISystem
 
             foreach (var pair in roomPokerPlayers.Players)
             {
-                var player = pair.Key;
+                var player = pair.Value;
                 
                 _playerRoomRemoteLeftSend.Set(player, new PlayerRoomRemoteLeftSend
                 {
