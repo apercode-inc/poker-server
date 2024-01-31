@@ -1,4 +1,5 @@
 using Scellecs.Morpeh;
+using Scellecs.Morpeh.Collections;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -21,12 +22,15 @@ public class RoomPokerPlayerJoinSystem : ISystem
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerId> _playerId;
 
+    private Random _random;
     private Filter _filter;
     
     public World World { get; set; }
 
     public void OnAwake()
     {
+        _random = new Random();
+        
         _filter = World.Filter
             .With<RoomPokerPlayerJoin>()
             .With<RoomPokerStats>()
@@ -65,14 +69,20 @@ public class RoomPokerPlayerJoinSystem : ISystem
             
             ref var roomPokerId = ref _roomPokerId.Get(entity);
 
-            byte seat = 0;
+            var freeSeats = new FastList<byte>();
 
-            while (roomPokerPlayers.Players.ContainsValue(seat))
+            for (byte index = 0; index < roomPokerStats.MaxPlayers; index++)
             {
-                seat++;
+                if (!roomPokerPlayers.Players.ContainsValue(index))
+                {
+                    freeSeats.Add(index);
+                }
             }
+
+            var randomIndex = _random.Next(0, freeSeats.length);
+            var seatIndex = freeSeats.data[randomIndex];
             
-            roomPokerPlayers.Players.Add(joinPlayerEntity, seat);
+            roomPokerPlayers.Players.Add(joinPlayerEntity, seatIndex);
             
             ref var playerId = ref _playerId.Get(joinPlayerEntity);
             ref var playerNickname = ref _playerNickname.Get(joinPlayerEntity);
@@ -104,7 +114,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
                     {
                         Id = playerId.Id,
                         Nickname = playerNickname.Value,
-                        Seat = seat,
+                        Seat = seatIndex,
                     }
                 });
 
@@ -120,7 +130,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
             {
                 RoomId = roomPokerId.Value,
                 MaxPlayers = roomPokerStats.MaxPlayers,
-                Seat = seat,
+                Seat = seatIndex,
                 RemotePlayers = playersNetworkModels,
             });
         }
