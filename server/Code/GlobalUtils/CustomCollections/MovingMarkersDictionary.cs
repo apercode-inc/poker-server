@@ -42,6 +42,11 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
     public bool Remove(T value)
     {
         var index = IndexOf(value);
+
+        if (index < 0 || index >= _data.Length)
+        {
+            return false;
+        }
         
         return Remove(index, out var removeValue);
     }
