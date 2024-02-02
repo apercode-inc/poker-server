@@ -1,6 +1,6 @@
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils.CustomCollections;
-using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
+using server.Code.MorpehFeatures.PokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Components;
 

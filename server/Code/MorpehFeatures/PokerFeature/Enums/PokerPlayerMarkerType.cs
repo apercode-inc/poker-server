@@ -1,4 +1,4 @@
-namespace server.Code.MorpehFeatures.RoomPokerFeature.Enums;
+namespace server.Code.MorpehFeatures.PokerFeature.Enums;
 
 public enum PokerPlayerMarkerType
 {

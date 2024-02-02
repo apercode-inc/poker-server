@@ -187,7 +187,9 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return GetEnumerator();
     }
     
-    private bool Remove(int index, IDictionary<TM, T> previousValuesByMarker = null)
+    //todo сейчас при выходе(удалении) игрока макрер хода, будет также сдвинут назад, а по идеи нужно вперёд
+    //Т.е диллера двигать назад, а активность вперёд
+    private bool Remove(int index, IDictionary<TM, T> previousValuesByMarker = null) 
     {
         if (_data[index].Value == null)
         {
