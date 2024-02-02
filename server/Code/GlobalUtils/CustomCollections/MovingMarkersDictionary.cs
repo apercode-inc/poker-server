@@ -11,13 +11,13 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
     public MovingMarkersDictionary(int size)
     {
         var markers = Enum.GetValues(typeof(TM))
-            .Cast<TM>().ToDictionary(enumMember=> enumMember, enumMember => false);
+            .Cast<TM>().ToDictionary(enumMember=> enumMember, enumMember => new MarkerData());
         
         _data = new MarkedItem<T, TM>[size];
 
         for (var index = 0; index < _data.Length; index++)
         {
-            _data[index] = new MarkedItem<T, TM>(index, new Dictionary<TM, bool>(markers));
+            _data[index] = new MarkedItem<T, TM>(index, new Dictionary<TM, MarkerData>(markers));
         }
     }
 
@@ -60,18 +60,18 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         
         foreach (var item in _data)
         {
-            if (item.Markers[marker])
+            if (item.Markers[marker].IsMarked)
             {
                 throw new Exception($"Set multiple markers {marker.GetType()}.{marker.ToString()}");
             }
         }
         
-        _data[index].Markers[marker] = true;
+        _data[index].Markers[marker].IsMarked = true;
     }
 
     public void ResetMarker(int index, TM marker)
     {
-        _data[index].Markers[marker] = false;
+        _data[index].Markers[marker].IsMarked = false;
     }
     
     public bool TryMoveMarker(TM marker, out MarkedItem<T, TM> value)
@@ -84,7 +84,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
                 return false;
             }
 
-            if (!_data[index].Markers[marker])
+            if (!_data[index].Markers[marker].IsMarked)
             {
                 continue;
             }
@@ -102,8 +102,8 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
                 }
     
                 value = _data[nextIndex];
-                _data[index].Markers[marker] = false;
-                _data[nextIndex].Markers[marker] = true;
+                _data[index].Markers[marker].IsMarked = false;
+                _data[nextIndex].Markers[marker].IsMarked = true;
                 return true;
             }
         }
@@ -157,7 +157,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
     {
         foreach (var item in _data)
         {
-            if (!item.Markers[marker])
+            if (!item.Markers[marker].IsMarked)
             {
                 continue;
             }
@@ -198,7 +198,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         
         foreach (var marker in _data[index].Markers)
         {
-            if (!marker.Value)
+            if (!marker.Value.IsMarked)
             {
                 continue;
             }
@@ -216,8 +216,8 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
                     continue;
                 }
                 
-                _data[currentIndex].Markers[marker.Key] = true;
-                _data[index].Markers[marker.Key] = false;
+                _data[currentIndex].Markers[marker.Key].IsMarked = true;
+                _data[index].Markers[marker.Key].IsMarked = false;
                 previousValuesByMarker?.Add(marker.Key, _data[currentIndex].Value);
                 
                 break;
@@ -252,12 +252,26 @@ public struct MarkedItem<T, TM> where TM : Enum
 {
     public T Value { get; internal set; }
     public int Key { get; }
-    public Dictionary<TM, bool> Markers { get; }
+    public Dictionary<TM, MarkerData> Markers { get; }
 
-    public MarkedItem(int key, Dictionary<TM, bool> markers)
+    public MarkedItem(int key, Dictionary<TM, MarkerData> markers)
     {
         Key = key;
         Markers = markers;
+    }
+}
+
+public class MarkerData
+{
+    public bool IsMarked;
+    public bool IsMoveForwardDirection;
+    public bool IsRemoveForwardDirection;
+
+    public MarkerData()
+    {
+        IsMarked = false;
+        IsMoveForwardDirection = true;
+        IsRemoveForwardDirection = true;
     }
 }
 
