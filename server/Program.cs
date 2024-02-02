@@ -30,7 +30,7 @@ var framesPerSecond = 0;
 Time.Initialize();
 
 //todo test
-RandomListTest.RunTest();
+MovingMarkersDictionaryTest.RunTest();
 
 while (true)
 {

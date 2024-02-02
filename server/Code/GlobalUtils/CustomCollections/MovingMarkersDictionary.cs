@@ -5,20 +5,24 @@ namespace server.Code.GlobalUtils.CustomCollections;
 public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> where TM : Enum
 {
     private MarkedItem<T, TM>[] _data;
+    private Dictionary<TM, MarkerSetting> _markerSettings;
 
     public int Count { get; private set; }
 
     public MovingMarkersDictionary(int size)
     {
         var markers = Enum.GetValues(typeof(TM))
-            .Cast<TM>().ToDictionary(enumMember=> enumMember, enumMember => new MarkerData());
+            .Cast<TM>().ToDictionary(enumMember=> enumMember, enumMember => new bool());
         
         _data = new MarkedItem<T, TM>[size];
 
         for (var index = 0; index < _data.Length; index++)
         {
-            _data[index] = new MarkedItem<T, TM>(index, new Dictionary<TM, MarkerData>(markers));
+            _data[index] = new MarkedItem<T, TM>(index, new Dictionary<TM, bool>(markers));
         }
+
+        _markerSettings = Enum.GetValues(typeof(TM)).Cast<TM>()
+            .ToDictionary(enumMember => enumMember, enumMember => new MarkerSetting());
     }
 
     public bool Add(int index, T value)
@@ -39,7 +43,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return true;
     }
 
-    public bool Remove(T value, Dictionary<TM, T> previousMarkerValues = null)
+    public bool Remove(T value, Dictionary<TM, T> movedValuesByMarker = null)
     {
         var index = IndexOf(value);
 
@@ -48,7 +52,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
             return false;
         }
         
-        return Remove(index, previousMarkerValues);
+        return Remove(index, movedValuesByMarker);
     }
 
     public void SetMarker(int index, TM marker)
@@ -60,55 +64,73 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         
         foreach (var item in _data)
         {
-            if (item.Markers[marker].IsMarked)
+            if (item.Markers[marker])
             {
                 throw new Exception($"Set multiple markers {marker.GetType()}.{marker.ToString()}");
             }
         }
         
-        _data[index].Markers[marker].IsMarked = true;
+        _data[index].Markers[marker] = true;
+    }
+
+    public void SetSettingMarker(TM marker, MarkerSettingType settingType, bool value)
+    {
+        switch (settingType)
+        {
+            case MarkerSettingType.MoveForwardDirection:
+                _markerSettings[marker].IsMoveForwardDirection = value;
+                break;
+            case MarkerSettingType.MoveWithRemoveForwardDirection:
+                _markerSettings[marker].IsMoveWithRemoveForwardDirection = value;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(settingType), settingType, null);
+        }
+
+        Console.WriteLine("Call SetSettingMarker: ");
+        foreach (var kek in _markerSettings)
+        {
+            Console.WriteLine($"Type =  {kek.Key} | IsMoveForwardDirection = {kek.Value.IsMoveForwardDirection} | IsMoveWithRemoveForwardDirection = {kek.Value.IsMoveWithRemoveForwardDirection}");
+        }
     }
 
     public void ResetMarker(int index, TM marker)
     {
-        _data[index].Markers[marker].IsMarked = false;
+        _data[index].Markers[marker] = false;
     }
     
-    public bool TryMoveMarker(TM marker, out MarkedItem<T, TM> value)
+    public bool TryMoveMarker(TM marker, out MarkedItem<T, TM> newMarkedValue)
     {
         for (var index = 0; index < _data.Length; index++)
         {
             if (Count < 2)
             {
-                value = default;
+                newMarkedValue = default;
                 return false;
             }
 
-            if (!_data[index].Markers[marker].IsMarked)
+            if (!_data[index].Markers[marker])
             {
                 continue;
             }
 
-            var iterationCount = 0;
-            
-            for (var i = index + 1; iterationCount < _data.Length; i++)
+            if (_markerSettings[marker].IsMoveForwardDirection)
             {
-                var nextIndex = i % _data.Length;
-                iterationCount++;
-
-                if (_data[nextIndex].Value == null)
+                if (MoveMarkerForward(marker, out newMarkedValue, index))
                 {
-                    continue;
-                }
-    
-                value = _data[nextIndex];
-                _data[index].Markers[marker].IsMarked = false;
-                _data[nextIndex].Markers[marker].IsMarked = true;
-                return true;
+                    return true;
+                } 
+            }
+            else
+            {
+                if (MoveMarkerBackward(marker, out newMarkedValue, index))
+                {
+                    return true;
+                } 
             }
         }
 
-        value = default;
+        newMarkedValue = default;
         return false;
     }
 
@@ -157,7 +179,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
     {
         foreach (var item in _data)
         {
-            if (!item.Markers[marker].IsMarked)
+            if (!item.Markers[marker])
             {
                 continue;
             }
@@ -187,9 +209,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return GetEnumerator();
     }
     
-    //todo сейчас при выходе(удалении) игрока макрер хода, будет также сдвинут назад, а по идеи нужно вперёд
-    //Т.е диллера двигать назад, а активность вперёд
-    private bool Remove(int index, IDictionary<TM, T> previousValuesByMarker = null) 
+    private bool Remove(int index, IDictionary<TM, T> movedValuesByMarker = null)
     {
         if (_data[index].Value == null)
         {
@@ -198,29 +218,28 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         
         foreach (var marker in _data[index].Markers)
         {
-            if (!marker.Value.IsMarked)
+            if (!marker.Value)
             {
                 continue;
             }
- 
-            var iterationIndex = 0;
-            var currentIndex = index;
 
-            while (iterationIndex < _data.Length)
+            MarkedItem<T, TM> newMarkedItem;
+            
+            if (_markerSettings[marker.Key].IsMoveWithRemoveForwardDirection)
             {
-                currentIndex = (currentIndex - 1 + _data.Length) % _data.Length;
-                iterationIndex++;
-
-                if (_data[currentIndex].Value == null)
+                Console.WriteLine("call MoveMarkerForward");
+                if (MoveMarkerForward(marker.Key, out newMarkedItem, index) && movedValuesByMarker != null)
                 {
-                    continue;
+                    movedValuesByMarker.Add(marker.Key, newMarkedItem.Value);
                 }
-                
-                _data[currentIndex].Markers[marker.Key].IsMarked = true;
-                _data[index].Markers[marker.Key].IsMarked = false;
-                previousValuesByMarker?.Add(marker.Key, _data[currentIndex].Value);
-                
-                break;
+            }
+            else
+            {
+                Console.WriteLine("call MoveMarkerBackward");
+                if (MoveMarkerBackward(marker.Key, out newMarkedItem, index) && movedValuesByMarker != null)
+                {
+                    movedValuesByMarker.Add(marker.Key, newMarkedItem.Value);
+                }
             }
         }
         
@@ -228,6 +247,56 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         Count--;
         
         return true;
+    }
+
+    private bool MoveMarkerBackward(TM marker, out MarkedItem<T, TM> newMarkedItem, int index)
+    {
+        var iterationIndex = 0;
+        var currentIndex = index;
+
+        while (iterationIndex < _data.Length)
+        {
+            currentIndex = (currentIndex - 1 + _data.Length) % _data.Length;
+            iterationIndex++;
+
+            if (_data[currentIndex].Value == null)
+            {
+                continue;
+            }
+
+            newMarkedItem = _data[currentIndex];
+            _data[currentIndex].Markers[marker] = true;
+            _data[index].Markers[marker] = false;
+
+            return true;
+        }
+
+        newMarkedItem = default;
+        return false;
+    }
+
+    private bool MoveMarkerForward(TM marker, out MarkedItem<T, TM> newMarkedItem, int index)
+    {
+        var iterationCount = 0;
+
+        for (var i = index + 1; iterationCount < _data.Length; i++)
+        {
+            var nextIndex = i % _data.Length;
+            iterationCount++;
+
+            if (_data[nextIndex].Value == null)
+            {
+                continue;
+            }
+
+            newMarkedItem = _data[nextIndex];
+            _data[index].Markers[marker] = false;
+            _data[nextIndex].Markers[marker] = true;
+            return true;
+        }
+
+        newMarkedItem = default;
+        return false;
     }
     
     private int IndexOf(T value)
@@ -246,32 +315,36 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
 
         return findIndex;
     }
+    
+    private class MarkerSetting
+    {
+        public bool IsMoveForwardDirection;
+        public bool IsMoveWithRemoveForwardDirection;
+
+        public MarkerSetting()
+        {
+            IsMoveForwardDirection = true;
+            IsMoveWithRemoveForwardDirection = true;
+        }
+    }
+}
+
+public enum MarkerSettingType : byte
+{
+    MoveForwardDirection = 0,
+    MoveWithRemoveForwardDirection = 1,
 }
 
 public struct MarkedItem<T, TM> where TM : Enum
 {
     public T Value { get; internal set; }
     public int Key { get; }
-    public Dictionary<TM, MarkerData> Markers { get; }
+    public Dictionary<TM, bool> Markers { get; }
 
-    public MarkedItem(int key, Dictionary<TM, MarkerData> markers)
+    public MarkedItem(int key, Dictionary<TM, bool> markers)
     {
         Key = key;
         Markers = markers;
-    }
-}
-
-public class MarkerData
-{
-    public bool IsMarked;
-    public bool IsMoveForwardDirection;
-    public bool IsRemoveForwardDirection;
-
-    public MarkerData()
-    {
-        IsMarked = false;
-        IsMoveForwardDirection = true;
-        IsRemoveForwardDirection = true;
     }
 }
 
