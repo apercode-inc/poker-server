@@ -2,6 +2,7 @@ using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -15,7 +16,7 @@ public class RoomPokerPlayerLeftSystem : ISystem
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerId> _playerId;
 
-    [Injectable] private RoomPokerStorageSystem _roomPokerStorage;
+    [Injectable] private RoomPokerStorage _roomPokerStorage;
 
     private Filter _filter;
     
@@ -40,13 +41,13 @@ public class RoomPokerPlayerLeftSystem : ISystem
 
             var playerLeft = roomPokerPlayerLeft.Player;
 
-            roomPokerPlayers.Players.Remove(playerLeft);
+            roomPokerPlayers.MarkedPlayersBySeat.Remove(playerLeft);
             
             ref var playerId = ref _playerId.Get(playerLeft);
 
             _playerRoomPoker.Remove(playerLeft);
 
-            foreach (var pair in roomPokerPlayers.Players)
+            foreach (var pair in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var player = pair.Value;
                 
@@ -59,7 +60,7 @@ public class RoomPokerPlayerLeftSystem : ISystem
 
             _roomPokerPlayerLeft.Remove(entity);
 
-            if (roomPokerPlayers.Players.Count != 0)
+            if (roomPokerPlayers.MarkedPlayersBySeat.Count != 0)
             {
                 continue;
             }

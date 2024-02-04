@@ -1,7 +1,7 @@
 using NetFrame;
 using NetFrame.WriteAndRead;
 
-namespace chess_server.Code.MorpehFeature.PlayersFeature.Dataframes;
+namespace server.Code.MorpehFeatures.PlayersFeature.Dataframes;
 
 public struct PlayerSetNicknameDataframe : INetworkDataframe
 {

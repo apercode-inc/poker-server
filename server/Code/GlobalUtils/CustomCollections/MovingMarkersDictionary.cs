@@ -55,9 +55,11 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return Remove(index, movedValuesByMarker);
     }
 
-    public void SetMarker(int index, TM marker)
+    public void SetMarker(T value, TM marker)
     {
-        if (_data[index].Value == null)
+        var index = IndexOf(value);
+        
+        if (index < 0)
         {
             throw new NullReferenceException($"no value with index = {index} ");
         }
@@ -86,17 +88,20 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
             default:
                 throw new ArgumentOutOfRangeException(nameof(settingType), settingType, null);
         }
-
-        Console.WriteLine("Call SetSettingMarker: ");
-        foreach (var kek in _markerSettings)
-        {
-            Console.WriteLine($"Type =  {kek.Key} | IsMoveForwardDirection = {kek.Value.IsMoveForwardDirection} | IsMoveWithRemoveForwardDirection = {kek.Value.IsMoveWithRemoveForwardDirection}");
-        }
     }
 
-    public void ResetMarker(int index, TM marker)
+    public void ResetMarker(TM marker)
     {
-        _data[index].Markers[marker] = false;
+        foreach (var item in _data)
+        {
+            if (!item.Markers[marker])
+            {
+                continue;
+            }
+            
+            item.Markers[marker] = false;
+            break;
+        }
     }
     
     public bool TryMoveMarker(TM marker, out MarkedItem<T, TM> newMarkedValue)
@@ -227,7 +232,6 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
             
             if (_markerSettings[marker.Key].IsMoveWithRemoveForwardDirection)
             {
-                Console.WriteLine("call MoveMarkerForward");
                 if (MoveMarkerForward(marker.Key, out newMarkedItem, index) && movedValuesByMarker != null)
                 {
                     movedValuesByMarker.Add(marker.Key, newMarkedItem.Value);
@@ -235,7 +239,6 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
             }
             else
             {
-                Console.WriteLine("call MoveMarkerBackward");
                 if (MoveMarkerBackward(marker.Key, out newMarkedItem, index) && movedValuesByMarker != null)
                 {
                     movedValuesByMarker.Add(marker.Key, newMarkedItem.Value);

@@ -1,5 +1,7 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
+using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 using server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature;
@@ -10,7 +12,8 @@ public static class RoomPokerFeature
     {
         var systemsGroup = world.CreateSystemsGroup();
         
-        systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerStorageSystem>());
+        systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerSeatsFactory>());
+        systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerStorage>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }

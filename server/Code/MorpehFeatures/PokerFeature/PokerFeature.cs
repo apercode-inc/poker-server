@@ -1,6 +1,7 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.PokerFeature.Services;
+using server.Code.MorpehFeatures.PokerFeature.Factories;
+using server.Code.MorpehFeatures.PokerFeature.Systems;
 
 namespace server.Code.MorpehFeatures.PokerFeature;
 
@@ -10,7 +11,7 @@ public static class PokerFeature
     {
         var systemsGroup = world.CreateSystemsGroup();
         
-        systemsGroup.AddInitializer(container.NewAndRegister<PokerCardDeskService>());
+        systemsGroup.AddInitializer(container.NewAndRegister<PokerCardDeskFactory>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }
@@ -18,6 +19,10 @@ public static class PokerFeature
     public static void Add(World world, ref int index, SimpleDImple container)
     {
         var systemsGroup = world.CreateSystemsGroup();
+
+        systemsGroup.AddSystem(container.New<PokerCheckStartSystem>());
+        systemsGroup.AddSystem(container.New<PokerStartTimerSystem>());
+        systemsGroup.AddSystem(container.New<PokerStartSystem>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }

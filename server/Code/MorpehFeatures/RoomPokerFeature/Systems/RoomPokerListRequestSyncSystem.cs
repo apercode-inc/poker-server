@@ -5,6 +5,7 @@ using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
+using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -18,7 +19,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
     
     [Injectable] private NetFrameServer _server;
 
-    [Injectable] private RoomPokerStorageSystem _roomPokerStorage;
+    [Injectable] private RoomPokerStorage _roomPokerStorage;
 
     private Filter _filter;
     
@@ -55,7 +56,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
 
             var playersInRoom = new List<RoomPlayerNetworkModel>();
             
-            foreach (var playerEntity in roomPokerPlayers.Players)
+            foreach (var playerEntity in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 ref var playerNickname = ref _playerNickname.Get(playerEntity.Value);
                 playersInRoom.Add(new RoomPlayerNetworkModel
@@ -68,7 +69,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
             responseDataframe.Rooms.Add(new RoomNetworkModel
             {
                 Id = roomPokerId.Value,
-                CurrentPlayers = (byte) roomPokerPlayers.Players.Count,
+                CurrentPlayers = (byte) roomPokerPlayers.MarkedPlayersBySeat.Count,
                 MaxPlayers = roomPokerStats.MaxPlayers,
                 SmallBet = roomPokerStats.SmallBet,
                 BigBet = roomPokerStats.BigBet,

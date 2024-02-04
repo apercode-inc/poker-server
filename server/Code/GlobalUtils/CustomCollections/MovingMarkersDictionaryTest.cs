@@ -4,17 +4,23 @@ namespace server.Code.GlobalUtils.CustomCollections;
 
 public static class MovingMarkersDictionaryTest
 {
-    private static Dictionary<PokerPlayerMarkerType, string> _movedPlayersByMarker = new();
+    private static Dictionary<PokerPlayerMarkerType, PlayerEntity> _movedPlayersByMarker = new();
     
     public static void RunTest()
     {
-        var playersBySeat = new MovingMarkersDictionary<string, PokerPlayerMarkerType>(5)
+        var sexPlayer = new PlayerEntity("Sex");
+        var kesPlayer = new PlayerEntity("Kes");
+        var betPlayer = new PlayerEntity("Rim");
+        var megPlayer = new PlayerEntity("Meg");
+        var popPlayer = new PlayerEntity("Pop");
+        
+        var playersBySeat = new MovingMarkersDictionary<PlayerEntity, PokerPlayerMarkerType>(5)
         {
-            { 0, "Sex" },
-            { 1, "Kes" },
-            { 2, "Bet" },
-            { 3, "Meg" },
-            { 4, "POP" }
+            { 0, sexPlayer },
+            { 1, kesPlayer },
+            { 2, betPlayer },
+            { 3, megPlayer },
+            { 4, popPlayer },
         };
         
         playersBySeat.SetSettingMarker(PokerPlayerMarkerType.DealerPlayer, MarkerSettingType.MoveWithRemoveForwardDirection, false);
@@ -22,49 +28,68 @@ public static class MovingMarkersDictionaryTest
         playersBySeat.SetSettingMarker(PokerPlayerMarkerType.DealerPlayer, MarkerSettingType.MoveForwardDirection, true);
         playersBySeat.SetSettingMarker(PokerPlayerMarkerType.ActivePlayer, MarkerSettingType.MoveForwardDirection, true);
         
-        playersBySeat.SetMarker(3, PokerPlayerMarkerType.DealerPlayer);
-        playersBySeat.SetMarker(3, PokerPlayerMarkerType.ActivePlayer);
+        playersBySeat.SetMarker(megPlayer, PokerPlayerMarkerType.DealerPlayer);
+        playersBySeat.SetMarker(megPlayer, PokerPlayerMarkerType.ActivePlayer);
         
-        foreach (var playerBySeat in playersBySeat)
-        {
-            Debug.LogColor($"seat: {playerBySeat.Key} | player: {playerBySeat.Value} | isDealer: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.DealerPlayer])} | isActive: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.ActivePlayer])}", ConsoleColor.Green);
-        }
+        ShowAllPlayers(playersBySeat);
 
         //playersBySeat.TryMoveMarker(PokerPlayerMarkerType.DealerPlayer, out var newDealerPlayerByType);
         _movedPlayersByMarker.Clear();
-        var removePlayer = "Meg";
+        var removePlayer = megPlayer;
         if (playersBySeat.Remove(removePlayer, _movedPlayersByMarker))
         {
+            Debug.LogColor($"remove player: {removePlayer.Nickname}", ConsoleColor.Magenta);
             foreach (var playerNewMarked in _movedPlayersByMarker)
             {
-                Debug.LogColor($"remove player: {removePlayer} | next marked player: {playerNewMarked.Value} | marker: {playerNewMarked.Key}" , ConsoleColor.Magenta);
+                Debug.LogColor($"next marked {playerNewMarked.Key}: {playerNewMarked.Value.Nickname}" , ConsoleColor.Magenta);
             }
         }
         
-        foreach (var playerBySeat in playersBySeat)
-        {
-            Debug.LogColor($"seat: {playerBySeat.Key} | player: {playerBySeat.Value} | isDealer: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.DealerPlayer])} | isActive: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.ActivePlayer])}", ConsoleColor.Green);
-        }
+        ShowAllPlayers(playersBySeat);
 
         var moveMarker = PokerPlayerMarkerType.ActivePlayer;
         if (playersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out var nextMarkedPlayer))
         {
-            Debug.LogColor($"next marked player: {nextMarkedPlayer.Value} | marker: {moveMarker}" , ConsoleColor.Magenta);
+            Debug.LogColor($"Move Marker {moveMarker}, next marked player: {nextMarkedPlayer.Value.Nickname}" , ConsoleColor.Magenta);
         }
         
-        foreach (var playerBySeat in playersBySeat)
-        {
-            Debug.LogColor($"seat: {playerBySeat.Key} | player: {playerBySeat.Value} | isDealer: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.DealerPlayer])} | isActive: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.ActivePlayer])}", ConsoleColor.Green);
-        }
+        ShowAllPlayers(playersBySeat);
 
+        var resetMarker = PokerPlayerMarkerType.ActivePlayer;
+        playersBySeat.ResetMarker(PokerPlayerMarkerType.ActivePlayer);
+        
+        Debug.LogColor($"Reset marked {resetMarker}", ConsoleColor.Magenta);
+        
+        ShowAllPlayers(playersBySeat);
+        
         Console.WriteLine(new string('-', 40));
         Console.WriteLine(new string('-', 40));
         Console.WriteLine(new string('-', 40));
         Console.WriteLine(new string('-', 40));
     }
 
+    private static void ShowAllPlayers(MovingMarkersDictionary<PlayerEntity, PokerPlayerMarkerType> playersBySeat)
+    {
+        foreach (var playerBySeat in playersBySeat)
+        {
+            Debug.LogColor(
+                $"seat: {playerBySeat.Key} | player: {playerBySeat.Value.Nickname} | isDealer: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.DealerPlayer])} | isActive: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.ActivePlayer])}",
+                ConsoleColor.Green);
+        }
+    }
+
     private static string GetFormat(bool value)
     {
         return value ? "X" : "O";
+    }
+}
+
+public class PlayerEntity
+{
+    public readonly string Nickname;
+    
+    public PlayerEntity(string nickname)
+    {
+        Nickname = nickname;
     }
 }

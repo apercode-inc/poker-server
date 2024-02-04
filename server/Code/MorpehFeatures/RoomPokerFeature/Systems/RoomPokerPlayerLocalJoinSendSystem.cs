@@ -2,6 +2,7 @@ using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.PokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -37,9 +38,19 @@ public class RoomPokerPlayerLocalJoinSendSystem : ISystem
                 Seat = playerRoomLocalJoinSend.Seat,
                 RemotePlayers = playerRoomLocalJoinSend.RemotePlayers,
             };
-            
             _server.Send(ref dataframe, entity);
+            
+            var startGameWaitTime = playerRoomLocalJoinSend.WaitTime;
 
+            if (startGameWaitTime > 0)
+            {
+                var timerDataframe = new PokerStartGameSetTimerDataframe
+                {
+                    WaitTime = startGameWaitTime,
+                };
+                _server.Send(ref timerDataframe, entity);
+            }
+            
             _playerRoomLocalJoinSend.Remove(entity);
         }
     }

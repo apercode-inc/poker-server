@@ -3,9 +3,9 @@ using server.Code.GlobalUtils.CustomCollections;
 using server.Code.MorpehFeatures.PokerFeature.Enums;
 using server.Code.MorpehFeatures.PokerFeature.Models;
 
-namespace server.Code.MorpehFeatures.PokerFeature.Services;
+namespace server.Code.MorpehFeatures.PokerFeature.Factories;
 
-public class PokerCardDeskService : IInitializer
+public class PokerCardDeskFactory : IInitializer
 {
     public World World { get; set; }
 
@@ -73,7 +73,7 @@ public class PokerCardDeskService : IInitializer
         };
     }
 
-    public RandomList<CardModel> GetNewCardDeskPokerStandard()
+    public RandomList<CardModel> CreateCardDeskPokerStandard()
     {
         var newCardDesk = new RandomList<CardModel>(52);
 

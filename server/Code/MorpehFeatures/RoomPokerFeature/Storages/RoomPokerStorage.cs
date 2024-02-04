@@ -6,10 +6,11 @@ using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 
-namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
+namespace server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
-public class RoomPokerStorageSystem : IInitializer
+public class RoomPokerStorage : IInitializer
 {
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
     [Injectable] private Stash<RoomPokerStats> _roomPokerData;
@@ -18,6 +19,8 @@ public class RoomPokerStorageSystem : IInitializer
 
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerRoomCreateSend> _playerRoomCreateSend;
+
+    [Injectable] private RoomPokerSeatsFactory _pokerSeatsFactory;
     
     private Dictionary<int, Entity> _rooms;
     private int _idCounter;
@@ -58,15 +61,13 @@ public class RoomPokerStorageSystem : IInitializer
             SmallBet = smallBet,
             BigBet = bigBet,
         });
-
-        var players = new MovingMarkersDictionary<Entity, PokerPlayerMarkerType>(maxPlayers)
-        {
-            { seat, createdPlayer }
-        };
+        
+        var markedPlayersBySeat = _pokerSeatsFactory
+            .Create(maxPlayers, seat, createdPlayer);
 
         _roomPokerPlayers.Set(newEntity, new RoomPokerPlayers
         {
-            Players = players,
+            MarkedPlayersBySeat = markedPlayersBySeat
         });
 
         _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker

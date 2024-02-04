@@ -3,6 +3,7 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -15,7 +16,7 @@ public class RoomPokerPlayerDestroySystem : ILateSystem
 
     [Injectable] private Stash<PlayerRoomRemoteLeftSend> _playerRoomRemoteLeftSend;
 
-    [Injectable] private RoomPokerStorageSystem _roomPokerStorage;
+    [Injectable] private RoomPokerStorage _roomPokerStorage;
 
     private Filter _filter;
 
@@ -47,11 +48,11 @@ public class RoomPokerPlayerDestroySystem : ILateSystem
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            var isRemoved = roomPokerPlayers.Players.Remove(playerEntity);
+            var isRemoved = roomPokerPlayers.MarkedPlayersBySeat.Remove(playerEntity);
 
             if (isRemoved)
             {
-                foreach (var player in roomPokerPlayers.Players)
+                foreach (var player in roomPokerPlayers.MarkedPlayersBySeat)
                 {
                     _playerRoomRemoteLeftSend.Set(player.Value, new PlayerRoomRemoteLeftSend
                     {
@@ -61,7 +62,7 @@ public class RoomPokerPlayerDestroySystem : ILateSystem
                 }
             }
 
-            if (roomPokerPlayers.Players.Count != 0)
+            if (roomPokerPlayers.MarkedPlayersBySeat.Count != 0)
             {
                 continue;
             }

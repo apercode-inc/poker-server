@@ -4,6 +4,7 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
+using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -14,7 +15,7 @@ public class RoomPokerLeftRequestSyncSystem : IInitializer
     [Injectable] private NetFrameServer _server;
 
     [Injectable] private PlayerStorageSystem _playerStorage;
-    [Injectable] private RoomPokerStorageSystem _roomPokerStorage;
+    [Injectable] private RoomPokerStorage _roomPokerStorage;
     
     public World World { get; set; }
 

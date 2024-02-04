@@ -21,6 +21,7 @@ public static class PlayersFeature
         var systemsGroup = world.CreateSystemsGroup();
 
         systemsGroup.AddInitializer(container.New<PlayerNicknameSyncSystem>());
+        systemsGroup.AddSystem(container.New<PlayerDbModelRequestSystem>());
         //systemsGroup.AddSystem(container.New<PlayerNicknameShowTestSystem>());
 
         world.AddSystemsGroup(index++, systemsGroup);

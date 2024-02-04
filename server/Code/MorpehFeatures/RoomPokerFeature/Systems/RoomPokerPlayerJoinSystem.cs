@@ -3,6 +3,7 @@ using Scellecs.Morpeh.Collections;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.PokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 
@@ -14,6 +15,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayerJoin> _roomPokerPlayerJoin;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<PokerStartTimer> _pokerStartTimer;
     
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerRoomRemoteJoinSend> _playerRoomRemoteJoinSend;
@@ -40,15 +42,15 @@ public class RoomPokerPlayerJoinSystem : ISystem
 
     public void OnUpdate(float deltaTime)
     {
-        foreach (var entity in _filter)
+        foreach (var roomEntity in _filter)
         {
-            ref var roomPokerStats = ref _roomPokerStats.Get(entity);
-            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(entity);
-            ref var roomPokerPlayerJoin = ref _roomPokerPlayerJoin.Get(entity);
+            ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
+            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+            ref var roomPokerPlayerJoin = ref _roomPokerPlayerJoin.Get(roomEntity);
             
             var joinPlayerEntity = roomPokerPlayerJoin.Player;
             
-            _roomPokerPlayerJoin.Remove(entity);
+            _roomPokerPlayerJoin.Remove(roomEntity);
 
             if (_playerRoomPoker.Has(joinPlayerEntity))
             {
@@ -56,24 +58,24 @@ public class RoomPokerPlayerJoinSystem : ISystem
                 continue;
             }
 
-            if (roomPokerStats.MaxPlayers == roomPokerPlayers.Players.Count)
+            if (roomPokerStats.MaxPlayers == roomPokerPlayers.MarkedPlayersBySeat.Count)
             {
                 Debug.LogError($"[RoomPokerPlayerJoinSystem.OnUpdate] trying to enter a crowded room");
                 continue;
             }
 
-            if (roomPokerPlayers.Players.ContainsValue(joinPlayerEntity))
+            if (roomPokerPlayers.MarkedPlayersBySeat.ContainsValue(joinPlayerEntity))
             {
                 continue;
             }
             
-            ref var roomPokerId = ref _roomPokerId.Get(entity);
+            ref var roomPokerId = ref _roomPokerId.Get(roomEntity);
 
             var freeSeats = new FastList<byte>();
 
             for (byte index = 0; index < roomPokerStats.MaxPlayers; index++)
             {
-                if (!roomPokerPlayers.Players.ContainsKey(index))
+                if (!roomPokerPlayers.MarkedPlayersBySeat.ContainsKey(index))
                 {
                     freeSeats.Add(index);
                 }
@@ -82,7 +84,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
             var randomIndex = _random.Next(0, freeSeats.length);
             var seatIndex = freeSeats.data[randomIndex];
             
-            roomPokerPlayers.Players.Add(seatIndex, joinPlayerEntity);
+            roomPokerPlayers.MarkedPlayersBySeat.Add(seatIndex, joinPlayerEntity);
             
             ref var playerId = ref _playerId.Get(joinPlayerEntity);
             ref var playerNickname = ref _playerNickname.Get(joinPlayerEntity);
@@ -94,10 +96,10 @@ public class RoomPokerPlayerJoinSystem : ISystem
 
             var playersNetworkModels = new List<RoomPlayerNetworkModel>();
 
-            foreach (var pair in roomPokerPlayers.Players)
+            foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {
-                var otherSeat = pair.Key;
-                var otherPlayer = pair.Value;
+                var otherSeat = playerBySeat.Key;
+                var otherPlayer = playerBySeat.Value;
 
                 ref var otherPlayerNickname = ref _playerNickname.Get(otherPlayer);
                 ref var otherPlayerId = ref _playerId.Get(otherPlayer);
@@ -125,6 +127,8 @@ public class RoomPokerPlayerJoinSystem : ISystem
                     Seat = (byte) otherSeat,
                 });
             }
+
+            ref var pokerStartTimer = ref _pokerStartTimer.Get(roomEntity, out var timerExist);
             
             _playerRoomLocalJoinSend.Set(joinPlayerEntity, new PlayerRoomLocalJoinSend
             {
@@ -132,6 +136,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
                 MaxPlayers = roomPokerStats.MaxPlayers,
                 Seat = seatIndex,
                 RemotePlayers = playersNetworkModels,
+                WaitTime = timerExist ? (int)(pokerStartTimer.TargetTime - pokerStartTimer.Timer) : 0,
             });
         }
     }

@@ -9,6 +9,7 @@ public class PlayerStorageSystem : IInitializer
 {
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<Destroy> _destroy;
+    [Injectable] private Stash<PlayerDbModelRequest> _playerDbModelRequest;
 
     private Filter _filter;
 
@@ -32,9 +33,10 @@ public class PlayerStorageSystem : IInitializer
         {
             Id = id,
         });
+        _playerDbModelRequest.Set(newEntity);
         _players.Add(id, newEntity);
-        
-        //Подгрузка из бд и навешивание PlayerAuthData
+
+        //Подгрузка из бд и навешивание PlayerAuthData и PlayerBalance, отправка баланса на клиент
     }
 
     public void Remove(int id)
