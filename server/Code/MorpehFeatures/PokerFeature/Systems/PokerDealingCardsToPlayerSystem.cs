@@ -86,7 +86,7 @@ public class PokerDealingCardsToPlayerSystem : ISystem
 
                 var dataframe = new PokerDealingCardsDataframe
                 {
-                    Cards = _networkCardsModel,
+                    CardsForLocal = _networkCardsModel,
                 };
                 _server.Send(ref dataframe, playerEntity);
             }

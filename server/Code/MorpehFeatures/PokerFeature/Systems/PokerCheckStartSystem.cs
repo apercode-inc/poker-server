@@ -8,7 +8,7 @@ namespace server.Code.MorpehFeatures.PokerFeature.Systems;
 
 public class PokerCheckStartSystem : ISystem
 {
-    private const float WAIT_TIME = 15.0f;
+    private const float WAIT_TIME = 5.0f;
     
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<PokerStartTimer> _pokerStartTimer;

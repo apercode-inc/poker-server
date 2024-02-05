@@ -6,15 +6,15 @@ namespace server.Code.MorpehFeatures.PokerFeature.Dataframes;
 
 public struct PokerDealingCardsDataframe : INetworkDataframe
 {
-    public List<PokerCardNetworkModel> Cards;
+    public List<PokerCardNetworkModel> CardsForLocal;
 
     public void Write(NetFrameWriter writer)
     {
-        writer.WriteInt(Cards?.Count ?? 0);
+        writer.WriteInt(CardsForLocal?.Count ?? 0);
 
-        if (Cards != null)
+        if (CardsForLocal != null)
         {
-            foreach (var user in Cards)
+            foreach (var user in CardsForLocal)
             {
                 writer.Write(user);
             }
@@ -27,10 +27,10 @@ public struct PokerDealingCardsDataframe : INetworkDataframe
 
         if (count > 0)
         {
-            Cards = new List<PokerCardNetworkModel>();
+            CardsForLocal = new List<PokerCardNetworkModel>();
             for (var i = 0; i < count; i++)
             {
-                Cards.Add(reader.Read<PokerCardNetworkModel>());
+                CardsForLocal.Add(reader.Read<PokerCardNetworkModel>());
             }
         }
     }

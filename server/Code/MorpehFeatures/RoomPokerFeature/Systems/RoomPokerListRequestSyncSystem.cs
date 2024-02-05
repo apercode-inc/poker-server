@@ -17,7 +17,8 @@ public class RoomPokerListRequestSyncSystem : IInitializer
 
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
-    
+    [Injectable] private Stash<PlayerCards> _playerCards;
+
     [Injectable] private NetFrameServer _server;
 
     [Injectable] private RoomPokerStorage _roomPokerStorage;
@@ -65,6 +66,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
                     Nickname = playerNickname.Value,
                     Seat = (byte) playerBySeat.Key,
                     IsDealer = _playerDealer.Has(playerBySeat.Value),
+                    IsCards = _playerCards.Has(playerBySeat.Value),
                 });
             }
             
