@@ -1,19 +1,19 @@
 using NetFrame;
 using NetFrame.WriteAndRead;
 
-namespace server.Code.MorpehFeatures.PokerFeature.Dataframes;
+namespace server.Code.MorpehFeatures.PokerFeature.Dataframes.StartTimer;
 
 public struct PokerStartGameSetTimerDataframe : INetworkDataframe
 {
-    public int WaitTime;
+    public float WaitTime;
     
     public void Write(NetFrameWriter writer)
     {
-        writer.WriteInt(WaitTime);
+        writer.WriteFloat(WaitTime);
     }
 
     public void Read(NetFrameReader reader)
     {
-        WaitTime = reader.ReadInt();
+        WaitTime = reader.ReadFloat();
     }
 }

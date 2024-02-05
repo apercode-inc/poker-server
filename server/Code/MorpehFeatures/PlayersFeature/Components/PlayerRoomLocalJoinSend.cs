@@ -9,5 +9,4 @@ public struct PlayerRoomLocalJoinSend : IComponent
     public byte MaxPlayers;
     public byte Seat;
     public List<RoomPlayerNetworkModel> RemotePlayers;
-    public int WaitTime;
 }

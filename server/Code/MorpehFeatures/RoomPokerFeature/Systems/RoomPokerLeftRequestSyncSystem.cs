@@ -14,7 +14,7 @@ public class RoomPokerLeftRequestSyncSystem : IInitializer
     
     [Injectable] private NetFrameServer _server;
 
-    [Injectable] private PlayerStorageSystem _playerStorage;
+    [Injectable] private PlayerStorage _playerStorage;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
     
     public World World { get; set; }

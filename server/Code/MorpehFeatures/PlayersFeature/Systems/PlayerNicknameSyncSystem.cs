@@ -11,7 +11,7 @@ public class PlayerNicknameSyncSystem : IInitializer
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     
     [Injectable] private NetFrameServer _server;
-    [Injectable] private PlayerStorageSystem _playerStorage;
+    [Injectable] private PlayerStorage _playerStorage;
     
     public World World { get; set; }
 

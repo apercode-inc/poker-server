@@ -3,6 +3,7 @@ using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PokerFeature.Components;
 using server.Code.MorpehFeatures.PokerFeature.Dataframes;
+using server.Code.MorpehFeatures.PokerFeature.Dataframes.StartTimer;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 namespace server.Code.MorpehFeatures.PokerFeature.Systems;
@@ -11,7 +12,7 @@ public class PokerStartTimerSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<PokerStartTimer> _pokerStartTimer;
-    [Injectable] private Stash<PokerStart> _pokerStart;
+    [Injectable] private Stash<PokerInitialize> _pokerInitialize;
 
     [Injectable] private NetFrameServer _server;
     
@@ -27,8 +28,7 @@ public class PokerStartTimerSystem : ISystem
             .With<PokerStartTimer>()
             .Build();
     }
-
-    //todo когда какой то игрок присоединяется к компанате, то смотреть PokerStartTimer и если 
+    
     public void OnUpdate(float deltaTime)
     {
         foreach (var roomEntity in _filter)
@@ -38,6 +38,9 @@ public class PokerStartTimerSystem : ISystem
             if (roomPokerPlayers.MarkedPlayersBySeat.Count < 2)
             {
                 _pokerStartTimer.Remove(roomEntity);
+                
+                var dataframe = new PokerStopGameResetTimerDataframe();
+                _server.SendInRoom(ref dataframe, roomEntity);
             }
             
             ref var pokerStartTimer = ref _pokerStartTimer.Get(roomEntity);
@@ -45,7 +48,7 @@ public class PokerStartTimerSystem : ISystem
 
             if (pokerStartTimer.Timer >= pokerStartTimer.TargetTime)
             {
-                _pokerStart.Set(roomEntity);
+                _pokerInitialize.Set(roomEntity);
                 _pokerStartTimer.Remove(roomEntity);
 
                 var dataframe = new PokerStartGameResetTimerDataframe();

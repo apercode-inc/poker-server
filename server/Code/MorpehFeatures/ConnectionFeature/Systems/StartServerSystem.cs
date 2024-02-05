@@ -11,7 +11,7 @@ namespace server.Code.MorpehFeatures.ConnectionFeature.Systems;
 public class StartServerSystem : ISystem
 {
     [Injectable] private NetFrameServer _server;
-    [Injectable] private PlayerStorageSystem _playerStorage;
+    [Injectable] private PlayerStorage _playerStorage;
 
     private const int MaxPlayers = 10;
     private const int Port = 8080;

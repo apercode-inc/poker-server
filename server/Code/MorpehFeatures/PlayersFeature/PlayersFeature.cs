@@ -1,7 +1,6 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
-using server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
 namespace server.Code.MorpehFeatures.PlayersFeature;
 
@@ -11,7 +10,7 @@ public static class PlayersFeature
     {
         var systemsGroup = world.CreateSystemsGroup();
 
-        systemsGroup.AddInitializer(container.NewAndRegister<PlayerStorageSystem>());
+        systemsGroup.AddInitializer(container.NewAndRegister<PlayerStorage>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }

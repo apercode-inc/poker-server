@@ -1,7 +1,7 @@
 using NetFrame;
 using NetFrame.WriteAndRead;
 
-namespace server.Code.MorpehFeatures.PokerFeature.Dataframes;
+namespace server.Code.MorpehFeatures.PokerFeature.Dataframes.StartTimer;
 
 public struct PokerStartGameResetTimerDataframe : INetworkDataframe
 {

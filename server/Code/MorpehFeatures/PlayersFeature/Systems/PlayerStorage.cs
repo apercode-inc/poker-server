@@ -5,7 +5,7 @@ using server.Code.MorpehFeatures.PlayersFeature.Components;
 
 namespace server.Code.MorpehFeatures.PlayersFeature.Systems;
 
-public class PlayerStorageSystem : IInitializer
+public class PlayerStorage : IInitializer
 {
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<Destroy> _destroy;

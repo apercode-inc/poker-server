@@ -19,10 +19,14 @@ public static class PokerFeature
     public static void Add(World world, ref int index, SimpleDImple container)
     {
         var systemsGroup = world.CreateSystemsGroup();
+        
+        systemsGroup.AddInitializer(container.New<PokerStartTimerSetSyncSystem>());
 
         systemsGroup.AddSystem(container.New<PokerCheckStartSystem>());
         systemsGroup.AddSystem(container.New<PokerStartTimerSystem>());
-        systemsGroup.AddSystem(container.New<PokerStartSystem>());
+        systemsGroup.AddSystem(container.New<PokerInitializeSystem>());
+
+        systemsGroup.AddSystem(container.New<PokerCheckStopGameSystem>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }

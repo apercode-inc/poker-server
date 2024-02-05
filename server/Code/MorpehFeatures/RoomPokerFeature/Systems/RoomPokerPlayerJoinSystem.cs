@@ -15,7 +15,6 @@ public class RoomPokerPlayerJoinSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayerJoin> _roomPokerPlayerJoin;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    [Injectable] private Stash<PokerStartTimer> _pokerStartTimer;
     
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerRoomRemoteJoinSend> _playerRoomRemoteJoinSend;
@@ -128,15 +127,12 @@ public class RoomPokerPlayerJoinSystem : ISystem
                 });
             }
 
-            ref var pokerStartTimer = ref _pokerStartTimer.Get(roomEntity, out var timerExist);
-            
             _playerRoomLocalJoinSend.Set(joinPlayerEntity, new PlayerRoomLocalJoinSend
             {
                 RoomId = roomPokerId.Value,
                 MaxPlayers = roomPokerStats.MaxPlayers,
                 Seat = seatIndex,
                 RemotePlayers = playersNetworkModels,
-                WaitTime = timerExist ? (int)(pokerStartTimer.TargetTime - pokerStartTimer.Timer) : 0,
             });
         }
     }
