@@ -180,6 +180,29 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return false;
     }
 
+    public bool TryGetFirst(out MarkedItem<T, TM> value)
+    {
+        if (Count == 0)
+        {
+            value = default;
+            return false;
+        }
+        
+        foreach (var item in this)
+        {
+            if (item.Value == null)
+            {
+                continue;
+            }
+
+            value = item;
+            return true;
+        }
+        
+        value = default;
+        return false;
+    }
+
     public bool TryGetValueByMarked(TM marker, out MarkedItem<T, TM> value)
     {
         foreach (var item in _data)

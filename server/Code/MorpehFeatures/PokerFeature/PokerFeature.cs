@@ -25,6 +25,8 @@ public static class PokerFeature
         systemsGroup.AddSystem(container.New<PokerCheckStartSystem>());
         systemsGroup.AddSystem(container.New<PokerStartTimerSystem>());
         systemsGroup.AddSystem(container.New<PokerInitializeSystem>());
+        systemsGroup.AddSystem(container.New<PokerDealingCardsToPlayerSystem>());
+        systemsGroup.AddSystem(container.New<PokerDealingCardsTimerSystem>());
 
         systemsGroup.AddSystem(container.New<PokerCheckStopGameSystem>());
         

@@ -16,6 +16,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private Stash<PlayerNickname> _playerNickname;
+    [Injectable] private Stash<PlayerDealer> _playerDealer;
     
     [Injectable] private NetFrameServer _server;
 
@@ -56,13 +57,14 @@ public class RoomPokerListRequestSyncSystem : IInitializer
 
             var playersInRoom = new List<RoomPlayerNetworkModel>();
             
-            foreach (var playerEntity in roomPokerPlayers.MarkedPlayersBySeat)
+            foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {
-                ref var playerNickname = ref _playerNickname.Get(playerEntity.Value);
+                ref var playerNickname = ref _playerNickname.Get(playerBySeat.Value);
                 playersInRoom.Add(new RoomPlayerNetworkModel
                 {
                     Nickname = playerNickname.Value,
-                    Seat = (byte) playerEntity.Key,
+                    Seat = (byte) playerBySeat.Key,
+                    IsDealer = _playerDealer.Has(playerBySeat.Value),
                 });
             }
             

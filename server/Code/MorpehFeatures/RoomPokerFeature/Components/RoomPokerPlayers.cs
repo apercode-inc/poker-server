@@ -6,5 +6,5 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 public struct RoomPokerPlayers : IComponent
 {
-    public MovingMarkersDictionary<Entity, PokerPlayerMarkerType> MarkedPlayersBySeat;
+    public MovingMarkersDictionary<Entity, PokerPlayerMarkerType> MarkedPlayersBySeat; //Key - seat, Value - player
 }
