@@ -1,5 +1,5 @@
 using Scellecs.Morpeh;
-using server.Code.MorpehFeatures.PokerFeature.Models;
+using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 
 namespace server.Code.MorpehFeatures.PlayersFeature.Components;
 

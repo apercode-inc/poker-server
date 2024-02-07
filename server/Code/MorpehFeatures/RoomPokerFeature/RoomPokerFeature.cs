@@ -14,6 +14,7 @@ public static class RoomPokerFeature
         var systemsGroup = world.CreateSystemsGroup();
         
         systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerSeatsFactory>());
+        systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerCardDeskFactory>());
         systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerStorage>());
         systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerService>());
         
@@ -28,6 +29,7 @@ public static class RoomPokerFeature
         systemsGroup.AddInitializer(container.New<RoomPokerJoinRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerLeftRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerListRequestSyncSystem>());
+        systemsGroup.AddInitializer(container.New<RoomPokerStartTimerSetSyncSystem>());
 
         //systemsGroup.AddSystem(container.New<RoomPokerShowTestSystem>()); //todo test
 
@@ -38,6 +40,17 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerPlayerCreateSendSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerLocalJoinSendSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerRemoteJoinSendSystem>());
+        
+        //poker game logic
+        systemsGroup.AddSystem(container.New<RoomPokerGameCheckStartSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerGameStartTimerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerGameInitializeSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerDealingCardsToPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerDealingCardsTimerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerSetBlindsSystem>());
+
+        systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
+        
         
         world.AddSystemsGroup(index++, systemsGroup);
     }

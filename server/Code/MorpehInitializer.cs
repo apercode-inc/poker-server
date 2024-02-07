@@ -1,10 +1,11 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature;
+using server.Code.MorpehFeatures.ConfigsFeature;
 using server.Code.MorpehFeatures.ConnectionFeature;
 using server.Code.MorpehFeatures.PlayersFeature;
-using server.Code.MorpehFeatures.PokerFeature;
 using server.Code.MorpehFeatures.RoomPokerFeature;
+using server.Code.MorpehFeatures.CurrencyFeature;
 
 namespace server.Code;
 
@@ -17,15 +18,17 @@ public static class MorpehInitializer
         container.AddResolver(type => world.GetReflectionStash(type.GenericTypeArguments[0]), typeof(Stash));
             
         //Storages
+        ConfigsFeature.AddStorage(world, ref groupIndex, container);
         PlayersFeature.AddStorage(world, ref groupIndex, container);
         RoomPokerFeature.AddStorage(world, ref groupIndex, container);
-        PokerFeature.AddStorage(world, ref groupIndex, container);
+        CurrencyFeature.AddStorage(world, ref groupIndex, container);
             
         //Systems
+        ConfigsFeature.Add(world, ref groupIndex, container);
         ConnectionFeature.Add(world, ref groupIndex, container);
         PlayersFeature.Add(world, ref groupIndex, container);
+        CurrencyFeature.Add(world, ref groupIndex, container);
         RoomPokerFeature.Add(world, ref groupIndex, container);
-        PokerFeature.Add(world, ref groupIndex, container);
 
         //Cleanup
         CleanupDestroyFeature.Add(world, ref groupIndex, container);

@@ -1,4 +1,4 @@
-using server.Code.MorpehFeatures.PokerFeature.Enums;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.GlobalUtils.CustomCollections;
 

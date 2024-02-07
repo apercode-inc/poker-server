@@ -103,6 +103,17 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
             break;
         }
     }
+
+    public void ResetAllMarkers()
+    {
+        foreach (var item in _data)
+        {
+            foreach (var markerType in item.Markers.Keys)
+            {
+                item.Markers[markerType] = false;
+            }
+        }
+    }
     
     public bool TryMoveMarker(TM marker, out MarkedItem<T, TM> newMarkedValue)
     {
