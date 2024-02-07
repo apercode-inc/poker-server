@@ -11,6 +11,7 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
     public byte Seat;
     public bool IsDealer;
     public bool IsCards;
+    public ulong Balance;
      
     public void Write(NetFrameWriter writer)
     {
@@ -19,6 +20,7 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
         writer.WriteByte(Seat);
         writer.WriteBool(IsDealer);
         writer.WriteBool(IsCards);
+        writer.WriteULong(Balance);
     }
 
     public void Read(NetFrameReader reader)
@@ -28,5 +30,6 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
         Seat = reader.ReadByte();
         IsDealer = reader.ReadBool();
         IsCards = reader.ReadBool();
+        Balance = reader.ReadULong();
     }
 }

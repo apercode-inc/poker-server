@@ -1,9 +1,7 @@
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
-using server.Code.MorpehFeatures.PokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 
@@ -20,6 +18,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
     [Injectable] private Stash<PlayerRoomRemoteJoinSend> _playerRoomRemoteJoinSend;
     [Injectable] private Stash<PlayerRoomLocalJoinSend> _playerRoomLocalJoinSend;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
+    [Injectable] private Stash<PlayerCards> _playerCards;
 
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerId> _playerId;
@@ -54,13 +53,11 @@ public class RoomPokerPlayerJoinSystem : ISystem
 
             if (_playerRoomPoker.Has(joinPlayerEntity))
             {
-                Debug.LogError($"[RoomPokerPlayerJoinSystem.OnUpdate] the player is already in the room");
                 continue;
             }
 
             if (roomPokerStats.MaxPlayers == roomPokerPlayers.MarkedPlayersBySeat.Count)
             {
-                Debug.LogError($"[RoomPokerPlayerJoinSystem.OnUpdate] trying to enter a crowded room");
                 continue;
             }
 
@@ -117,7 +114,8 @@ public class RoomPokerPlayerJoinSystem : ISystem
                         Id = playerId.Id,
                         Nickname = playerNickname.Value,
                         Seat = seatIndex,
-                        IsDealer = _playerDealer.Has(playerBySeat.Value),
+                        IsDealer = _playerDealer.Has(joinPlayerEntity),
+                        IsCards = _playerCards.Has(joinPlayerEntity),
                     }
                 });
 
@@ -126,7 +124,8 @@ public class RoomPokerPlayerJoinSystem : ISystem
                     Id = otherPlayerId.Id,
                     Nickname = otherPlayerNickname.Value,
                     Seat = (byte) otherSeat,
-                    IsDealer = _playerDealer.Has(playerBySeat.Value),
+                    IsDealer = _playerDealer.Has(otherPlayer),
+                    IsCards = _playerCards.Has(otherPlayer),
                 });
             }
 

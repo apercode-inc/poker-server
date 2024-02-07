@@ -65,8 +65,6 @@ public class RoomPokerListRequestSyncSystem : IInitializer
                 {
                     Nickname = playerNickname.Value,
                     Seat = (byte) playerBySeat.Key,
-                    IsDealer = _playerDealer.Has(playerBySeat.Value),
-                    IsCards = _playerCards.Has(playerBySeat.Value),
                 });
             }
             
