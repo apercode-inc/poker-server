@@ -1,11 +1,15 @@
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils.CustomCollections;
+using server.Code.Injection;
+using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 
 public class RoomPokerSeatsFactory : IInitializer
 {
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
+    
     public World World { get; set; }
 
     public void OnAwake()
@@ -18,6 +22,11 @@ public class RoomPokerSeatsFactory : IInitializer
         {
             {seat, player},
         };
+        
+        _playerSeat.Set(player, new PlayerSeat
+        {
+            SeatIndex = (byte) seat,
+        });
 
         markedPlayersBySeat.SetSettingMarker(PokerPlayerMarkerType.DealerPlayer, MarkerSettingType.MoveWithRemoveForwardDirection, false);
         markedPlayersBySeat.SetSettingMarker(PokerPlayerMarkerType.ActivePlayer, MarkerSettingType.MoveWithRemoveForwardDirection, true);

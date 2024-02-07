@@ -17,6 +17,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerRoomRemoteJoinSend> _playerRoomRemoteJoinSend;
     [Injectable] private Stash<PlayerRoomLocalJoinSend> _playerRoomLocalJoinSend;
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
     [Injectable] private Stash<PlayerCards> _playerCards;
 
@@ -82,6 +83,10 @@ public class RoomPokerPlayerJoinSystem : ISystem
             var seatIndex = freeSeats.data[randomIndex];
             
             roomPokerPlayers.MarkedPlayersBySeat.Add(seatIndex, joinPlayerEntity);
+            _playerSeat.Set(joinPlayerEntity, new PlayerSeat
+            {
+                SeatIndex = seatIndex,
+            });
             
             ref var playerId = ref _playerId.Get(joinPlayerEntity);
             ref var playerNickname = ref _playerNickname.Get(joinPlayerEntity);

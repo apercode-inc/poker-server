@@ -1,6 +1,7 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
+using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 using server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -14,6 +15,7 @@ public static class RoomPokerFeature
         
         systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerSeatsFactory>());
         systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerStorage>());
+        systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerService>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }
@@ -36,8 +38,6 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerPlayerCreateSendSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerLocalJoinSendSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerRemoteJoinSendSystem>());
-
-        systemsGroup.AddSystem(container.New<RoomPokerPlayerRemoteLeftSendSystem>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }
