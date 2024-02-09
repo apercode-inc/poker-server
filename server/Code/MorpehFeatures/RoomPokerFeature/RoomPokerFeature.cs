@@ -25,6 +25,7 @@ public static class RoomPokerFeature
     {
         var systemsGroup = world.CreateSystemsGroup();
         
+        systemsGroup.AddInitializer(container.New<RoomPokerSettingRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerCreateRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerJoinRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerLeftRequestSyncSystem>());

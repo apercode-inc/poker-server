@@ -1,8 +1,5 @@
 using Newtonsoft.Json;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
-using server.Code.MorpehFeatures.ConfigsFeature.Constants;
-using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 
 namespace server.Code.MorpehFeatures.ConfigsFeature.Services;
 
@@ -14,12 +11,7 @@ public class ConfigsService : IInitializer
 
     public void OnAwake()
     {
-        Debug.LogError(GetProjectPath());
-
         _projectPath = GetProjectPath();
-        
-        var config = GetConfig<RoomPokerTimers>(ConfigsPath.PokerGameTimers);
-        Debug.LogColor($"StartGameTime = {config.StartGameTime} | PlayerTurnTime = {config.PlayerTurnTime}", ConsoleColor.Green);
     }
 
     public T GetConfig<T>(string configPath) where T : class
