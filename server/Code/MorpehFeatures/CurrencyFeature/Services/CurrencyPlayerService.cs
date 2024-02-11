@@ -23,13 +23,13 @@ public class CurrencyPlayerService : IInitializer
     {
         ref var playerCurrency = ref _playerCurrency.Get(player);
 
-        if (playerCurrency.BalanceByType[type] < cost)
+        if (playerCurrency.CurrencyByType[type] < cost)
         {
             return false;
         }
-        playerCurrency.BalanceByType[type] -= cost;
+        playerCurrency.CurrencyByType[type] -= cost;
         
-        Send(player, type, playerCurrency.BalanceByType[type]);
+        Send(player, type, playerCurrency.CurrencyByType[type]);
         
         return true;
     }
@@ -37,9 +37,9 @@ public class CurrencyPlayerService : IInitializer
     public void Give(Entity player, CurrencyType type, ulong cost)
     {
         ref var playerCurrency = ref _playerCurrency.Get(player);
-        playerCurrency.BalanceByType[type] += cost;
+        playerCurrency.CurrencyByType[type] += cost;
 
-        Send(player, type, playerCurrency.BalanceByType[type]);
+        Send(player, type, playerCurrency.CurrencyByType[type]);
     }
 
     private void Send(Entity player, CurrencyType type, ulong value)

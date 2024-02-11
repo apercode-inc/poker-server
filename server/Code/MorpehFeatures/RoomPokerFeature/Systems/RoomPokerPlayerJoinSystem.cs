@@ -1,5 +1,6 @@
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -20,6 +21,7 @@ public class RoomPokerPlayerJoinSystem : ISystem
     [Injectable] private Stash<PlayerSeat> _playerSeat;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
     [Injectable] private Stash<PlayerCards> _playerCards;
+    [Injectable] private Stash<PlayerCurrency> _playerCurrency;
 
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerId> _playerId;
@@ -64,6 +66,20 @@ public class RoomPokerPlayerJoinSystem : ISystem
 
             if (roomPokerPlayers.MarkedPlayersBySeat.ContainsValue(joinPlayerEntity))
             {
+                continue;
+            }
+
+            ref var playerCurrency = ref _playerCurrency.Get(joinPlayerEntity, out var currencyExist);
+
+            if (!currencyExist)
+            {
+                continue;
+            }
+
+            if (playerCurrency.CurrencyByType[roomPokerStats.CurrencyType] < roomPokerStats.Contribution)
+            {
+                //todo
+                Debug.LogError("отправить игроку нотиф о том что он не может присоединится из за того что ему не хватает на взнос");
                 continue;
             }
             

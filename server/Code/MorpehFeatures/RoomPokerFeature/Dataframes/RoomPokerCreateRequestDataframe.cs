@@ -1,25 +1,29 @@
 using NetFrame;
 using NetFrame.WriteAndRead;
+using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
 public struct RoomPokerCreateRequestDataframe : INetworkDataframe
 {
     public byte MaxPlayers;
-    public ulong SmallBet;
+    public CurrencyType CurrencyType;
+    public ulong Contribution;
     public ulong BigBet;
 
     public void Write(NetFrameWriter writer)
     {
         writer.WriteByte(MaxPlayers);
-        writer.WriteULong(SmallBet);
+        writer.WriteInt((int) CurrencyType);
+        writer.WriteULong(Contribution);
         writer.WriteULong(BigBet);
     }
 
     public void Read(NetFrameReader reader)
     {
         MaxPlayers = reader.ReadByte();
-        SmallBet = reader.ReadULong();
+        CurrencyType = (CurrencyType) reader.ReadInt();
+        Contribution = reader.ReadULong();
         BigBet = reader.ReadULong();
     }
 }

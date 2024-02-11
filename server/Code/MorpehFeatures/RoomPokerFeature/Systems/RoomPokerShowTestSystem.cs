@@ -32,7 +32,7 @@ public class RoomPokerShowTestSystem : ISystem
             ref var roomPokerStats = ref _roomPokerStats.Get(entity);
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(entity);
             
-            Debug.LogColor($"roomId: {roomPokerId.Value} maxPlayers: {roomPokerStats.MaxPlayers} smallBet: {roomPokerStats.SmallBet} bigBet: {roomPokerStats.BigBet} playerCount: {roomPokerPlayers.MarkedPlayersBySeat.Count}", ConsoleColor.Magenta);
+            Debug.LogColor($"roomId: {roomPokerId.Value} maxPlayers: {roomPokerStats.MaxPlayers} smallBet: {roomPokerStats.BigBet / 2} bigBet: {roomPokerStats.BigBet} playerCount: {roomPokerPlayers.MarkedPlayersBySeat.Count}", ConsoleColor.Magenta);
         }
     }
 

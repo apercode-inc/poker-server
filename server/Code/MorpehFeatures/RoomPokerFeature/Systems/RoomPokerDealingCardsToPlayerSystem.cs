@@ -1,8 +1,11 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.ConfigsFeature.Constants;
+using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
@@ -12,9 +15,6 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerDealingCardsToPlayerSystem : ISystem
 {
     private const int HOLDEM_CARD_COUNT = 2;
-    private const float DEALING_DELAY = 3;
-    private const ulong SMALL_BLIND = 100;
-    private const ulong BIG_BLIND = 200;
     
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
@@ -25,6 +25,7 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
     [Injectable] private Stash<PlayerCards> _playerCards;
 
     [Injectable] private NetFrameServer _server;
+    [Injectable] private ConfigsService _configsService;
 
     private Filter _filter;
 
@@ -93,15 +94,13 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
                 _server.Send(ref dataframe, playerEntity);
             }
 
-            _roomPokerSetBlinds.Set(roomEntity, new RoomPokerSetBlinds
-            {
-                Small = SMALL_BLIND,
-                Big = BIG_BLIND,
-            });
+            _roomPokerSetBlinds.Set(roomEntity, new RoomPokerSetBlinds());
+
+            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPoker);
             
             _pokerDealingTimer.Set(roomEntity,new RoomPokerDealingTimer
             {
-                Timer = DEALING_DELAY,
+                Timer = config.DealingCardsTime,
             });
             _roomPokerDealingCardsToPlayer.Remove(roomEntity);
         }

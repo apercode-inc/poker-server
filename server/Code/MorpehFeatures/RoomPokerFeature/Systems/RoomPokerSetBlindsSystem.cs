@@ -14,6 +14,7 @@ public class RoomPokerSetBlindsSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerSetBlinds> _roomPokerSetBlinds;
+    [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
 
     [Injectable] private Stash<PlayerId> _playerId;
 
@@ -28,6 +29,7 @@ public class RoomPokerSetBlindsSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
+            .With<RoomPokerStats>()
             .With<RoomPokerPlayers>()
             .With<RoomPokerSetBlinds>()
             .Build();
@@ -40,10 +42,10 @@ public class RoomPokerSetBlindsSystem : ISystem
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             var markedPlayers = roomPokerPlayers.MarkedPlayersBySeat;
             var playersCount = roomPokerPlayers.MarkedPlayersBySeat.Count;
-
-            ref var roomPokerSetBlinds = ref _roomPokerSetBlinds.Get(roomEntity);
-            var small = roomPokerSetBlinds.Small;
-            var big = roomPokerSetBlinds.Big;
+            
+            ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
+            var small = roomPokerStats.BigBet / 2;
+            var big = roomPokerStats.BigBet;
 
             if (markedPlayers.TryGetValueByMarked(PokerPlayerMarkerType.ActivePlayer, out var nextPlayerByMarked))
             {
@@ -52,14 +54,14 @@ public class RoomPokerSetBlindsSystem : ISystem
                     var smallBlindPlayer = nextPlayerByMarked.Value;
                     
                     _currencyPlayerService.TryTake(smallBlindPlayer, CurrencyType.Chips, small);
-                    _roomPokerService.SendBetInRoom(roomEntity, smallBlindPlayer, small); //todo на клиенте не обработано
+                    _roomPokerService.SendBetInRoom(roomEntity, smallBlindPlayer, small);
                     
                     markedPlayers.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out nextPlayerByMarked);
 
                     var bigBlindPlayer = nextPlayerByMarked.Value;
                     
                     _currencyPlayerService.TryTake(bigBlindPlayer, CurrencyType.Chips, big);
-                    _roomPokerService.SendBetInRoom(roomEntity, bigBlindPlayer, big); //todo на клиенте не обработано
+                    _roomPokerService.SendBetInRoom(roomEntity, bigBlindPlayer, big);
                     
                     markedPlayers.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out nextPlayerByMarked);
                     

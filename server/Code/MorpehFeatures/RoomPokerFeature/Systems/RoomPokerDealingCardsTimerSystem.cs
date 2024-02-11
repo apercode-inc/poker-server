@@ -1,4 +1,5 @@
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
@@ -30,6 +31,7 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
             if (pokerDealingTimer.Timer <= 0)
             {
                 //TODO раздача окончена игрок начинает ходить...
+                Debug.LogError("раздача окончена игрок начинает ходить...");
 
                 _pokerDealingTimer.Remove(roomEntity);
             }

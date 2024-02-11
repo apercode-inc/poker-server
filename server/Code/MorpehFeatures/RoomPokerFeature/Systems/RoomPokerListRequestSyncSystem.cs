@@ -73,7 +73,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
                 Id = roomPokerId.Value,
                 CurrentPlayers = (byte) roomPokerPlayers.MarkedPlayersBySeat.Count,
                 MaxPlayers = roomPokerStats.MaxPlayers,
-                SmallBet = roomPokerStats.SmallBet,
+                SmallBet = roomPokerStats.BigBet / 2,
                 BigBet = roomPokerStats.BigBet,
                 Players = playersInRoom,
             });

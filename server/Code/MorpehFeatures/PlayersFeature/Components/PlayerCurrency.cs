@@ -5,5 +5,5 @@ namespace server.Code.MorpehFeatures.PlayersFeature.Components;
 
 public struct PlayerCurrency : IComponent
 {
-    public Dictionary<CurrencyType, ulong> BalanceByType;
+    public Dictionary<CurrencyType, ulong> CurrencyByType;
 }

@@ -15,7 +15,7 @@ public class RoomPokerGameInitializeSystem : ISystem
     [Injectable] private Stash<RoomPokerActive> _pokerActive;
     [Injectable] private Stash<RoomPokerCardDesk> _pokerCardDesk;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _pokerDealingCardsToPlayer;
+    [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
 
     [Injectable] private Stash<PlayerDealer> _playerDealer;
     [Injectable] private Stash<PlayerCards> _playerCards;
@@ -58,10 +58,16 @@ public class RoomPokerGameInitializeSystem : ISystem
             foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var playerEntity = playerBySeat.Value;
+                var playerSeat = playerBySeat.Key;
 
                 if (count == 0)
                 {
                     roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.DealerPlayer);
+                    var dataframe = new RoomPokerSetDealerDataframe
+                    {
+                        PlayerSeat = playerSeat,
+                    };
+                    _server.SendInRoom(ref dataframe, roomEntity);
                 }
                 else if (count == 1)
                 {
@@ -72,7 +78,7 @@ public class RoomPokerGameInitializeSystem : ISystem
                 count++;
             }
             
-            _pokerDealingCardsToPlayer.Set(roomEntity);
+            _roomPokerDealingCardsToPlayer.Set(roomEntity);
 
             _pokerInitialize.Remove(roomEntity);
         }

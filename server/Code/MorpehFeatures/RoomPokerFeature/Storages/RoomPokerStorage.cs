@@ -3,6 +3,7 @@ using server.Code.GlobalUtils;
 using server.Code.GlobalUtils.CustomCollections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
+using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
@@ -39,7 +40,7 @@ public class RoomPokerStorage : IInitializer
             .Build();
     }
 
-    public void Add(Entity createdPlayer, byte maxPlayers, ulong smallBet, ulong bigBet)
+    public void Add(Entity createdPlayer, byte maxPlayers, CurrencyType currencyType, ulong contribution, ulong bigBet)
     {
         if (_playerRoomPoker.Has(createdPlayer))
         {
@@ -57,7 +58,8 @@ public class RoomPokerStorage : IInitializer
         _roomPokerData.Set(newEntity, new RoomPokerStats
         {
             MaxPlayers = maxPlayers,
-            SmallBet = smallBet,
+            CurrencyType = currencyType,
+            Contribution = contribution,
             BigBet = bigBet,
         });
         

@@ -46,7 +46,7 @@ public class PlayerDbModelRequestSystem : ISystem
             
             _playerCurrency.Set(entity, new PlayerCurrency
             {
-                BalanceByType = currencyByType,
+                CurrencyByType = currencyByType,
             });
 
             var dataframe = new CurrencyInitDataframe

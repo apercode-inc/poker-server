@@ -1,18 +1,20 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.ConfigsFeature.Constants;
+using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
 public class RoomPokerGameCheckStartSystem : ISystem
 {
-    private const float WAIT_TIME = 15.0f;
-    
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerGameStartTimer> _roomPokerGameStartTimer;
 
     [Injectable] private NetFrameServer _server;
+    [Injectable] private ConfigsService _configsService;
     
     public World World { get; set; }
 
@@ -39,10 +41,12 @@ public class RoomPokerGameCheckStartSystem : ISystem
                 continue;
             }
 
+            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPoker);
+
             _roomPokerGameStartTimer.Set(roomEntity, new RoomPokerGameStartTimer
             {
                 Timer = 0,
-                TargetTime = WAIT_TIME,
+                TargetTime = config.StartGameTime,
             });
         }
     }

@@ -1,6 +1,7 @@
 {
   "start_game_time": 15,
   "player_turn_time": 20,
+  "dealing_cards_time": 3,
   "player_turn_fast_time": 10,
   "seat_counts": [10], 
   "bets": [
