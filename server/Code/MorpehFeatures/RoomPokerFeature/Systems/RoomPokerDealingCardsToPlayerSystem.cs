@@ -24,6 +24,7 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
     [Injectable] private Stash<RoomPokerSetBlinds> _roomPokerSetBlinds;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
+    [Injectable] private Stash<PlayerId> _playerId;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private ConfigsService _configsService;
@@ -60,6 +61,8 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
             {
                 var playerEntity = playerBySeat.Value;
 
+                ref var playerId = ref _playerId.Get(playerEntity);
+
                 _networkCardsModel.Clear();
                 _cardModels.Clear();
 
@@ -89,11 +92,20 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
                     Cards = cardsModel,
                 });
 
-                var dataframe = new RoomPokerDealingCardsDataframe
+                var dataframe = new RoomPokerSetCardsByPlayerDataframe
                 {
-                    CardsForLocal = _networkCardsModel,
+                    PlayerId = playerId.Id,
+                    CardsState = CardsState.Close,
+                    Cards = _networkCardsModel,
                 };
-                _server.Send(ref dataframe, playerEntity);
+                _server.Send(ref dataframe, playerId.Id);
+                
+                var dataframeOtherPlayers = new RoomPokerSetCardsByPlayerDataframe
+                {
+                    PlayerId = playerId.Id,
+                    CardsState = CardsState.Close,
+                };
+                _server.SendInRoomExcept(ref dataframeOtherPlayers, roomEntity, playerEntity);
             }
 
             _roomPokerSetBlinds.Set(roomEntity, new RoomPokerSetBlinds());
