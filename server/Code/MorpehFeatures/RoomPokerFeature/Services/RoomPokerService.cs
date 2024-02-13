@@ -5,6 +5,7 @@ using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
+using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Services;
@@ -24,6 +25,7 @@ public class RoomPokerService : IInitializer
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
+    [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
 
     public World World { get; set; }
 
@@ -48,7 +50,7 @@ public class RoomPokerService : IInitializer
         _markersByPlayer.Clear();
         var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);
 
-        ReturnCardInDesk(roomEntity, playerLeft);
+        _roomPokerCardDeskService.ReturnCardInDesk(roomEntity, playerLeft);
 
         if (isRemove)
         {
@@ -92,22 +94,6 @@ public class RoomPokerService : IInitializer
         }
 
         _roomPokerStorage.Remove(roomPokerId.Value);
-    }
-
-    private void ReturnCardInDesk(Entity roomEntity, Entity playerLeft)
-    {
-        ref var playerCards = ref _playerCards.Get(playerLeft, out var cardExist);
-
-        if (cardExist)
-        {
-            ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
-
-            while (playerCards.Cards.Count > 0)
-            {
-                var card = playerCards.Cards.Dequeue();
-                roomPokerCardDesk.CardDesk.Add(card);
-            }
-        }
     }
 
     private void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)

@@ -20,7 +20,7 @@ public class RoomPokerGameInitializeSystem : ISystem
     [Injectable] private Stash<PlayerDealer> _playerDealer;
     [Injectable] private Stash<PlayerCards> _playerCards;
 
-    [Injectable] private RoomPokerCardDeskFactory _cardDeskFactory;
+    [Injectable] private RoomPokerCardDeskService _cardDeskService;
 
     [Injectable] private NetFrameServer _server;
 
@@ -46,7 +46,7 @@ public class RoomPokerGameInitializeSystem : ISystem
             {
                 _pokerCardDesk.Set(roomEntity, new RoomPokerCardDesk
                 {
-                    CardDesk = _cardDeskFactory.CreateCardDeskPokerStandard()
+                    CardDesk = _cardDeskService.CreateCardDeskPokerStandard()
                 });
             }
 

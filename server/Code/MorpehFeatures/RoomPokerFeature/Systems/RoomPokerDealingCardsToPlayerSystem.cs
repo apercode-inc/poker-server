@@ -8,6 +8,7 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -84,12 +85,13 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
                 
                 _playerCards.Set(playerEntity, new PlayerCards
                 {
+                    CardsState = CardsState.Close,
                     Cards = cardsModel,
                 });
 
                 var dataframe = new RoomPokerDealingCardsDataframe
                 {
-                    CardsForLocal = _networkCardsModel,
+                    Cards = _networkCardsModel,
                 };
                 _server.Send(ref dataframe, playerEntity);
             }

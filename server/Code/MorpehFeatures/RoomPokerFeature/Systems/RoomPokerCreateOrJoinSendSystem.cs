@@ -98,7 +98,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                 }
             }
 
-            var createDataframe = new RoomPokerCreateResponseDataframe //todo отсылать тому кто создал или присоединился
+            var createDataframe = new RoomPokerCreateResponseDataframe
             {
                 RoomId = roomPokerId.Value,
                 MaxPlayers = roomPokerStats.MaxPlayers,
@@ -109,7 +109,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
 
             thisPlayerModel.CardsModel?.Clear();
             
-            var joinDataframe = new RoomPokerJoinResponseDataframe //todo отсылать тем кто уже в комнате
+            var joinDataframe = new RoomPokerJoinResponseDataframe
             {
                 RoomId = roomPokerId.Value,
                 PlayerModel = thisPlayerModel,

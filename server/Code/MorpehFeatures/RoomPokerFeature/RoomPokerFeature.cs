@@ -14,7 +14,7 @@ public static class RoomPokerFeature
         var systemsGroup = world.CreateSystemsGroup();
         
         systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerSeatsFactory>());
-        systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerCardDeskFactory>());
+        systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerCardDeskService>());
         systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerStorage>());
         systemsGroup.AddInitializer(container.NewAndRegister<RoomPokerService>());
         
