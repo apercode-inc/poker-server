@@ -1,7 +1,7 @@
 using NetFrame;
 using NetFrame.WriteAndRead;
 
-namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.New;
+namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
 public struct RoomPokerJoinRequestDataframe : INetworkDataframe
 {

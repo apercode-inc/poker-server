@@ -7,7 +7,6 @@ using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
-using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.New;
 using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;

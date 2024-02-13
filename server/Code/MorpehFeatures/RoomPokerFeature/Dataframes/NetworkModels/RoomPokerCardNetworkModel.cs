@@ -18,6 +18,6 @@ public struct RoomPokerCardNetworkModel : IWriteable, IReadable
     public void Read(NetFrameReader reader)
     {
         Rank = (CardRank) reader.ReadInt();
-        Suit = (CardSuit)reader.ReadInt();
+        Suit = (CardSuit) reader.ReadInt();
     }
 }

@@ -1,8 +1,11 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.StartTimer;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -11,6 +14,8 @@ public class RoomPokerCheckStopGameSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerActive> _pokerActive;
+
+    [Injectable] private Stash<PlayerId> _playerId;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
@@ -34,19 +39,30 @@ public class RoomPokerCheckStopGameSystem : ISystem
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            if (roomPokerPlayers.MarkedPlayersBySeat.Count < 2)
+            if (roomPokerPlayers.MarkedPlayersBySeat.Count >= 2)
             {
-                _pokerActive.Remove(roomEntity);
-
-                foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
-                {
-                    var player = playerBySeat.Value;
-                    _roomPokerCardDeskService.ReturnCardInDesk(roomEntity, player);
-                }
-                
-                var dataframe = new RoomPokerStopGameResetTimerDataframe();
-                _server.SendInRoom(ref dataframe, roomEntity);
+                continue;
             }
+            
+            _pokerActive.Remove(roomEntity);
+
+            foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
+            {
+                var player = playerBySeat.Value;
+                _roomPokerCardDeskService.ReturnCardInDesk(roomEntity, player);
+
+                ref var playerId = ref _playerId.Get(player);
+                
+                var cardsDataframe = new RoomPokerSetCardsByPlayerDataframe
+                {
+                    CardsState = CardsState.Empty,
+                    PlayerId = playerId.Id,
+                };
+                _server.SendInRoom(ref cardsDataframe, roomEntity);
+            }
+
+            var dataframe = new RoomPokerStopGameResetTimerDataframe();
+            _server.SendInRoom(ref dataframe, roomEntity);
         }
     }
 

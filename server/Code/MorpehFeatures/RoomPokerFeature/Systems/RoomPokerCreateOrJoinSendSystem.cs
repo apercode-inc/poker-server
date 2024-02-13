@@ -3,8 +3,8 @@ using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
-using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.New;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
