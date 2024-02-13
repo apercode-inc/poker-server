@@ -1,28 +1,29 @@
 using NetFrame;
 using NetFrame.WriteAndRead;
+using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 
-namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
+namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.New;
 
-public struct RoomPokerLocalPlayerJoinResponseDataframe : INetworkDataframe
+public struct RoomPokerCreateResponseDataframe : INetworkDataframe
 {
     public int RoomId;
+    public CurrencyType CurrencyType; 
     public byte MaxPlayers;
-    public byte Seat;
     
-    public List<RoomPlayerNetworkModel> RemotePlayers;
+    public List<RoomPlayerNetworkModel> PlayerModels;
     
     public void Write(NetFrameWriter writer)
     {
         writer.WriteInt(RoomId);
+        writer.WriteInt((int) CurrencyType);
         writer.WriteByte(MaxPlayers);
-        writer.WriteByte(Seat);
         
-        writer.WriteInt(RemotePlayers?.Count ?? 0);
+        writer.WriteInt(PlayerModels?.Count ?? 0);
 
-        if (RemotePlayers != null)
+        if (PlayerModels != null)
         {
-            foreach (var player in RemotePlayers)
+            foreach (var player in PlayerModels)
             {
                 writer.Write(player);
             }
@@ -32,17 +33,17 @@ public struct RoomPokerLocalPlayerJoinResponseDataframe : INetworkDataframe
     public void Read(NetFrameReader reader)
     {
         RoomId = reader.ReadInt();
+        CurrencyType = (CurrencyType) reader.ReadInt();
         MaxPlayers = reader.ReadByte();
-        Seat = reader.ReadByte();
         
         var count = reader.ReadInt();
         
         if (count > 0)
         {
-            RemotePlayers = new List<RoomPlayerNetworkModel>();
+            PlayerModels = new List<RoomPlayerNetworkModel>();
             for (var i = 0; i < count; i++)
             {
-                RemotePlayers.Add(reader.Read<RoomPlayerNetworkModel>());
+                PlayerModels.Add(reader.Read<RoomPlayerNetworkModel>());
             }
         }
     }

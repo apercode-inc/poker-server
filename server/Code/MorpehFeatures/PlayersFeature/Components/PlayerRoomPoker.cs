@@ -4,5 +4,5 @@ namespace server.Code.MorpehFeatures.PlayersFeature.Components;
 
 public struct PlayerRoomPoker : IComponent
 {
-    public int RoomId;
+    public Entity RoomEntity;
 }

@@ -20,6 +20,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
+    [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
@@ -33,18 +34,11 @@ public class RoomPokerService : IInitializer
         _markersByPlayer = new Dictionary<PokerPlayerMarkerType, Entity>();
     }
 
-    public void SendBetInRoom(Entity roomEntity, Entity playerEntity, ulong betValue)
+    public void AddPlayerIdRoom(Entity roomEntity, Entity playerJoin)
     {
-        ref var playerId = ref _playerId.Get(playerEntity);
-
-        var dataframe = new RoomPokerPlayerSetBetDataframe
-        {
-            Bet = betValue,
-            PlayerId = playerId.Id,
-        };
-        _server.SendInRoom(ref dataframe, roomEntity);
+        
     }
-    
+
     public void RemovePlayerFromRoom(Entity roomEntity, Entity playerLeft)
     {
         ref var roomPokerId = ref _roomPokerId.Get(roomEntity);
@@ -79,7 +73,7 @@ public class RoomPokerService : IInitializer
         
         ref var playerId = ref _playerId.Get(playerLeft);
 
-        var dataframe = new RoomPokerRemotePlayerLeftResponseDataframe
+        var dataframe = new RoomPokerLeftResponseDataframe
         {
             RoomId =  roomPokerId.Value,
             PlayerId = playerId.Id,
@@ -90,6 +84,7 @@ public class RoomPokerService : IInitializer
         _playerCards.Remove(playerLeft);
         _playerRoomPoker.Remove(playerLeft);
         _playerSeat.Remove(playerLeft);
+        _playerPokerContribution.Remove(playerLeft);
         
         if (markedPlayersBySeat.Count != 0)
         {

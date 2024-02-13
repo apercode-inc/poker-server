@@ -1,7 +1,10 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
+using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
+using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 
 namespace server.Code.MorpehFeatures.PlayersFeature.Systems;
 
@@ -10,6 +13,12 @@ public class PlayerStorage : IInitializer
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<Destroy> _destroy;
     [Injectable] private Stash<PlayerDbModelRequest> _playerDbModelRequest;
+
+    [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
+    [Injectable] private Stash<PlayerRoomCreateSend> _playerRoomCreateSend;
+    [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
+    [Injectable] private Stash<PlayerCards> _playerCards;
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
 
     private Filter _filter;
 
@@ -37,6 +46,30 @@ public class PlayerStorage : IInitializer
         _players.Add(id, newEntity);
 
         //Подгрузка из бд и навешивание PlayerAuthData и PlayerBalance, отправка баланса на клиент
+    }
+    
+    public void CreateForRoomAndSync(Entity createdPlayer, CurrencyType currencyType, ulong contribution,
+        Entity roomEntity, byte seat)
+    {
+        _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker
+        {
+            RoomEntity = roomEntity,
+        });
+        _playerSeat.Set(createdPlayer, new PlayerSeat
+        {
+            SeatIndex = seat,
+        });
+        _playerPokerContribution.Set(createdPlayer, new PlayerPokerContribution
+        {
+            CurrencyType = currencyType,
+            Value = contribution,
+        });
+        _playerCards.Set(createdPlayer, new PlayerCards
+        {
+            Cards = new Queue<CardModel>(),
+            CardsState = CardsState.Empty,
+        });
+        _playerRoomCreateSend.Set(createdPlayer);
     }
 
     public void Remove(int id)

@@ -21,4 +21,22 @@ public static class ServerExtension
             server.Send(ref dataframe, playerBySeat.Value);
         }
     }
+
+    public static void SendInRoomExcept<T>(this NetFrameServer server, ref T dataframe, Entity roomEntity,
+        Entity exceptPlayer) where T : struct, INetworkDataframe
+    {
+        ref var roomPokerPlayers = ref roomEntity.GetComponent<RoomPokerPlayers>();
+        
+        foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
+        {
+            var playerEntity = playerBySeat.Value;
+
+            if (playerEntity == exceptPlayer)
+            {
+                continue;
+            }
+            
+            server.Send(ref dataframe, playerEntity);
+        }
+    }
 }

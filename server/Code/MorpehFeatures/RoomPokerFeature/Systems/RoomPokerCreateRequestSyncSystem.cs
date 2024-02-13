@@ -2,10 +2,9 @@ using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
-using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.New;
 using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -47,7 +46,7 @@ public class RoomPokerCreateRequestSyncSystem : IInitializer
             return;
         }
             
-        _roomPokerStorage.Add(player, dataframe.MaxPlayers, dataframe.CurrencyType, dataframe.Contribution, dataframe.BigBet);
+        _roomPokerStorage.CreateRoom(player, dataframe.MaxPlayers, dataframe.CurrencyType, dataframe.Contribution, dataframe.BigBet);
     }
 
     public void Dispose()

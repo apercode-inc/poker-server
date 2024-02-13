@@ -2,7 +2,7 @@ using NetFrame;
 using NetFrame.WriteAndRead;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 
-namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
+namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.New;
 
 public struct RoomPokerCreateRequestDataframe : INetworkDataframe
 {

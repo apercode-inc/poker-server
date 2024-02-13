@@ -22,11 +22,6 @@ public class RoomPokerSeatsFactory : IInitializer
         {
             {seat, player},
         };
-        
-        _playerSeat.Set(player, new PlayerSeat
-        {
-            SeatIndex = (byte) seat,
-        });
 
         markedPlayersBySeat.SetSettingMarker(PokerPlayerMarkerType.DealerPlayer, MarkerSettingType.MoveWithRemoveForwardDirection, false);
         markedPlayersBySeat.SetSettingMarker(PokerPlayerMarkerType.ActivePlayer, MarkerSettingType.MoveWithRemoveForwardDirection, true);

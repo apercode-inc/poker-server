@@ -28,6 +28,12 @@ public class PlayerNicknameSyncSystem : IInitializer
             {
                 Value = dataframe.Nickname,
             });
+
+            var playerIdDataframe = new PlayerLocalIdResponseDataframe
+            {
+                PlayerId = id,
+            };
+            _server.Send(ref playerIdDataframe, id);
         }
     }
 

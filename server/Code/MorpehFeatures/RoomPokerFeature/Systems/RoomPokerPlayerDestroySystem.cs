@@ -33,13 +33,8 @@ public class RoomPokerPlayerDestroySystem : ILateSystem
         foreach (var playerEntity in _filter)
         {
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
-            var roomId = playerRoomPoker.RoomId;
+            var roomEntity = playerRoomPoker.RoomEntity;
 
-            if (!_roomPokerStorage.TryGetById(roomId, out var roomEntity))
-            {
-                continue;
-            }
-            
             _roomPokerService.RemovePlayerFromRoom(roomEntity, playerEntity);
         }
     }

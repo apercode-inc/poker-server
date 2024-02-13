@@ -42,10 +42,7 @@ public class RoomPokerStartTimerSetSyncSystem : IInitializer
             return;
         }
 
-        if (!_roomPokerStorage.TryGetById(playerRoomPoker.RoomId, out var room))
-        {
-            return;
-        }
+        var room = playerRoomPoker.RoomEntity;
 
         ref var pokerStartTimer = ref _pokerStartTimer.Get(room, out var timerExist);
 

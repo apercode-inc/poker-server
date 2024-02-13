@@ -3,23 +3,20 @@ using NetFrame.WriteAndRead;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
-public struct RoomPokerLocalPlayerCreateResponseDataframe : INetworkDataframe
+public struct RoomPokerLeftResponseDataframe : INetworkDataframe
 {
     public int RoomId;
-    public byte MaxPlayers;
-    public byte Seat;
+    public int PlayerId;
     
     public void Write(NetFrameWriter writer)
     {
         writer.WriteInt(RoomId);
-        writer.WriteByte(MaxPlayers);
-        writer.WriteByte(Seat);
+        writer.WriteInt(PlayerId);
     }
 
     public void Read(NetFrameReader reader)
     {
         RoomId = reader.ReadInt();
-        MaxPlayers = reader.ReadByte();
-        Seat = reader.ReadByte();
+        PlayerId = reader.ReadInt();
     }
 }

@@ -1,11 +1,12 @@
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
-using server.Code.GlobalUtils.CustomCollections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Storages;
@@ -18,9 +19,9 @@ public class RoomPokerStorage : IInitializer
     [Injectable] private Stash<Destroy> _destroy;
 
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<PlayerRoomCreateSend> _playerRoomCreateSend;
 
     [Injectable] private RoomPokerSeatsFactory _pokerSeatsFactory;
+    [Injectable] private PlayerStorage _playerStorage;
     
     private Dictionary<int, Entity> _rooms;
     private int _idCounter;
@@ -40,7 +41,7 @@ public class RoomPokerStorage : IInitializer
             .Build();
     }
 
-    public void Add(Entity createdPlayer, byte maxPlayers, CurrencyType currencyType, ulong contribution, ulong bigBet)
+    public void CreateRoom(Entity createdPlayer, byte maxPlayers, CurrencyType currencyType, ulong contribution, ulong bigBet)
     {
         if (_playerRoomPoker.Has(createdPlayer))
         {
@@ -48,14 +49,14 @@ public class RoomPokerStorage : IInitializer
             return;
         }
         
-        var newEntity = World.CreateEntity();
+        var roomEntity = World.CreateEntity();
         var seat = (byte) _random.Next(0, maxPlayers);
         
-        _roomPokerId.Set(newEntity, new RoomPokerId
+        _roomPokerId.Set(roomEntity, new RoomPokerId
         {
             Value = _idCounter,
         });
-        _roomPokerData.Set(newEntity, new RoomPokerStats
+        _roomPokerData.Set(roomEntity, new RoomPokerStats
         {
             MaxPlayers = maxPlayers,
             CurrencyType = currencyType,
@@ -66,24 +67,14 @@ public class RoomPokerStorage : IInitializer
         var markedPlayersBySeat = _pokerSeatsFactory
             .Create(maxPlayers, seat, createdPlayer);
 
-        _roomPokerPlayers.Set(newEntity, new RoomPokerPlayers
+        _roomPokerPlayers.Set(roomEntity, new RoomPokerPlayers
         {
             MarkedPlayersBySeat = markedPlayersBySeat
         });
 
-        _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker
-        {
-            RoomId = _idCounter,
-        });
-        
-        _playerRoomCreateSend.Set(createdPlayer, new PlayerRoomCreateSend
-        {
-            RoomId = _idCounter,
-            MaxPlayers = maxPlayers,
-            Seat = seat,
-        });
+        _playerStorage.CreateForRoomAndSync(createdPlayer, currencyType, contribution, roomEntity, seat);
 
-        _rooms.Add(_idCounter, newEntity);
+        _rooms.Add(_idCounter, roomEntity);
 
         _idCounter++;
     }

@@ -52,16 +52,14 @@ public class RoomPokerSetBlindsSystem : ISystem
                 if (playersCount > 2)
                 {
                     var smallBlindPlayer = nextPlayerByMarked.Value;
-                    
-                    _currencyPlayerService.TryTake(smallBlindPlayer, CurrencyType.Chips, small);
-                    _roomPokerService.SendBetInRoom(roomEntity, smallBlindPlayer, small);
+
+                    _currencyPlayerService.TryTakeFromContribution(roomEntity, smallBlindPlayer, small);
                     
                     markedPlayers.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out nextPlayerByMarked);
 
                     var bigBlindPlayer = nextPlayerByMarked.Value;
-                    
-                    _currencyPlayerService.TryTake(bigBlindPlayer, CurrencyType.Chips, big);
-                    _roomPokerService.SendBetInRoom(roomEntity, bigBlindPlayer, big);
+
+                    _currencyPlayerService.TryTakeFromContribution(roomEntity, bigBlindPlayer, big);
                     
                     markedPlayers.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out nextPlayerByMarked);
                     
