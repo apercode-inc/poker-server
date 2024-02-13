@@ -36,11 +36,6 @@ public class RoomPokerService : IInitializer
         _markersByPlayer = new Dictionary<PokerPlayerMarkerType, Entity>();
     }
 
-    public void AddPlayerIdRoom(Entity roomEntity, Entity playerJoin)
-    {
-        
-    }
-
     public void RemovePlayerFromRoom(Entity roomEntity, Entity playerLeft)
     {
         ref var roomPokerId = ref _roomPokerId.Get(roomEntity);
@@ -99,12 +94,12 @@ public class RoomPokerService : IInitializer
     private void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
     {
         _playerDealer.Set(nextMarkedPlayer);
-
-        ref var playerSeat = ref _playerSeat.Get(nextMarkedPlayer);
+        
+        ref var playerId = ref _playerId.Get(nextMarkedPlayer);
         
         var dataframe = new RoomPokerSetDealerDataframe
         {
-            PlayerSeat = playerSeat.SeatIndex,
+            PlayerId = playerId.Id,
         };
         _server.SendInRoom(ref dataframe, roomEntity);
     }

@@ -19,6 +19,7 @@ public class RoomPokerGameInitializeSystem : ISystem
 
     [Injectable] private Stash<PlayerDealer> _playerDealer;
     [Injectable] private Stash<PlayerCards> _playerCards;
+    [Injectable] private Stash<PlayerId> _playerId;
 
     [Injectable] private RoomPokerCardDeskService _cardDeskService;
 
@@ -58,14 +59,15 @@ public class RoomPokerGameInitializeSystem : ISystem
             foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var playerEntity = playerBySeat.Value;
-                var playerSeat = playerBySeat.Key;
+
+                ref var playerId = ref _playerId.Get(playerEntity);
 
                 if (count == 0)
                 {
                     roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.DealerPlayer);
                     var dataframe = new RoomPokerSetDealerDataframe
                     {
-                        PlayerSeat = playerSeat,
+                        PlayerId = playerId.Id
                     };
                     _server.SendInRoom(ref dataframe, roomEntity);
                 }

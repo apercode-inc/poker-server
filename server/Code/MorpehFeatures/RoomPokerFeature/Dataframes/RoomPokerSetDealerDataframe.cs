@@ -5,15 +5,15 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
 public struct RoomPokerSetDealerDataframe : INetworkDataframe
 {
-    public int PlayerSeat;
+    public int PlayerId;
     
     public void Write(NetFrameWriter writer)
     {
-        writer.WriteInt(PlayerSeat);
+        writer.WriteInt(PlayerId);
     }
 
     public void Read(NetFrameReader reader)
     {
-        PlayerSeat = reader.ReadInt();
+        PlayerId = reader.ReadInt();
     }
 }
