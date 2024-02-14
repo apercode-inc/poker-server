@@ -1,6 +1,6 @@
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
-public enum RoomPokerHudState
+public enum PokerPlayerTurnType
 {
     CheckPossible = 0,
     OnlyCallOrRaise = 1,

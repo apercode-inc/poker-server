@@ -13,6 +13,7 @@ public class RoomPokerGameInitializeSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerGameInitialize> _pokerInitialize;
     [Injectable] private Stash<RoomPokerActive> _pokerActive;
+    [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
     [Injectable] private Stash<RoomPokerCardDesk> _pokerCardDesk;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
@@ -42,6 +43,7 @@ public class RoomPokerGameInitializeSystem : ISystem
         foreach (var roomEntity in _filter)
         {
             _pokerActive.Set(roomEntity);
+            _roomPokerBank.Set(roomEntity);
 
             if (!_pokerCardDesk.Has(roomEntity))
             {

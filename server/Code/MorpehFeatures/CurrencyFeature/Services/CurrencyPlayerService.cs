@@ -4,12 +4,15 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.CurrencyFeature.Dataframe;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
 namespace server.Code.MorpehFeatures.CurrencyFeature.Services;
 
 public class CurrencyPlayerService : IInitializer
 {
+    [Injectable] private Stash<RoomPokerSetBank> _roomPokerSetBank;
+    
     [Injectable] private Stash<PlayerCurrency> _playerCurrency;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerId> _playerId;
@@ -22,7 +25,7 @@ public class CurrencyPlayerService : IInitializer
     {
     }
 
-    public bool TryTakeFromContribution(Entity room, Entity player, ulong cost)
+    public bool TrySetBet(Entity room, Entity player, ulong cost)
     {
         ref var playerCurrency = ref _playerCurrency.Get(player);
         ref var playerId = ref _playerId.Get(player);
@@ -53,6 +56,11 @@ public class CurrencyPlayerService : IInitializer
         _server.SendInRoom(ref dataframe, room);
 
         Send(player, currencyType, playerCurrency.CurrencyByType[currencyType]);
+        
+        _roomPokerSetBank.Set(room, new RoomPokerSetBank
+        {
+            Value = cost,
+        });
 
         return true;
     }
