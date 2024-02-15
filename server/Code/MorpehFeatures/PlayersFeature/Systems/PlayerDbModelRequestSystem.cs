@@ -35,10 +35,10 @@ public class PlayerDbModelRequestSystem : ISystem
             //надо создать PlayerDbModelResponseSystem и вытащить запись из таблицы с игроками,
             //а пока что временно повесим баланс какой нибудь
 
-            ulong chips = 10000;
-            ulong gold = 150;
+            long chips = 10000;
+            long gold = 150;
 
-            var currencyByType = new Dictionary<CurrencyType, ulong>
+            var currencyByType = new Dictionary<CurrencyType, long>
             {
                 [CurrencyType.Chips] = chips,
                 [CurrencyType.Gold] = gold,

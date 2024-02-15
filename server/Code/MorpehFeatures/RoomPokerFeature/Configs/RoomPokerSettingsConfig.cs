@@ -16,6 +16,6 @@ public class RoomPokerSettingsConfig
 [JsonObject]
 public class RoomPokerBetsConfig
 {
-    [JsonProperty("blind_big")] public ulong BlindBig;
-    [JsonProperty("contribution")] public ulong Contribution;
+    [JsonProperty("blind_big")] public long BlindBig;
+    [JsonProperty("contribution")] public long Contribution;
 }

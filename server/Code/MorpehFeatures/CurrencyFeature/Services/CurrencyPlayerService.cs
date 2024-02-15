@@ -11,11 +11,12 @@ namespace server.Code.MorpehFeatures.CurrencyFeature.Services;
 
 public class CurrencyPlayerService : IInitializer
 {
-    [Injectable] private Stash<RoomPokerSetBank> _roomPokerSetBank;
-    
+    [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerCurrency> _playerCurrency;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerId> _playerId;
+
+    [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
 
     [Injectable] private NetFrameServer _server;
     
@@ -25,16 +26,11 @@ public class CurrencyPlayerService : IInitializer
     {
     }
 
-    public bool TrySetBet(Entity room, Entity player, ulong cost)
+    public bool TrySetBet(Entity room, Entity player, long cost)
     {
         ref var playerCurrency = ref _playerCurrency.Get(player);
         ref var playerId = ref _playerId.Get(player);
-        ref var playerPokerContribution = ref _playerPokerContribution.Get(player, out var exist);
-
-        if (!exist)
-        {
-            return false;
-        }
+        ref var playerPokerContribution = ref _playerPokerContribution.Get(player);
 
         var currencyType = playerPokerContribution.CurrencyType;
         
@@ -55,17 +51,22 @@ public class CurrencyPlayerService : IInitializer
         };
         _server.SendInRoom(ref dataframe, room);
 
-        Send(player, currencyType, playerCurrency.CurrencyByType[currencyType]);
-        
-        _roomPokerSetBank.Set(room, new RoomPokerSetBank
+        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
+        playerPokerCurrentBet.Value += cost;
+
+        ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(room);
+
+        if (roomPokerMaxBet.Value < cost)
         {
-            Value = cost,
-        });
+            roomPokerMaxBet.Value = cost;
+        }
+        
+        Send(player, currencyType, playerCurrency.CurrencyByType[currencyType]);
 
         return true;
     }
 
-    public bool TryTake(Entity player, CurrencyType type, ulong cost)
+    public bool TryTake(Entity player, CurrencyType type, long cost)
     {
         ref var playerCurrency = ref _playerCurrency.Get(player);
 
@@ -80,7 +81,7 @@ public class CurrencyPlayerService : IInitializer
         return true;
     }
 
-    public void Give(Entity player, CurrencyType type, ulong cost)
+    public void Give(Entity player, CurrencyType type, long cost)
     {
         ref var playerCurrency = ref _playerCurrency.Get(player);
         playerCurrency.CurrencyByType[type] += cost;
@@ -88,7 +89,7 @@ public class CurrencyPlayerService : IInitializer
         Send(player, type, playerCurrency.CurrencyByType[type]);
     }
 
-    private void Send(Entity player, CurrencyType type, ulong value)
+    private void Send(Entity player, CurrencyType type, long value)
     {
         var dataframe = new CurrencyUpdateDataframe
         {

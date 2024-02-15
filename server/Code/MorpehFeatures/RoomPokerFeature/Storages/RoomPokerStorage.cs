@@ -14,8 +14,9 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 public class RoomPokerStorage : IInitializer
 {
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
-    [Injectable] private Stash<RoomPokerStats> _roomPokerData;
+    [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
     [Injectable] private Stash<Destroy> _destroy;
 
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
@@ -41,7 +42,7 @@ public class RoomPokerStorage : IInitializer
             .Build();
     }
 
-    public void CreateRoom(Entity createdPlayer, byte maxPlayers, CurrencyType currencyType, ulong contribution, ulong bigBet)
+    public void CreateRoom(Entity createdPlayer, byte maxPlayers, CurrencyType currencyType, long contribution, long bigBet)
     {
         if (_playerRoomPoker.Has(createdPlayer))
         {
@@ -56,7 +57,7 @@ public class RoomPokerStorage : IInitializer
         {
             Value = _idCounter,
         });
-        _roomPokerData.Set(roomEntity, new RoomPokerStats
+        _roomPokerStats.Set(roomEntity, new RoomPokerStats
         {
             MaxPlayers = maxPlayers,
             CurrencyType = currencyType,
@@ -71,6 +72,7 @@ public class RoomPokerStorage : IInitializer
         {
             MarkedPlayersBySeat = markedPlayersBySeat
         });
+        _roomPokerMaxBet.Set(roomEntity);
 
         _playerStorage.CreateForRoomAndSync(createdPlayer, currencyType, contribution, roomEntity, seat);
 

@@ -6,23 +6,23 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 public struct RoomPokerPlayerSetBetDataframe : INetworkDataframe
 {
     public int PlayerId;
-    public ulong Bet;
-    public ulong ContributionBalance;
-    public ulong AllBalance;
+    public long Bet;
+    public long ContributionBalance;
+    public long AllBalance;
     
     public void Write(NetFrameWriter writer)
     {
         writer.WriteInt(PlayerId);
-        writer.WriteULong(Bet);
-        writer.WriteULong(ContributionBalance);
-        writer.WriteULong(AllBalance);
+        writer.WriteLong(Bet);
+        writer.WriteLong(ContributionBalance);
+        writer.WriteLong(AllBalance);
     }
 
     public void Read(NetFrameReader reader)
     {
         PlayerId = reader.ReadInt();
-        Bet = reader.ReadULong();
-        ContributionBalance = reader.ReadULong();
-        AllBalance = reader.ReadULong();
+        Bet = reader.ReadLong();
+        ContributionBalance = reader.ReadLong();
+        AllBalance = reader.ReadLong();
     }
 }

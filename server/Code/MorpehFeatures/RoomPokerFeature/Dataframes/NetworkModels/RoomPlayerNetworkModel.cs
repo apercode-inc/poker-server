@@ -10,8 +10,8 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
     public string Nickname;
     public byte Seat;
     public bool IsDealer;
-    public ulong ContributionBalance;
-    public ulong AllBalance;
+    public long ContributionBalance;
+    public long AllBalance;
     public CardsState CardsState;
     public List<RoomPokerCardNetworkModel> CardsModel;
 
@@ -21,8 +21,8 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
         writer.WriteString(Nickname);
         writer.WriteByte(Seat);
         writer.WriteBool(IsDealer);
-        writer.WriteULong(ContributionBalance);
-        writer.WriteULong(AllBalance);
+        writer.WriteLong(ContributionBalance);
+        writer.WriteLong(AllBalance);
         writer.WriteByte((byte) CardsState);
         
         writer.WriteInt(CardsModel?.Count ?? 0);
@@ -42,8 +42,8 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
         Nickname = reader.ReadString();
         Seat = reader.ReadByte();
         IsDealer = reader.ReadBool();
-        ContributionBalance = reader.ReadULong();
-        AllBalance = reader.ReadULong();
+        ContributionBalance = reader.ReadLong();
+        AllBalance = reader.ReadLong();
         CardsState = (CardsState)reader.ReadByte();
         
         var count = reader.ReadInt();

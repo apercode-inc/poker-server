@@ -17,6 +17,7 @@ public class PlayerStorage : IInitializer
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerRoomCreateSend> _playerRoomCreateSend;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
+    [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
 
@@ -48,7 +49,7 @@ public class PlayerStorage : IInitializer
         //Подгрузка из бд и навешивание PlayerAuthData и PlayerBalance, отправка баланса на клиент
     }
     
-    public void CreateForRoomAndSync(Entity createdPlayer, CurrencyType currencyType, ulong contribution,
+    public void CreateForRoomAndSync(Entity createdPlayer, CurrencyType currencyType, long contribution,
         Entity roomEntity, byte seat)
     {
         _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker
@@ -64,6 +65,7 @@ public class PlayerStorage : IInitializer
             CurrencyType = currencyType,
             Value = contribution,
         });
+        _playerPokerCurrentBet.Set(createdPlayer);
         _playerCards.Set(createdPlayer, new PlayerCards
         {
             Cards = new Queue<CardModel>(),

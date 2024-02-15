@@ -6,7 +6,7 @@ namespace server.Code.MorpehFeatures.CurrencyFeature.Dataframe;
 
 public struct CurrencyInitDataframe : INetworkDataframe
 {
-    public Dictionary<CurrencyType, ulong> CurrencyByType;
+    public Dictionary<CurrencyType, long> CurrencyByType;
     
     public void Write(NetFrameWriter writer)
     {
@@ -17,7 +17,7 @@ public struct CurrencyInitDataframe : INetworkDataframe
             foreach (var item in CurrencyByType)
             {
                 writer.WriteByte((byte) item.Key);
-                writer.WriteULong(item.Value);
+                writer.WriteLong(item.Value);
             }
         }
     }
@@ -28,10 +28,10 @@ public struct CurrencyInitDataframe : INetworkDataframe
 
         if (count > 0)
         {
-            CurrencyByType = new Dictionary<CurrencyType, ulong>();
+            CurrencyByType = new Dictionary<CurrencyType, long>();
             for (var i = 0; i < count; i++)
             {
-                CurrencyByType.Add((CurrencyType) reader.ReadByte(), reader.ReadULong());
+                CurrencyByType.Add((CurrencyType) reader.ReadByte(), reader.ReadLong());
             }
         }
     }

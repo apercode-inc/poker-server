@@ -5,18 +5,18 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 
 public struct RoomPokerSettingsBetNetworkModel : IWriteable, IReadable
 {
-    public ulong BlindBig;
-    public ulong Contribution;
+    public long BlindBig;
+    public long Contribution;
     
     public void Write(NetFrameWriter writer)
     {
-        writer.WriteULong(BlindBig);
-        writer.WriteULong(Contribution);
+        writer.WriteLong(BlindBig);
+        writer.WriteLong(Contribution);
     }
 
     public void Read(NetFrameReader reader)
     {
-        BlindBig = reader.ReadULong();
-        Contribution = reader.ReadULong();
+        BlindBig = reader.ReadLong();
+        Contribution = reader.ReadLong();
     }
 }

@@ -2,7 +2,7 @@ using Scellecs.Morpeh;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
-public struct RoomPokerSetBank : IComponent
+public struct RoomPokerMaxBet : IComponent
 {
     public long Value;
 }
