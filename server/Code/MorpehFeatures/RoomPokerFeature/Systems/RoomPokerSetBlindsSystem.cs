@@ -1,11 +1,9 @@
-using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CurrencyFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
-using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -14,14 +12,10 @@ public class RoomPokerSetBlindsSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerSetBlinds> _roomPokerSetBlinds;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
-    [Injectable] private Stash<RoomPokerSetBank> _roomPokerSetBank;
-
-    [Injectable] private Stash<PlayerId> _playerId;
+    
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
 
     [Injectable] private CurrencyPlayerService _currencyPlayerService;
-    [Injectable] private RoomPokerService _roomPokerService;
-    [Injectable] private NetFrameServer _server;
 
     private Filter _filter;
 
@@ -68,7 +62,7 @@ public class RoomPokerSetBlindsSystem : ISystem
                 {
                     var smallBlindPlayer = nextPlayerByMarked.Value;
                     
-                    _currencyPlayerService.TrySetBet(roomEntity, smallBlindPlayer, small);
+                    _currencyPlayerService.TrySetBet(roomEntity, smallBlindPlayer, big);
                     
                     markedPlayers.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out nextPlayerByMarked);
                 }

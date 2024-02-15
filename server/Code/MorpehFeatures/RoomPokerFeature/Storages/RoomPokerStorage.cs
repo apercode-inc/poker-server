@@ -52,7 +52,7 @@ public class RoomPokerStorage : IInitializer
         
         var roomEntity = World.CreateEntity();
         var seat = (byte) _random.Next(0, maxPlayers);
-        
+
         _roomPokerId.Set(roomEntity, new RoomPokerId
         {
             Value = _idCounter,

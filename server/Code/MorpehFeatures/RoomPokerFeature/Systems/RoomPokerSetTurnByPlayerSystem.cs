@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -14,17 +15,21 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
+    [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
 
     [Injectable] private NetFrameServer _server;
-    
+
+    private List<long> _raiseBets;
     private Filter _filter;
     
     public World World { get; set; }
 
     public void OnAwake()
     {
+        _raiseBets = new List<long>();
+        
         _filter = World.Filter
             .With<PlayerPokerCurrentBet>()
             .With<PlayerRoomPoker>()
@@ -32,16 +37,6 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             .With<PlayerSetPokerTurn>()
             .Build();
     }
-    
-    //Player1 - 50
-    //Player2 - 50
-    //Player3 - 50
-    //В Call показывать сколько ещё доложить надо
-    //
-
-    // Если call ноль или меньше то, CheckPossible
-    // Если call положителен и remainderAfterCall положителен и не ноль, то OnlyCallOrRaise
-    // Если call положителен и remainderAfterCall отрицателен и ноль, то OnlyAllIn
 
     public void OnUpdate(float deltaTime)
     {
@@ -53,23 +48,45 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             
             var roomEntity = playerRoomPoker.RoomEntity;
             ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
+            ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
 
-            var call = roomPokerMaxBet.Value - playerPokerCurrentBet.Value; //250 - 50 = 100 --- надо доложить
-            var remainderAfterCall = playerPokerContribution.Value - call; //1000 - 100 = 900 --- Проверка можем ли доложить
+            var requiredBet = roomPokerMaxBet.Value - playerPokerCurrentBet.Value; //250 - 50 = 200 --- надо доложить
+            var remainderAfterCall = playerPokerContribution.Value - requiredBet; //1000 - 100 = 900 --- остаток вклада после ставки
 
-
-            PokerPlayerTurnType turnType = default;
-            if (call > 0 && remainderAfterCall >= 0)
+            _raiseBets.Clear();
+            
+            PokerPlayerTurnType turnType;
+            
+            if (requiredBet <= 0)
+            {
+                turnType = PokerPlayerTurnType.CheckPossible;
+            }
+            else if (remainderAfterCall > 0)
             {
                 turnType = PokerPlayerTurnType.OnlyCallOrRaise;
             }
-            else if (remainderAfterCall >= 0)
+            else
             {
+                turnType = PokerPlayerTurnType.OnlyAllIn;
+                requiredBet -= playerPokerContribution.Value; //250 - 100 = 150 ---- сколько надо доложить при ALL IN 
             }
+            
+            var raiseBet = requiredBet + roomPokerStats.BigBet;
+            _raiseBets.Add(raiseBet);
+            while (playerPokerContribution.Value > raiseBet)
+            {
+                raiseBet += roomPokerStats.BigBet;
+                _raiseBets.Add(raiseBet);
+            }
+            _raiseBets.Add(playerPokerContribution.Value);
 
+            ref var playerNickname = ref playerEntity.GetComponent<PlayerNickname>();
+            Debug.LogColor($"Передаем ход = {playerNickname.Value}", ConsoleColor.Magenta);
             var dataframe = new RoomPokerPlayerTurnRequestDataframe
             {
-                TurnType = PokerPlayerTurnType.OnlyCallOrRaise,
+                TurnType = turnType,
+                RequiredBet = requiredBet,
+                RaiseBets = _raiseBets,
             };
             _server.Send(ref dataframe, playerEntity);
             
@@ -80,5 +97,6 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
     public void Dispose()
     {
         _filter = null;
+        _raiseBets = null;
     }
 }

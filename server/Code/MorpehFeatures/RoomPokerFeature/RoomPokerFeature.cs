@@ -1,5 +1,6 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
@@ -32,6 +33,8 @@ public static class RoomPokerFeature
         systemsGroup.AddInitializer(container.New<RoomPokerJoinRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerLeftRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerStartTimerSetSyncSystem>());
+        
+        systemsGroup.AddInitializer(container.New<RoomPokerHudSetBetRequestSyncSystem>());
 
         //systemsGroup.AddSystem(container.New<RoomPokerShowTestSystem>()); //todo test
         
@@ -46,6 +49,10 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerDealingCardsToPlayerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerDealingCardsTimerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerSetBlindsSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerSetBetByPlayerSystem>());
+        
+        
+        
         systemsGroup.AddSystem(container.New<RoomPokerTopUpBankSystem>());
 
         systemsGroup.AddSystem(container.New<RoomPokerSetTurnByPlayerSystem>());

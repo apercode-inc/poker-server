@@ -17,6 +17,7 @@ public class CurrencyPlayerService : IInitializer
     [Injectable] private Stash<PlayerId> _playerId;
 
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
+    [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
 
     [Injectable] private NetFrameServer _server;
     
@@ -41,20 +42,23 @@ public class CurrencyPlayerService : IInitializer
 
         playerPokerContribution.Value -= cost;
         playerCurrency.CurrencyByType[currencyType] -= cost;
+
+        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
+        playerPokerCurrentBet.Value += cost;
         
         var dataframe = new RoomPokerPlayerSetBetDataframe
         {
             ContributionBalance = playerPokerContribution.Value,
             AllBalance = playerCurrency.CurrencyByType[currencyType],
-            Bet = cost,
+            Bet = playerPokerCurrentBet.Value,
             PlayerId = playerId.Id,
         };
         _server.SendInRoom(ref dataframe, room);
 
-        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
-        playerPokerCurrentBet.Value += cost;
-
         ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(room);
+        ref var roomPokerBank = ref _roomPokerBank.Get(room);
+
+        roomPokerBank.Value += cost;
 
         if (roomPokerMaxBet.Value < cost)
         {

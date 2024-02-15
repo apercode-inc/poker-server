@@ -7,17 +7,42 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 public struct RoomPokerPlayerTurnRequestDataframe : INetworkDataframe
 {
     public PokerPlayerTurnType TurnType;
+    public long RequiredBet;
     public float TurnTime;
-    
+    public List<long> RaiseBets;
+
     public void Write(NetFrameWriter writer)
     {
         writer.WriteInt((int) TurnType);
+        writer.WriteLong(RequiredBet);
         writer.WriteFloat(TurnTime);
+        
+        writer.WriteInt(RaiseBets?.Count ?? 0);
+
+        if (RaiseBets != null)
+        {
+            foreach (var item in RaiseBets)
+            {
+                writer.WriteLong(item);
+            }
+        }
     }
 
     public void Read(NetFrameReader reader)
     {
         TurnType = (PokerPlayerTurnType)reader.ReadInt();
+        RequiredBet = reader.ReadLong();
+        TurnTime = reader.ReadFloat();
         
+        var count = reader.ReadInt();
+
+        if (count > 0)
+        {
+            RaiseBets = new List<long>();
+            for (var i = 0; i < count; i++)
+            {
+                RaiseBets.Add(reader.ReadLong());
+            }
+        }
     }
 }
