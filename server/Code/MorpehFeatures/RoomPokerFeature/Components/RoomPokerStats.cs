@@ -9,4 +9,5 @@ public struct RoomPokerStats : IComponent
     public CurrencyType CurrencyType;
     public long Contribution;
     public long BigBet;
+    public int TurnTime;
 }

@@ -12,8 +12,6 @@ public class RoomPokerSetBlindsSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerSetBlinds> _roomPokerSetBlinds;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
-    
-    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
 
     [Injectable] private CurrencyPlayerService _currencyPlayerService;
 
@@ -55,19 +53,13 @@ public class RoomPokerSetBlindsSystem : ISystem
                     var bigBlindPlayer = nextPlayerByMarked.Value;
 
                     _currencyPlayerService.TrySetBet(roomEntity, bigBlindPlayer, big);
-
-                    markedPlayers.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out nextPlayerByMarked);
                 }
                 else if (playersCount == 2)
                 {
                     var smallBlindPlayer = nextPlayerByMarked.Value;
                     
                     _currencyPlayerService.TrySetBet(roomEntity, smallBlindPlayer, small);
-                    
-                    markedPlayers.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out nextPlayerByMarked);
                 }
-                
-                _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
             }
 
             _roomPokerSetBlinds.Remove(roomEntity);

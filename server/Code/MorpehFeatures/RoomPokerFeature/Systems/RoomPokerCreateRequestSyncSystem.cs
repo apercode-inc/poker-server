@@ -45,8 +45,9 @@ public class RoomPokerCreateRequestSyncSystem : IInitializer
             Debug.LogError("отправить игроку нотиф о том что он не может присоединится из за того что ему не хватает на взнос");
             return;
         }
-            
-        _roomPokerStorage.CreateRoom(player, dataframe.MaxPlayers, dataframe.CurrencyType, dataframe.Contribution, dataframe.BigBet);
+
+        _roomPokerStorage.CreateRoom(player, dataframe.MaxPlayers, dataframe.CurrencyType, dataframe.Contribution, 
+            dataframe.BigBet, dataframe.IsFastTurn);
     }
 
     public void Dispose()

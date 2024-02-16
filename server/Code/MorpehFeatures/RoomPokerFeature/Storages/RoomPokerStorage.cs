@@ -2,11 +2,13 @@ using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
+using server.Code.MorpehFeatures.ConfigsFeature.Constants;
+using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
+using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Storages;
@@ -23,6 +25,7 @@ public class RoomPokerStorage : IInitializer
 
     [Injectable] private RoomPokerSeatsFactory _pokerSeatsFactory;
     [Injectable] private PlayerStorage _playerStorage;
+    [Injectable] private ConfigsService _configsService;
     
     private Dictionary<int, Entity> _rooms;
     private int _idCounter;
@@ -42,7 +45,8 @@ public class RoomPokerStorage : IInitializer
             .Build();
     }
 
-    public void CreateRoom(Entity createdPlayer, byte maxPlayers, CurrencyType currencyType, long contribution, long bigBet)
+    public void CreateRoom(Entity createdPlayer, byte maxPlayers, CurrencyType currencyType, long contribution, 
+        long bigBet, bool isFastTurn)
     {
         if (_playerRoomPoker.Has(createdPlayer))
         {
@@ -52,6 +56,9 @@ public class RoomPokerStorage : IInitializer
         
         var roomEntity = World.CreateEntity();
         var seat = (byte) _random.Next(0, maxPlayers);
+        
+        var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPoker);
+        var turnTime = isFastTurn ? config.PlayerTurnTimeFast : config.PlayerTurnTime;
 
         _roomPokerId.Set(roomEntity, new RoomPokerId
         {
@@ -63,6 +70,7 @@ public class RoomPokerStorage : IInitializer
             CurrencyType = currencyType,
             Contribution = contribution,
             BigBet = bigBet,
+            TurnTime = turnTime,
         });
         
         var markedPlayersBySeat = _pokerSeatsFactory
@@ -74,7 +82,7 @@ public class RoomPokerStorage : IInitializer
         });
         _roomPokerMaxBet.Set(roomEntity, new RoomPokerMaxBet
         {
-            Value = bigBet,
+            Value = bigBet / 2,
         });
 
         _playerStorage.CreateForRoomAndSync(createdPlayer, currencyType, contribution, roomEntity, seat);

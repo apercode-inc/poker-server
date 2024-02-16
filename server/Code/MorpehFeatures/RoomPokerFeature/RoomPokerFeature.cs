@@ -51,13 +51,10 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerSetBlindsSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerSetBetByPlayerSystem>());
         
-        
-        
         systemsGroup.AddSystem(container.New<RoomPokerTopUpBankSystem>());
-
+        
         systemsGroup.AddSystem(container.New<RoomPokerSetTurnByPlayerSystem>());
         
-
         systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
         
         

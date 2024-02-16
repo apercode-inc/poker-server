@@ -15,8 +15,9 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
-    [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
+    [Injectable] private Stash<PlayerId> _playerId;
     
+    [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
 
     [Injectable] private NetFrameServer _server;
@@ -45,10 +46,16 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
             ref var playerPokerContribution = ref _playerPokerContribution.Get(playerEntity);
+            ref var playerId = ref _playerId.Get(playerEntity);
             
             var roomEntity = playerRoomPoker.RoomEntity;
             ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
             ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
+
+            if (roomPokerMaxBet.Value < roomPokerStats.BigBet)
+            {
+                roomPokerMaxBet.Value = roomPokerStats.BigBet;
+            }
 
             var requiredBet = roomPokerMaxBet.Value - playerPokerCurrentBet.Value; //250 - 50 = 200 --- надо доложить
             var remainderAfterCall = playerPokerContribution.Value - requiredBet; //1000 - 100 = 900 --- остаток вклада после ставки
@@ -87,6 +94,13 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                 RaiseBets = _raiseBets,
             };
             _server.Send(ref dataframe, playerEntity);
+
+            var timeDataframe = new RoomPokerSetTurnTimerDataframe
+            {
+                PlayerId = playerId.Id,
+                Time = roomPokerStats.TurnTime,
+            };
+            _server.SendInRoom(ref timeDataframe, roomEntity); //todo запустить таймер на сервере и на клиенте
             
             _playerSetPokerTurn.Remove(playerEntity);
         }

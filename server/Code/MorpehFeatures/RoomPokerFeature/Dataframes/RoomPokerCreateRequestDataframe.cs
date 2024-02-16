@@ -10,6 +10,7 @@ public struct RoomPokerCreateRequestDataframe : INetworkDataframe
     public CurrencyType CurrencyType;
     public long Contribution;
     public long BigBet;
+    public bool IsFastTurn;
 
     public void Write(NetFrameWriter writer)
     {
@@ -17,6 +18,7 @@ public struct RoomPokerCreateRequestDataframe : INetworkDataframe
         writer.WriteInt((int) CurrencyType);
         writer.WriteLong(Contribution);
         writer.WriteLong(BigBet);
+        writer.WriteBool(IsFastTurn);
     }
 
     public void Read(NetFrameReader reader)
@@ -25,5 +27,6 @@ public struct RoomPokerCreateRequestDataframe : INetworkDataframe
         CurrencyType = (CurrencyType) reader.ReadInt();
         Contribution = reader.ReadLong();
         BigBet = reader.ReadLong();
+        IsFastTurn = reader.ReadBool();
     }
 }
