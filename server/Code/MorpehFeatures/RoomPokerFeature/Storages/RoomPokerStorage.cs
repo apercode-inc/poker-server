@@ -72,7 +72,10 @@ public class RoomPokerStorage : IInitializer
         {
             MarkedPlayersBySeat = markedPlayersBySeat
         });
-        _roomPokerMaxBet.Set(roomEntity);
+        _roomPokerMaxBet.Set(roomEntity, new RoomPokerMaxBet
+        {
+            Value = bigBet,
+        });
 
         _playerStorage.CreateForRoomAndSync(createdPlayer, currencyType, contribution, roomEntity, seat);
 

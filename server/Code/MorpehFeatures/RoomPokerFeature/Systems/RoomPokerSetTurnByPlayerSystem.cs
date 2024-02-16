@@ -70,7 +70,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                 turnType = PokerPlayerTurnType.OnlyAllIn;
                 requiredBet -= playerPokerContribution.Value; //250 - 100 = 150 ---- сколько надо доложить при ALL IN 
             }
-            
+
             var raiseBet = requiredBet + roomPokerStats.BigBet;
             _raiseBets.Add(raiseBet);
             while (playerPokerContribution.Value > raiseBet)
@@ -80,8 +80,6 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             }
             _raiseBets.Add(playerPokerContribution.Value);
 
-            ref var playerNickname = ref playerEntity.GetComponent<PlayerNickname>();
-            Debug.LogColor($"Передаем ход = {playerNickname.Value}", ConsoleColor.Magenta);
             var dataframe = new RoomPokerPlayerTurnRequestDataframe
             {
                 TurnType = turnType,

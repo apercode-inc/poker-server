@@ -62,7 +62,7 @@ public class RoomPokerSetBlindsSystem : ISystem
                 {
                     var smallBlindPlayer = nextPlayerByMarked.Value;
                     
-                    _currencyPlayerService.TrySetBet(roomEntity, smallBlindPlayer, big);
+                    _currencyPlayerService.TrySetBet(roomEntity, smallBlindPlayer, small);
                     
                     markedPlayers.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out nextPlayerByMarked);
                 }

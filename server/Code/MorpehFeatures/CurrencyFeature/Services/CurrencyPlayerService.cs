@@ -39,11 +39,18 @@ public class CurrencyPlayerService : IInitializer
         {
             return false;
         }
+        
+        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
+        ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(room);
+
+        if (playerPokerCurrentBet.Value + cost < roomPokerMaxBet.Value) //todo потестить
+        {
+            return false;
+        }
 
         playerPokerContribution.Value -= cost;
         playerCurrency.CurrencyByType[currencyType] -= cost;
 
-        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
         playerPokerCurrentBet.Value += cost;
         
         var dataframe = new RoomPokerPlayerSetBetDataframe
@@ -55,14 +62,13 @@ public class CurrencyPlayerService : IInitializer
         };
         _server.SendInRoom(ref dataframe, room);
 
-        ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(room);
         ref var roomPokerBank = ref _roomPokerBank.Get(room);
 
         roomPokerBank.Value += cost;
 
-        if (roomPokerMaxBet.Value < cost)
+        if (roomPokerMaxBet.Value < playerPokerCurrentBet.Value)
         {
-            roomPokerMaxBet.Value = cost;
+            roomPokerMaxBet.Value = playerPokerCurrentBet.Value;
         }
         
         Send(player, currencyType, playerCurrency.CurrencyByType[currencyType]);
