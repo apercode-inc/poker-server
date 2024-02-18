@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -23,6 +24,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<PlayerSeat> _playerSeat;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
+    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
@@ -44,9 +46,9 @@ public class RoomPokerService : IInitializer
         var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
 
         _markersByPlayer.Clear();
-        var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);
-
         _roomPokerCardDeskService.ReturnCardInDesk(roomEntity, playerLeft);
+        
+        var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);
 
         if (isRemove)
         {
@@ -55,13 +57,14 @@ public class RoomPokerService : IInitializer
                 var marker = markerByPlayer.Key;
                 var nextPlayerMarked = markerByPlayer.Value;
 
+                ref var nickname = ref nextPlayerMarked.GetComponent<PlayerNickname>();
                 switch (marker)
                 {
                     case PokerPlayerMarkerType.DealerPlayer:
                         SetDealerPlayerMarker(roomEntity, nextPlayerMarked);
                         break;
                     case PokerPlayerMarkerType.ActivePlayer:
-                        SetActivePlayerMarker(roomEntity, nextPlayerMarked);
+                        SetActivePlayerMarker(nextPlayerMarked);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -93,6 +96,47 @@ public class RoomPokerService : IInitializer
         _roomPokerStorage.Remove(roomPokerId.Value);
     }
 
+    public void DropCards(Entity roomEntity, Entity playerEntity)
+    {
+        _roomPokerCardDeskService.ReturnCardInDesk(roomEntity, playerEntity);
+
+        ref var playerId = ref _playerId.Get(playerEntity);
+        ref var playerSeat = ref _playerSeat.Get(playerEntity);
+                
+        _playerCards.Set(playerEntity, new PlayerCards
+        {
+            CardsState = CardsState.Empty,
+            Cards = null,
+        });
+                
+        var dataframe = new RoomPokerSetCardsByPlayerDataframe
+        {
+            PlayerId = playerId.Id,
+            CardsState = CardsState.Empty,
+            Cards = null,
+        };
+        _server.SendInRoom(ref dataframe, roomEntity);
+        
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+        var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
+
+        markedPlayersBySeat.TryGetValueByMarkers(playerSeat.SeatIndex, out var playerByMarkers);
+
+        foreach (var marker in playerByMarkers.Markers)
+        {
+            var isMarked = marker.Value;
+            var markerType = marker.Key;
+
+            if (isMarked && markerType == PokerPlayerMarkerType.ActivePlayer)
+            {
+                if (markedPlayersBySeat.TryMoveMarker(markerType, out var nextPlayerActive))
+                {
+                    SetActivePlayerMarker(nextPlayerActive.Value);
+                }
+            }
+        }
+    }
+
     private void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
     {
         _playerDealer.Set(nextMarkedPlayer);
@@ -105,11 +149,10 @@ public class RoomPokerService : IInitializer
         };
         _server.SendInRoom(ref dataframe, roomEntity);
     }
-
-    //todo dev
-    private void SetActivePlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
+    
+    private void SetActivePlayerMarker(Entity nextMarkedPlayer)
     {
-        
+        _playerSetPokerTurn.Set(nextMarkedPlayer);
     }
 
     public void Dispose()

@@ -93,7 +93,12 @@ public class RoomPokerCardDeskService : IInitializer
     
     public void ReturnCardInDesk(Entity roomEntity, Entity playerLeft)
     {
-        ref var playerCards = ref _playerCards.Get(playerLeft, out var cardExist);
+        ref var playerCards = ref _playerCards.Get(playerLeft);
+
+        if (playerCards.CardsState == CardsState.Empty)
+        {
+            return;
+        }
 
         ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
 

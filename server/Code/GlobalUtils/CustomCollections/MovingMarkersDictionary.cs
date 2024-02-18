@@ -150,13 +150,13 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return false;
     }
 
-    public bool TryGetValue(int key, out T value)
+    public bool TryGetValueByMarkers(int key, out MarkedItem<T, TM> value)
     {
         foreach (var markedItem in this)
         {
             if (markedItem.Key == key)
             {
-                value = markedItem.Value;
+                value = markedItem;
                 return true;
             }
         }

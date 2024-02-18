@@ -9,7 +9,7 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
 public class RoomPokerSetBetByPlayerSystem : ISystem
 {
-    [Injectable] private Stash<PlayerSetBet> _roomPokerSetBet;
+    [Injectable] private Stash<PlayerSetBet> _playerSetBet;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
 
@@ -33,7 +33,7 @@ public class RoomPokerSetBetByPlayerSystem : ISystem
     {
         foreach (var playerEntity in _filter)
         {
-            ref var roomPokerSetBet = ref _roomPokerSetBet.Get(playerEntity);
+            ref var roomPokerSetBet = ref _playerSetBet.Get(playerEntity);
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
 
             var roomEntity = playerRoomPoker.RoomEntity;
@@ -49,7 +49,7 @@ public class RoomPokerSetBetByPlayerSystem : ISystem
                 }
             }
 
-            _roomPokerSetBet.Remove(playerEntity);
+            _playerSetBet.Remove(playerEntity);
         }
     }
 

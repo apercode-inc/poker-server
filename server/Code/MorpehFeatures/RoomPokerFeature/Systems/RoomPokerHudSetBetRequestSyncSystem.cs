@@ -13,6 +13,7 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
+    [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<PlayerSetBet> _playerSetBet;
@@ -57,6 +58,8 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
         {
             Bet =  dataframe.Bet,
         });
+        _playerTurnTimerReset.Set(player);
+        
     }
 
     public void Dispose()

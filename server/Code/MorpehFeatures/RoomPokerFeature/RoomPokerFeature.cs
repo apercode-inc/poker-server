@@ -54,6 +54,8 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerTopUpBankSystem>());
         
         systemsGroup.AddSystem(container.New<RoomPokerSetTurnByPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerTickTimerTurnByPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerResetTimerTurnByPlayerSystem>());
         
         systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
         
