@@ -19,6 +19,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerCurrency> _playerCurrency;
+    [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
@@ -64,10 +65,11 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                 ref var playerPokerContribution = ref _playerPokerContribution.Get(playerEntityFromRoom);
                 ref var playerCurrency = ref _playerCurrency.Get(playerEntityFromRoom);
                 ref var playerCards = ref _playerCards.Get(playerEntityFromRoom);
+                ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntityFromRoom);
 
                 var cardsModel = new List<RoomPokerCardNetworkModel>();
 
-                if (thisPlayer || playerCards.CardsState == CardsState.Open) //Если это запросивший игрок или если карты вскрыты
+                if (thisPlayer || playerCards.CardsState == CardsState.Open)
                 {
                     foreach (var card in playerCards.Cards)
                     {
@@ -87,6 +89,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                     IsDealer = isDealer,
                     ContributionBalance = playerPokerContribution.Value,
                     AllBalance = playerCurrency.CurrencyByType[roomPokerStats.CurrencyType],
+                    CurrentBet = playerPokerCurrentBet.Value,
                     CardsState = playerCards.CardsState,
                     CardsModel = cardsModel,
                 };
