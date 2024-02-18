@@ -4,7 +4,6 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
-using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -17,8 +16,8 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
-
-    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
+    
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
 
     [Injectable] private NetFrameServer _server;
@@ -62,13 +61,7 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
             }
             else
             {
-                ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-                if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer,
-                        out var nextPlayerByMarked))
-                {
-                    _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
-                }
+                _playerPokerCheck.Set(playerEntity);
             }
 
             var dataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();

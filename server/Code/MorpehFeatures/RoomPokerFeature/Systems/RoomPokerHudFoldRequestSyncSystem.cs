@@ -9,25 +9,25 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
+public class RoomPokerHudFoldRequestSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
-
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    [Injectable] private Stash<PlayerSetBet> _playerSetBet;
 
-    [Injectable] private PlayerStorage _playerStorage;
+    [Injectable] private Stash<PlayerDropCards> _playerDropCards;
+    [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
+    
     [Injectable] private NetFrameServer _server;
+    [Injectable] private PlayerStorage _playerStorage;
     
     public World World { get; set; }
 
     public void OnAwake()
     {
-        _server.Subscribe<RoomPokerHudSetBetRequestDataframe>(Handler);
+        _server.Subscribe<RoomPokerHudFoldRequestDataframe>(Handler);
     }
-
-    private void Handler(RoomPokerHudSetBetRequestDataframe dataframe, int clientId)
+    
+    private void Handler(RoomPokerHudFoldRequestDataframe dataframe, int clientId)
     {
         if (!_playerStorage.TryGetPlayerById(clientId, out var player))
         {
@@ -40,7 +40,7 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
         {
             return;
         }
-
+        
         var roomEntity = playerRoomPoker.RoomEntity;
 
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
@@ -53,15 +53,12 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
             return;
         }
 
-        _playerSetBet.Set(player, new PlayerSetBet
-        {
-            Bet =  dataframe.Bet,
-        });
+        _playerDropCards.Set(player);
         _playerTurnTimerReset.Set(player);
     }
 
     public void Dispose()
     {
-        _server.Unsubscribe<RoomPokerHudSetBetRequestDataframe>(Handler);
+        _server.Unsubscribe<RoomPokerHudFoldRequestDataframe>(Handler);
     }
 }

@@ -17,9 +17,9 @@ public class RoomPokerSetBetByPlayerSystem : ISystem
     
     [Injectable] private CurrencyPlayerService _currencyPlayerService;
     
-    public World World { get; set; }
-
     private Filter _filter;
+    
+    public World World { get; set; }
     
     public void OnAwake()
     {

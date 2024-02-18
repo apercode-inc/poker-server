@@ -9,25 +9,27 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
+public class RoomPokerHudCheckRequestSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
-
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    [Injectable] private Stash<PlayerSetBet> _playerSetBet;
+    [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
 
-    [Injectable] private PlayerStorage _playerStorage;
+    [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
+    [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
+    [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
+    
     [Injectable] private NetFrameServer _server;
+    [Injectable] private PlayerStorage _playerStorage;
     
     public World World { get; set; }
 
     public void OnAwake()
     {
-        _server.Subscribe<RoomPokerHudSetBetRequestDataframe>(Handler);
+        _server.Subscribe<RoomPokerHudCheckRequestDataframe>(Handler);
     }
 
-    private void Handler(RoomPokerHudSetBetRequestDataframe dataframe, int clientId)
+    private void Handler(RoomPokerHudCheckRequestDataframe dataframe, int clientId)
     {
         if (!_playerStorage.TryGetPlayerById(clientId, out var player))
         {
@@ -40,7 +42,7 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
         {
             return;
         }
-
+        
         var roomEntity = playerRoomPoker.RoomEntity;
 
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
@@ -53,15 +55,21 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
             return;
         }
 
-        _playerSetBet.Set(player, new PlayerSetBet
+        ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
+        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
+
+        if (roomPokerMaxBet.Value - playerPokerCurrentBet.Value > 0)
         {
-            Bet =  dataframe.Bet,
-        });
+            return;
+        }
+        
+        _playerPokerCheck.Set(player);
         _playerTurnTimerReset.Set(player);
+
     }
 
     public void Dispose()
     {
-        _server.Unsubscribe<RoomPokerHudSetBetRequestDataframe>(Handler);
+        _server.Unsubscribe<RoomPokerHudCheckRequestDataframe>(Handler);
     }
 }
