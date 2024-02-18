@@ -20,6 +20,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerCurrency> _playerCurrency;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
+    [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
     
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
@@ -66,6 +67,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                 ref var playerCurrency = ref _playerCurrency.Get(playerEntityFromRoom);
                 ref var playerCards = ref _playerCards.Get(playerEntityFromRoom);
                 ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntityFromRoom);
+                ref var playerTurnTimer = ref _playerTurnTimer.Get(playerEntityFromRoom, out var turnTimerExist);
 
                 var cardsModel = new List<RoomPokerCardNetworkModel>();
 
@@ -90,6 +92,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                     ContributionBalance = playerPokerContribution.Value,
                     AllBalance = playerCurrency.CurrencyByType[roomPokerStats.CurrencyType],
                     CurrentBet = playerPokerCurrentBet.Value,
+                    TurnTime = turnTimerExist ? playerTurnTimer.TurnTime - playerTurnTimer.Timer : 0,
                     CardsState = playerCards.CardsState,
                     CardsModel = cardsModel,
                 };
