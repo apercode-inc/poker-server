@@ -1,4 +1,5 @@
 using Scellecs.Morpeh;
+using Scellecs.Morpeh.Collections;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
@@ -9,7 +10,9 @@ using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
+using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
@@ -19,6 +22,7 @@ public class RoomPokerStorage : IInitializer
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
+    [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
     [Injectable] private Stash<Destroy> _destroy;
 
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
@@ -83,6 +87,11 @@ public class RoomPokerStorage : IInitializer
         _roomPokerMaxBet.Set(roomEntity, new RoomPokerMaxBet
         {
             Value = bigBet / 2,
+        });
+        _roomPokerCardsToTable.Set(roomEntity, new RoomPokerCardsToTable
+        {
+            State = CardToTableState.PreFlop,
+            Cards = new FastList<CardModel>(),
         });
 
         _playerStorage.CreateForRoomAndSync(createdPlayer, currencyType, contribution, roomEntity, seat);

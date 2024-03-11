@@ -10,6 +10,7 @@ public class RoomPokerCheckByPlayerSystem : ISystem
 {
     [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
+    [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
 
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
     
@@ -41,7 +42,8 @@ public class RoomPokerCheckByPlayerSystem : ISystem
             {
                 _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
             }
-            
+
+            _playerTurnCompleteFlag.Set(playerEntity);
             _playerPokerCheck.Remove(playerEntity);
         }
     }

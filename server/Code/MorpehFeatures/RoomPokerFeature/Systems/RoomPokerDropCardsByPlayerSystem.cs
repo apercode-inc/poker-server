@@ -9,6 +9,7 @@ public class RoomPokerDropCardsByPlayerSystem : ISystem
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerDropCards> _playerDropCards;
+    [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
 
     [Injectable] private RoomPokerService _roomPokerService;
     
@@ -34,6 +35,7 @@ public class RoomPokerDropCardsByPlayerSystem : ISystem
             
             _roomPokerService.DropCards(roomEntity, playerEntity);
             
+            _playerTurnCompleteFlag.Set(playerEntity);
             _playerDropCards.Remove(playerEntity);
         }
     }

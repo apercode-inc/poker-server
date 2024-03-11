@@ -26,6 +26,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
     [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
+    [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
@@ -89,6 +90,7 @@ public class RoomPokerService : IInitializer
         _playerPokerContribution.Remove(playerLeft);
         _playerPokerCurrentBet.Remove(playerLeft);
         _playerTurnTimer.Remove(playerLeft);
+        _playerTurnCompleteFlag.Remove(playerLeft);
         
         if (markedPlayersBySeat.Count != 0)
         {
