@@ -68,6 +68,8 @@ public class RoomPokerService : IInitializer
                     case PokerPlayerMarkerType.ActivePlayer:
                         SetActivePlayerMarker(nextPlayerMarked);
                         break;
+                    case PokerPlayerMarkerType.NextRoundActivePlayer:
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

@@ -4,4 +4,5 @@ public enum PokerPlayerMarkerType
 {
     DealerPlayer = 0,
     ActivePlayer = 1,
+    NextRoundActivePlayer = 2,
 }

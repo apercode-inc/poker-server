@@ -27,6 +27,8 @@ public class RoomPokerSeatsFactory : IInitializer
         markedPlayersBySeat.SetSettingMarker(PokerPlayerMarkerType.ActivePlayer, MarkerSettingType.MoveWithRemoveForwardDirection, true);
         markedPlayersBySeat.SetSettingMarker(PokerPlayerMarkerType.DealerPlayer, MarkerSettingType.MoveForwardDirection, true);
         markedPlayersBySeat.SetSettingMarker(PokerPlayerMarkerType.ActivePlayer, MarkerSettingType.MoveForwardDirection, true);
+        markedPlayersBySeat.SetSettingMarker(PokerPlayerMarkerType.NextRoundActivePlayer, MarkerSettingType.MoveForwardDirection, true);
+        markedPlayersBySeat.SetSettingMarker(PokerPlayerMarkerType.NextRoundActivePlayer, MarkerSettingType.MoveWithRemoveForwardDirection, true);
         
         return markedPlayersBySeat;
     }

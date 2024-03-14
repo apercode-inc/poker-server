@@ -3,7 +3,7 @@
   "player_turn_time": 20,
   "player_turn_fast_time": 10,
   "dealing_cards_time": 3,
-  "seat_counts": [10], 
+  "seat_counts": [10, 7], 
   "bets": [
     {
       "blind_big": 10,

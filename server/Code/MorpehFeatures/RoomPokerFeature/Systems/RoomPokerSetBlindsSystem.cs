@@ -1,7 +1,6 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CurrencyFeature.Services;
-using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
@@ -34,7 +33,6 @@ public class RoomPokerSetBlindsSystem : ISystem
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             var markedPlayers = roomPokerPlayers.MarkedPlayersBySeat;
-            var playersCount = roomPokerPlayers.MarkedPlayersBySeat.Count;
 
             ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
             var small = roomPokerStats.BigBet / 2;
@@ -42,24 +40,15 @@ public class RoomPokerSetBlindsSystem : ISystem
 
             if (markedPlayers.TryGetValueByMarked(PokerPlayerMarkerType.ActivePlayer, out var nextPlayerByMarked))
             {
-                if (playersCount > 2)
-                {
-                    var smallBlindPlayer = nextPlayerByMarked.Value;
+                var smallBlindPlayer = nextPlayerByMarked.Value;
 
-                    _currencyPlayerService.TrySetBet(roomEntity, smallBlindPlayer, small);
+                _currencyPlayerService.TrySetBet(roomEntity, smallBlindPlayer, small);
 
-                    markedPlayers.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out nextPlayerByMarked);
+                markedPlayers.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out nextPlayerByMarked);
 
-                    var bigBlindPlayer = nextPlayerByMarked.Value;
+                var bigBlindPlayer = nextPlayerByMarked.Value;
 
-                    _currencyPlayerService.TrySetBet(roomEntity, bigBlindPlayer, big);
-                }
-                else if (playersCount == 2)
-                {
-                    var smallBlindPlayer = nextPlayerByMarked.Value;
-                    
-                    _currencyPlayerService.TrySetBet(roomEntity, smallBlindPlayer, small);
-                }
+                _currencyPlayerService.TrySetBet(roomEntity, bigBlindPlayer, big);
             }
 
             _roomPokerSetBlinds.Remove(roomEntity);

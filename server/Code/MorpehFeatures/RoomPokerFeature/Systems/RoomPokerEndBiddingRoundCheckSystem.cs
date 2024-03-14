@@ -1,5 +1,4 @@
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -75,13 +74,10 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
                 continue;
             }
             
-            _playerSetPokerTurn.Remove(playerEntity);
-
-            var currentTime = DateTime.Now;
-            Debug.LogError($"{currentTime:d}: круг торгов прерван, можно выкладывать карты на стол");
+            roomPokerPlayers.MarkedPlayersBySeat.ResetMarker(PokerPlayerMarkerType.ActivePlayer);
             
+            _playerSetPokerTurn.Remove(playerEntity);
             _roomPokerSetCardsToTable.Set(roomEntity);
-            //todo на комнату навесить компонент выкладывание карт на стол
         }
     }
 

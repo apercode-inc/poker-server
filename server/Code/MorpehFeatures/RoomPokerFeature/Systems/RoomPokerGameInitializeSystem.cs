@@ -76,6 +76,7 @@ public class RoomPokerGameInitializeSystem : ISystem
                 else if (count == 1)
                 {
                     roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.ActivePlayer);
+                    roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.NextRoundActivePlayer);
                     break;
                 }
                 
