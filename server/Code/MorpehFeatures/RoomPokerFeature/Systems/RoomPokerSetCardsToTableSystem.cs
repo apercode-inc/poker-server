@@ -1,8 +1,12 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.ConfigsFeature.Constants;
+using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
@@ -22,9 +26,11 @@ public class RoomPokerSetCardsToTableSystem : ISystem
     [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
+    [Injectable] private Stash<RoomPokerSetCardsTickTimer> _roomPokerSetCardsTickTimer;
 
     [Injectable] private RoomPokerCardDeskService _cardDeskService;
     [Injectable] private NetFrameServer _server;
+    [Injectable] private ConfigsService _configsService;
 
     private Filter _filter;
     
@@ -54,16 +60,17 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                 case CardToTableState.PreFlop:
                     throw new ArgumentOutOfRangeException();
                 case CardToTableState.Flop:
-                    SetCards(roomEntity, cards, CardFlopCount);
+                    SetCards(roomEntity, roomPokerCardsToTable.State, cards, CardFlopCount);
                     break;
                 case CardToTableState.Turn:
-                    SetCards(roomEntity, cards, CardTurnCount);
+                    SetCards(roomEntity, roomPokerCardsToTable.State, cards, CardTurnCount);
                     break;
                 case CardToTableState.River:
-                    SetCards(roomEntity, cards, CardRiverCount);
+                    SetCards(roomEntity, roomPokerCardsToTable.State, cards, CardRiverCount);
                     break;
                 case CardToTableState.Showdown:
-                    //TODO передача управления системе (или системам) которые сравнивают комбинации
+                    Debug.LogColor("Далее должен быть Showdown!", ConsoleColor.Magenta);
+                    //TODO передача управления системе (или системам) которые сравнивают комбинации + система выигрыша игрока
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -73,7 +80,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         }
     }
 
-    private void SetCards(Entity roomEntity, FastList<CardModel> cards, int cardCount)
+    private void SetCards(Entity roomEntity, CardToTableState cardToTableState, FastList<CardModel> cards, int cardCount)
     {
         ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
         ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
@@ -101,11 +108,16 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         var dataframe = new RoomPokerSetCardsToTableDataframe
         {
             Bank = roomPokerBank.Value,
+            CardToTableState = cardToTableState,
             Cards = cardsNetworkModels,
         };
         _server.SendInRoom(ref dataframe, roomEntity);
-
-        //todo надо сделать какой то таймер чтобы показать раскладку и дальше передавать ходы игрокам
+        
+        var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPoker);
+        _roomPokerSetCardsTickTimer.Set(roomEntity, new RoomPokerSetCardsTickTimer
+        {
+            Value = config.DealingCardTimeToTable,
+        });
     }
 
     public void Dispose()

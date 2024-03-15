@@ -1,4 +1,5 @@
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CurrencyFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -38,7 +39,7 @@ public class RoomPokerSetBetByPlayerSystem : ISystem
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
 
             var roomEntity = playerRoomPoker.RoomEntity;
-
+            
             if (_currencyPlayerService.TrySetBet(roomEntity, playerEntity, roomPokerSetBet.Bet))
             {
                 ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);

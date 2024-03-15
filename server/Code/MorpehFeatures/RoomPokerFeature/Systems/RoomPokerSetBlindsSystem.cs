@@ -10,6 +10,7 @@ public class RoomPokerSetBlindsSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerSetBlinds> _roomPokerSetBlinds;
+    [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
 
     [Injectable] private CurrencyPlayerService _currencyPlayerService;
@@ -31,6 +32,7 @@ public class RoomPokerSetBlindsSystem : ISystem
     {
         foreach (var roomEntity in _filter)
         {
+            ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             var markedPlayers = roomPokerPlayers.MarkedPlayersBySeat;
 
@@ -51,6 +53,9 @@ public class RoomPokerSetBlindsSystem : ISystem
                 _currencyPlayerService.TrySetBet(roomEntity, bigBlindPlayer, big);
             }
 
+            
+            roomPokerMaxBet.Value = roomPokerStats.BigBet;
+            
             _roomPokerSetBlinds.Remove(roomEntity);
         }
     }

@@ -1,17 +1,20 @@
 using NetFrame;
 using NetFrame.WriteAndRead;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
 public struct RoomPokerSetCardsToTableDataframe : INetworkDataframe
 {
     public long Bank;
+    public CardToTableState CardToTableState;
     public List<RoomPokerCardNetworkModel> Cards;
     
     public void Write(NetFrameWriter writer)
     {
         writer.WriteLong(Bank);
+        writer.WriteByte((byte) CardToTableState);
         
         var hasUsers = Cards != null;
         writer.WriteBool(hasUsers);
@@ -30,6 +33,7 @@ public struct RoomPokerSetCardsToTableDataframe : INetworkDataframe
     public void Read(NetFrameReader reader)
     {
         Bank = reader.ReadLong();
+        CardToTableState = (CardToTableState) reader.ReadByte();
         
         if (reader.ReadBool())
         {

@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -68,11 +69,6 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             
             ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
             ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
-
-            if (roomPokerMaxBet.Value < roomPokerStats.BigBet)
-            {
-                roomPokerMaxBet.Value = roomPokerStats.BigBet;
-            }
 
             var requiredBet = roomPokerMaxBet.Value - playerPokerCurrentBet.Value;
             var remainderAfterCall = playerPokerContribution.Value - requiredBet;

@@ -73,6 +73,15 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
             {
                 continue;
             }
+
+            roomPokerMaxBet.Value = 0;
+
+            foreach (var markedPlayers in roomPokerPlayers.MarkedPlayersBySeat)
+            {
+                var player = markedPlayers.Value;
+                ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
+                playerPokerCurrentBet.Value = 0;
+            }
             
             roomPokerPlayers.MarkedPlayersBySeat.ResetMarker(PokerPlayerMarkerType.ActivePlayer);
             
