@@ -47,12 +47,6 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
             {
                 var player = markedPlayers.Value;
                 
-                if (!_playerTurnCompleteFlag.Has(player))
-                {
-                    isContinueBiddingRound = true;
-                    break;
-                }
-                
                 ref var playerCards = ref _playerCards.Get(player);
 
                 if (_playerAllin.Has(player) || playerCards.CardsState == CardsState.Empty)
@@ -60,6 +54,12 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
                     continue;
                 }
                 
+                if (!_playerTurnCompleteFlag.Has(player))
+                {
+                    isContinueBiddingRound = true;
+                    break;
+                }
+
                 ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
 
                 if (playerPokerCurrentBet.Value != roomPokerMaxBet.Value)
