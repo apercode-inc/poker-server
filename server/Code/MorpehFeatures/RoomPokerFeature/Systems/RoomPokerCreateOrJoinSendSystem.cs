@@ -25,6 +25,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
+    [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
 
     [Injectable] private NetFrameServer _server;
     
@@ -50,6 +51,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             ref var roomPokerId = ref _roomPokerId.Get(roomEntity);
+            ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
 
             var roomPlayerNetworkModels = new List<RoomPlayerNetworkModel>();
             RoomPlayerNetworkModel thisPlayerModel = default;
@@ -104,10 +106,23 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                 }
             }
 
+            var cardsToTableNetworkModel = new List<RoomPokerCardNetworkModel>();
+
+            foreach (var card in roomPokerCardsToTable.Cards)
+            {
+                cardsToTableNetworkModel.Add(new RoomPokerCardNetworkModel
+                {
+                    Rank = card.Rank,
+                    Suit = card.Suit,
+                });
+            }
+
             var createDataframe = new RoomPokerCreateResponseDataframe
             {
                 RoomId = roomPokerId.Value,
                 MaxPlayers = roomPokerStats.MaxPlayers,
+                CardToTableState = roomPokerCardsToTable.State,
+                CardToTableModels = cardsToTableNetworkModel,
                 CurrencyType = roomPokerStats.CurrencyType,
                 PlayerModels = roomPlayerNetworkModels,
             };
