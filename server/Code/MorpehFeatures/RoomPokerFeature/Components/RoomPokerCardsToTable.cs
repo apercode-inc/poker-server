@@ -8,5 +8,5 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Components;
 public struct RoomPokerCardsToTable : IComponent
 {
     public CardToTableState State;
-    public FastList<CardModel> Cards;
+    public List<CardModel> Cards;
 }

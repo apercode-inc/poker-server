@@ -27,6 +27,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
     [Injectable] private Stash<RoomPokerSetCardsTickTimer> _roomPokerSetCardsTickTimer;
+    [Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdownTimer;
 
     [Injectable] private RoomPokerCardDeskService _cardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -69,8 +70,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                     SetCards(roomEntity, roomPokerCardsToTable.State, cards, CardRiverCount);
                     break;
                 case CardToTableState.Showdown:
-                    Debug.LogColor("Далее должен быть Showdown!", ConsoleColor.Magenta);
-                    //TODO передача управления системе (или системам) которые сравнивают комбинации + система выигрыша игрока
+                    _roomPokerShowdownTimer.Set(roomEntity);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -80,7 +80,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         }
     }
 
-    private void SetCards(Entity roomEntity, CardToTableState cardToTableState, FastList<CardModel> cards, int cardCount)
+    private void SetCards(Entity roomEntity, CardToTableState cardToTableState, List<CardModel> cards, int cardCount)
     {
         ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
         ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);

@@ -91,7 +91,7 @@ public class RoomPokerStorage : IInitializer
         _roomPokerCardsToTable.Set(roomEntity, new RoomPokerCardsToTable
         {
             State = CardToTableState.PreFlop,
-            Cards = new FastList<CardModel>(),
+            Cards = new List<CardModel>(),
         });
 
         _playerStorage.CreateForRoomAndSync(createdPlayer, currencyType, contribution, roomEntity, seat);

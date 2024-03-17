@@ -4,6 +4,7 @@
   "player_turn_fast_time": 10,
   "dealing_cards_time": 3,
   "dealing_card_time_to_table": 2,
+  "showdown_to_table": 2,
   "seat_counts": [10, 7], 
   "bets": [
     {
