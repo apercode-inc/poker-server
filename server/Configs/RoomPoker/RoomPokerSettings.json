@@ -5,7 +5,7 @@
   "dealing_cards_time": 3,
   "dealing_card_time_to_table": 2,
   "showdown_to_table": 2,
-  "seat_counts": [10, 7], 
+  "seat_counts": [7, 10], 
   "bets": [
     {
       "blind_big": 10,

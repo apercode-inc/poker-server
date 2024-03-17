@@ -48,11 +48,19 @@ public class RoomPokerCombinationSystem : ISystem
                     continue;
                 }
 
-                var combination = DetermineCombination(playerCards.Cards, roomPokerCardsToTable.Cards);
+                var combination = DetermineCombination(playerCards.Cards, roomPokerCardsToTable.Cards, 
+                    out var kickerRanks);
 
                 ref var playerNickname = ref _playerNickname.Get(player);
-                
+
+                Debug.LogColor(new string('-', 50), ConsoleColor.Yellow);
                 Debug.LogColor($"player: {playerNickname.Value} combination : {combination}", ConsoleColor.Magenta);
+
+                foreach (var kicker in kickerRanks)
+                {
+                    Debug.LogColor($"kicker: {kicker}", ConsoleColor.Magenta);
+                }
+                Debug.LogColor(new string('-', 50), ConsoleColor.Yellow);
 
                 // _playerCombination.Set(player, new PlayerCombination
                 // {
@@ -62,62 +70,67 @@ public class RoomPokerCombinationSystem : ISystem
             }
         }
     }
-    
-    public CombinationType DetermineCombination(IEnumerable<CardModel> playerCards, IEnumerable<CardModel> tableCards)
+
+    //todo сгенерировано с помощью chat GPT, потестить и разобраться с кикерами
+    public CombinationType DetermineCombination(IEnumerable<CardModel> playerCards, 
+        IEnumerable<CardModel> tableCards, out List<CardRank> kickerRanks)
     {
         var allCards = new List<CardModel>(playerCards);
         allCards.AddRange(tableCards);
 
         allCards.Sort((x, y) => y.Rank.CompareTo(x.Rank)); // Сортировка карт по убыванию ранга
 
+        var combinationType = CombinationType.HighCard;
+        var findKickerRanks = new List<CardRank>();
+
         if (IsRoyalFlush(allCards))
         {
-            return CombinationType.RoyalFlush;
+            combinationType = CombinationType.RoyalFlush;
         }
-
-        if (IsStraightFlush(allCards))
+        else if (IsStraightFlush(allCards))
         {
-            return CombinationType.StraightFlush;
+            combinationType = CombinationType.StraightFlush;
         }
-
-        if (IsFourOfAKind(allCards))
+        else if (IsFourOfAKind(allCards))
         {
-            return CombinationType.FourKing;
+            combinationType = CombinationType.FourKing;
+            findKickerRanks.Add(allCards[0].Rank);
         }
-
-        if (IsFullHouse(allCards))
+        else if (IsFullHouse(allCards))
         {
-            return CombinationType.FullHouse;
+            combinationType = CombinationType.FullHouse;
         }
-
-        if (IsFlush(allCards))
+        else if (IsFlush(allCards))
         {
-            return CombinationType.Flush;
+            combinationType = CombinationType.Flush;
+            findKickerRanks.AddRange(allCards.Select(c => c.Rank).Take(5));
         }
-
-        if (IsStraight(allCards))
+        else if (IsStraight(allCards))
         {
-            return CombinationType.Straight;
+            combinationType = CombinationType.Straight;
+            findKickerRanks.Add(allCards[0].Rank);
         }
-
-        if (IsThreeOfAKind(allCards))
+        else if (IsThreeOfAKind(allCards))
         {
-            return CombinationType.ThreeKing;
+            combinationType = CombinationType.ThreeKing;
+            findKickerRanks.AddRange(allCards.Where(c => c.Rank != allCards[2].Rank).Select(c => c.Rank).Take(2));
         }
-
-        if (IsTwoPair(allCards))
+        else if (IsTwoPair(allCards))
         {
-            return CombinationType.TwoPair;
+            combinationType = CombinationType.TwoPair;
+            findKickerRanks.AddRange(allCards.Where(c => c.Rank != allCards[2].Rank && c.Rank != allCards[4].Rank)
+                .Select(c => c.Rank).Take(1));
         }
-
-        if (IsPair(allCards))
+        else if (IsPair(allCards))
         {
-            return CombinationType.OnePair;
+            combinationType = CombinationType.OnePair;
+            findKickerRanks.AddRange(allCards.Where(c => c.Rank != allCards[2].Rank).Select(c => c.Rank).Take(3));
         }
 
-        return CombinationType.HighCard;
+        kickerRanks = findKickerRanks;
+        return combinationType;
     }
-    
+
     private bool IsRoyalFlush(List<CardModel> cards)
     {
         return IsStraightFlush(cards) && cards[0].Rank == CardRank.Ace;
@@ -130,7 +143,7 @@ public class RoomPokerCombinationSystem : ISystem
         {
             suitsCount[(int)card.Suit]++;
         }
-    
+
         for (var i = 0; i < cards.Count - 4; i++)
         {
             var isStraightFlush = true;
@@ -142,13 +155,13 @@ public class RoomPokerCombinationSystem : ISystem
                     break;
                 }
             }
-    
+
             if (isStraightFlush)
             {
                 return true;
             }
         }
-    
+
         return false;
     }
 
@@ -177,7 +190,7 @@ public class RoomPokerCombinationSystem : ISystem
             {
                 continue;
             }
-            
+
             threeOfAKindFound = true;
 
             for (var j = 0; j <= cards.Count - 2; j++)
@@ -186,7 +199,7 @@ public class RoomPokerCombinationSystem : ISystem
                 {
                     continue;
                 }
-                    
+
                 pairFound = true;
                 break;
             }
@@ -200,7 +213,7 @@ public class RoomPokerCombinationSystem : ISystem
         return threeOfAKindFound && pairFound;
     }
 
-    
+
     private bool IsFlush(List<CardModel> cards)
     {
         var suitsCount = new int[4];
@@ -275,9 +288,42 @@ public class RoomPokerCombinationSystem : ISystem
 
         return false;
     }
-    
+
+
     public void Dispose()
     {
         _filter = null;
     }
 }
+
+
+
+//TODO test
+// var combination = new RoomPokerCombinationSystem();
+//
+// var playerCards = new List<CardModel>
+// {
+//     new(CardRank.Five, CardSuit.Diamonds),
+//     new(CardRank.King, CardSuit.Diamonds),
+// };
+//
+// var tableCards = new List<CardModel>
+// {
+//     new(CardRank.Five, CardSuit.Hearts),
+//     new(CardRank.Seven, CardSuit.Spades),
+//     new(CardRank.Nine, CardSuit.Diamonds),
+//     new(CardRank.Five, CardSuit.Hearts),
+//     new(CardRank.Five, CardSuit.Clubs),
+// };
+//
+// var result = combination.DetermineCombination(playerCards, tableCards, out var kickerRanks);
+//
+// foreach (var kicker in kickerRanks)
+// {
+//     Debug.LogColor($"kicker: {kicker}", ConsoleColor.Yellow);
+// }
+//
+//
+// Debug.LogColor($"{result}", ConsoleColor.Blue);
+
+//TODO end

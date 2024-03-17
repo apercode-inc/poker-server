@@ -4,12 +4,7 @@ using Scellecs.Morpeh;
 using server;
 using server.Code;
 using server.Code.GlobalUtils;
-using server.Code.GlobalUtils.CustomCollections;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
-using server.Code.MorpehFeatures.RoomPokerFeature.Models;
-using server.Code.MorpehFeatures.RoomPokerFeature.Systems;
-using Debug = server.Code.GlobalUtils.Debug;
 
 //Injection
 var container = new SimpleDImple();
@@ -35,29 +30,6 @@ Time.Initialize();
 
 //todo test
 //MovingMarkersDictionaryTest.RunTest();
-
-//TODO test
-var combination = new RoomPokerCombinationSystem();
-
-var playerCards = new List<CardModel>
-{
-    new(CardRank.Ace, CardSuit.Diamonds),
-    new(CardRank.King, CardSuit.Diamonds),
-};
-
-var tableCards = new List<CardModel>
-{
-    new(CardRank.Queen, CardSuit.Diamonds),
-    new(CardRank.Jack, CardSuit.Spades),
-    new(CardRank.Ten, CardSuit.Diamonds),
-    new(CardRank.Two, CardSuit.Hearts),
-    new(CardRank.Three, CardSuit.Clubs),
-};
-
-var result = combination.DetermineCombination(playerCards, tableCards);
-Debug.LogColor($"{result}", ConsoleColor.Blue);
-
-//TODO end
 
 while (true)
 {
