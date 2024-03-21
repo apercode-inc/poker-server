@@ -28,7 +28,7 @@ public class RoomPokerTopUpBankSystem : ISystem
             ref var roomPokerSetBank = ref _roomPokerSetBank.Get(roomEntity);
             ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
 
-            roomPokerBank.Value += roomPokerSetBank.Value;
+            roomPokerBank.Total += roomPokerSetBank.Value;
             
             _roomPokerSetBank.Remove(roomEntity);
         }

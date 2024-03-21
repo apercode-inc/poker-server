@@ -26,6 +26,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
     [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
+    [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
 
     [Injectable] private NetFrameServer _server;
     
@@ -52,6 +53,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             ref var roomPokerId = ref _roomPokerId.Get(roomEntity);
             ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
+            ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
 
             var roomPlayerNetworkModels = new List<RoomPlayerNetworkModel>();
             RoomPlayerNetworkModel thisPlayerModel = default;
@@ -116,12 +118,13 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                     Suit = card.Suit,
                 });
             }
-
+            
             var createDataframe = new RoomPokerCreateResponseDataframe
             {
                 RoomId = roomPokerId.Value,
                 MaxPlayers = roomPokerStats.MaxPlayers,
                 CardToTableState = roomPokerCardsToTable.State,
+                Bank = roomPokerBank.OnTable,
                 CardToTableModels = cardsToTableNetworkModel,
                 CurrencyType = roomPokerStats.CurrencyType,
                 PlayerModels = roomPlayerNetworkModels,

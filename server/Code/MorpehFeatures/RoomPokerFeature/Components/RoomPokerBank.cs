@@ -4,5 +4,6 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 public struct RoomPokerBank : IComponent
 {
-    public long Value;
+    public long Total;
+    public long OnTable;
 }

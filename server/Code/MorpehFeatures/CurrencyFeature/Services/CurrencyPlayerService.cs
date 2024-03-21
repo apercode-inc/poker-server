@@ -65,7 +65,7 @@ public class CurrencyPlayerService : IInitializer
 
         ref var roomPokerBank = ref _roomPokerBank.Get(room);
 
-        roomPokerBank.Value += cost;
+        roomPokerBank.Total += cost;
 
         if (roomPokerMaxBet.Value < playerPokerCurrentBet.Value)
         {

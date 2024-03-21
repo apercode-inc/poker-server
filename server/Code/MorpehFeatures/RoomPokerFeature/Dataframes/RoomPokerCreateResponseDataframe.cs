@@ -11,6 +11,7 @@ public struct RoomPokerCreateResponseDataframe : INetworkDataframe
     public int RoomId;
     public CurrencyType CurrencyType; 
     public byte MaxPlayers;
+    public long Bank;
     public CardToTableState CardToTableState;
     public List<RoomPokerCardNetworkModel> CardToTableModels;
     public List<RoomPlayerNetworkModel> PlayerModels;
@@ -20,6 +21,7 @@ public struct RoomPokerCreateResponseDataframe : INetworkDataframe
         writer.WriteInt(RoomId);
         writer.WriteInt((int) CurrencyType);
         writer.WriteByte(MaxPlayers);
+        writer.WriteLong(Bank);
         writer.WriteByte((byte) CardToTableState);
 
         var hasCards = CardToTableModels != null;
@@ -54,6 +56,7 @@ public struct RoomPokerCreateResponseDataframe : INetworkDataframe
         RoomId = reader.ReadInt();
         CurrencyType = (CurrencyType) reader.ReadInt();
         MaxPlayers = reader.ReadByte();
+        Bank = reader.ReadLong();
         CardToTableState = (CardToTableState) reader.ReadByte();
 
         if (reader.ReadBool())

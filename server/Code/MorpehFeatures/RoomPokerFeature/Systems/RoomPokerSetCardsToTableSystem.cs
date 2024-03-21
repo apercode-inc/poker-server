@@ -84,6 +84,8 @@ public class RoomPokerSetCardsToTableSystem : ISystem
     {
         ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
         ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
+
+        roomPokerBank.OnTable = roomPokerBank.Total;
         
         var cardsNetworkModels = new List<RoomPokerCardNetworkModel>();
         
@@ -104,10 +106,10 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                 throw new Exception($"[RoomPokerSetCardsToTableSystem.SetCards] No cards in deck, roomId = {roomPokerId.Value}");
             }
         }
-
+        
         var dataframe = new RoomPokerSetCardsToTableDataframe
         {
-            Bank = roomPokerBank.Value,
+            Bank = roomPokerBank.OnTable,
             CardToTableState = cardToTableState,
             Cards = cardsNetworkModels,
         };
