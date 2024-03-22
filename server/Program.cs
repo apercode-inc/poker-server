@@ -5,6 +5,10 @@ using server;
 using server.Code;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
+using server.Code.MorpehFeatures.RoomPokerFeature.Models;
+using server.Code.MorpehFeatures.RoomPokerFeature.Systems;
+using Debug = server.Code.GlobalUtils.Debug;
 
 //Injection
 var container = new SimpleDImple();
@@ -29,7 +33,12 @@ var framesPerSecond = 0;
 Time.Initialize();
 
 //todo test
-//MovingMarkersDictionaryTest.RunTest();
+
+TestCombination();
+
+//TODO test
+
+//TODO end
 
 while (true)
 {
@@ -60,5 +69,57 @@ while (true)
     if (timeLeft > 0)
     {
         Thread.Sleep(timeLeft);
+    }
+}
+
+void TestCombination()
+{
+    var combination = new RoomPokerCombinationSystem();
+
+    var playerOneCards = new List<CardModel>
+    {
+        new(CardRank.Five, CardSuit.Spades),
+        new(CardRank.Nine, CardSuit.Clubs),
+    };
+
+    var playerTwoCards = new List<CardModel>
+    {
+        new(CardRank.King, CardSuit.Hearts),
+        new(CardRank.Jack, CardSuit.Hearts),
+    };
+
+    var tableCards = new List<CardModel>
+    {
+        new(CardRank.Queen, CardSuit.Diamonds),
+        new(CardRank.Ten, CardSuit.Hearts),
+        new(CardRank.Nine, CardSuit.Diamonds),
+        new(CardRank.Seven, CardSuit.Hearts),
+        new(CardRank.Two, CardSuit.Spades),
+    };
+
+    var resultPlayerOne = combination.DetermineCombination(playerOneCards, tableCards, 
+        out var kickerRanksPlayerOne, out var advantageRankPlayerOne);
+
+    var resultPlayerTwo = combination.DetermineCombination(playerTwoCards, tableCards, 
+        out var kickerRanksPlayerTwo, out var advantageRankPlayerTwo);
+
+    Debug.LogColor($"combination_player_1: {resultPlayerOne} ---> "
+                   + Debug.GetCardsLog(playerOneCards) + "--- " + Debug.GetCardsLog(tableCards), ConsoleColor.Blue);
+
+    Debug.LogColor($"advantageRankPlayerOne {advantageRankPlayerOne}", ConsoleColor.DarkCyan);
+    foreach (var kicker in kickerRanksPlayerOne)
+    {
+        Debug.LogColor($"kicker_player_1: {kicker}", ConsoleColor.Yellow);
+    }
+
+    ///////
+    
+    Debug.LogColor($"combination_player_2: {resultPlayerTwo} ---> "
+                   + Debug.GetCardsLog(playerTwoCards) + "--- " + Debug.GetCardsLog(tableCards), ConsoleColor.Blue);
+
+    Debug.LogColor($"advantageRankPlayerTwo {advantageRankPlayerTwo}", ConsoleColor.DarkCyan);
+    foreach (var kicker in kickerRanksPlayerTwo)
+    {
+        Debug.LogColor($"kicker_player_2: {kicker}", ConsoleColor.Yellow);
     }
 }
