@@ -78,23 +78,23 @@ void TestCombination()
 
     var playerTwoCards = new List<CardModel>
     {
-        new(CardRank.Eight, CardSuit.Spades) { IsHands = true },
-        new(CardRank.Ace, CardSuit.Spades) { IsHands = true },
+        new(CardRank.Four, CardSuit.Diamonds) { IsHands = true },
+        new(CardRank.Queen, CardSuit.Clubs) { IsHands = true },
     };
     
     var playerOneCards = new List<CardModel>
     {
-        new(CardRank.King, CardSuit.Hearts) { IsHands = true },
-        new(CardRank.Jack, CardSuit.Hearts) { IsHands = true },
+        new(CardRank.Nine, CardSuit.Diamonds) { IsHands = true },
+        new(CardRank.Jack, CardSuit.Clubs) { IsHands = true },
     };
 
     var tableCards = new List<CardModel> //A, 2, 3, 4, 5 не учитывает младший стрит (колесо)
     {
-        new(CardRank.Queen, CardSuit.Hearts),
-        new(CardRank.Seven, CardSuit.Clubs),
-        new(CardRank.Ten, CardSuit.Hearts),
-        new(CardRank.Ace, CardSuit.Hearts),
-        new(CardRank.Two, CardSuit.Spades),
+        new(CardRank.Five, CardSuit.Spades),
+        new(CardRank.Three, CardSuit.Hearts),
+        new(CardRank.Six, CardSuit.Clubs),
+        new(CardRank.Seven, CardSuit.Diamonds),
+        new(CardRank.Eight, CardSuit.Spades),
     };
     
     combination.TestMockData(playerOneCards, tableCards);

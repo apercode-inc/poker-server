@@ -147,8 +147,9 @@ public class RoomPokerCombinationSystem : ISystem
             }
         }
         
-        Debug.LogError($"tmpValue = {tmpValue}");
-
+        //Debug.LogError($"tmpValue = {tmpValue}");
+        //Debug.LogError($"isOrdered {isOrdered}");
+        
         var isHighAce = CardRank.Ace == tmpValue;
         
         if (isSameSuit)
