@@ -78,26 +78,28 @@ void TestCombination()
 
     var playerTwoCards = new List<CardModel>
     {
-        new(CardRank.Four, CardSuit.Diamonds) { IsHands = true },
-        new(CardRank.Queen, CardSuit.Clubs) { IsHands = true },
+        new(CardRank.Queen, CardSuit.Diamonds) { IsHands = true },
+        new(CardRank.Seven, CardSuit.Spades) { IsHands = true },
     };
     
     var playerOneCards = new List<CardModel>
     {
-        new(CardRank.Nine, CardSuit.Diamonds) { IsHands = true },
-        new(CardRank.Jack, CardSuit.Clubs) { IsHands = true },
+        new(CardRank.Ace, CardSuit.Hearts) { IsHands = true },
+        new(CardRank.Seven, CardSuit.Diamonds) { IsHands = true },
     };
 
     var tableCards = new List<CardModel> //A, 2, 3, 4, 5 не учитывает младший стрит (колесо)
     {
-        new(CardRank.Five, CardSuit.Spades),
-        new(CardRank.Three, CardSuit.Hearts),
-        new(CardRank.Six, CardSuit.Clubs),
-        new(CardRank.Seven, CardSuit.Diamonds),
-        new(CardRank.Eight, CardSuit.Spades),
+        new(CardRank.Two, CardSuit.Hearts),
+        new(CardRank.Jack, CardSuit.Clubs),
+        new(CardRank.Ten, CardSuit.Spades),
+        new(CardRank.Nine, CardSuit.Spades),
+        new(CardRank.Four, CardSuit.Hearts),
     };
     
-    combination.TestMockData(playerOneCards, tableCards);
-    Debug.LogColor(new string('-', 50), ConsoleColor.Blue);
+    Debug.LogColor("------------ Player_2 ------------", ConsoleColor.Magenta);
     combination.TestMockData(playerTwoCards, tableCards);
+    
+    Debug.LogColor("------------ Player_1 ------------", ConsoleColor.Magenta);
+    combination.TestMockData(playerOneCards, tableCards);
 }

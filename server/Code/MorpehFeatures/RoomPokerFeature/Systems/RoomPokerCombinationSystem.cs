@@ -62,9 +62,11 @@ public class RoomPokerCombinationSystem : ISystem
         var subsetsForSeat = CollectionsUtils.CombinationsRosettaWoRecursion(allCards.ToArray(), 5);
         
         CombinationType combinationMaxType = default;
+
+        var forSeat = subsetsForSeat as List<CardModel>[] ?? subsetsForSeat.ToArray();
+        var cardsModel = forSeat.First();
         
-        var cardsModel = new List<CardModel>();
-        foreach (var subset in subsetsForSeat)
+        foreach (var subset in forSeat)
         {
             var combinationType = DetectCombination(subset);
             if (combinationType > combinationMaxType)
