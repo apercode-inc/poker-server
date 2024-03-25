@@ -31,8 +31,6 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
 
     private Filter _filter;
 
-    private Queue<CardModel> _cardModels;
-
     private List<RoomPokerCardNetworkModel> _networkCardsModel;
     
     public World World { get; set; }
@@ -40,8 +38,7 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
     public void OnAwake()
     {
         _networkCardsModel = new List<RoomPokerCardNetworkModel>();
-        _cardModels = new Queue<CardModel>();
-            
+
         _filter = World.Filter
             .With<RoomPokerPlayers>()
             .With<RoomPokerActive>()
@@ -64,7 +61,6 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
                 ref var playerId = ref _playerId.Get(playerEntity);
 
                 _networkCardsModel.Clear();
-                _cardModels.Clear();
 
                 var cardsModel = new Queue<CardModel>();
                 
@@ -72,6 +68,7 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
                 {
                     if (pokerCardDesk.CardDesk.TryRandomRemove(out var cardModel))
                     {
+                        cardModel.IsHands = true;
                         cardsModel.Enqueue(cardModel);
                     }
                     else
@@ -124,6 +121,5 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
     {
         _filter = null;
         _networkCardsModel = null;
-        _cardModels = null;
     }
 }

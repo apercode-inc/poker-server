@@ -105,6 +105,7 @@ public class RoomPokerCardDeskService : IInitializer
         while (playerCards.Cards.Count > 0)
         {
             var card = playerCards.Cards.Dequeue();
+            card.IsHands = false;
             roomPokerCardDesk.CardDesk.Add(card);
         }
 

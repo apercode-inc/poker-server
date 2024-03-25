@@ -76,50 +76,28 @@ void TestCombination()
 {
     var combination = new RoomPokerCombinationSystem();
 
-    var playerOneCards = new List<CardModel>
-    {
-        new(CardRank.Five, CardSuit.Spades),
-        new(CardRank.Nine, CardSuit.Clubs),
-    };
-
     var playerTwoCards = new List<CardModel>
     {
-        new(CardRank.King, CardSuit.Hearts),
-        new(CardRank.Jack, CardSuit.Hearts),
+        new(CardRank.Eight, CardSuit.Spades) { IsHands = true },
+        new(CardRank.Ace, CardSuit.Spades) { IsHands = true },
+    };
+    
+    var playerOneCards = new List<CardModel>
+    {
+        new(CardRank.King, CardSuit.Hearts) { IsHands = true },
+        new(CardRank.Jack, CardSuit.Hearts) { IsHands = true },
     };
 
-    var tableCards = new List<CardModel>
+    var tableCards = new List<CardModel> //A, 2, 3, 4, 5 не учитывает младший стрит (колесо)
     {
-        new(CardRank.Queen, CardSuit.Diamonds),
+        new(CardRank.Queen, CardSuit.Hearts),
+        new(CardRank.Seven, CardSuit.Clubs),
         new(CardRank.Ten, CardSuit.Hearts),
-        new(CardRank.Nine, CardSuit.Diamonds),
-        new(CardRank.Seven, CardSuit.Hearts),
+        new(CardRank.Ace, CardSuit.Hearts),
         new(CardRank.Two, CardSuit.Spades),
     };
-
-    var resultPlayerOne = combination.DetermineCombination(playerOneCards, tableCards, 
-        out var kickerRanksPlayerOne, out var advantageRankPlayerOne);
-
-    var resultPlayerTwo = combination.DetermineCombination(playerTwoCards, tableCards, 
-        out var kickerRanksPlayerTwo, out var advantageRankPlayerTwo);
-
-    Debug.LogColor($"combination_player_1: {resultPlayerOne} ---> "
-                   + Debug.GetCardsLog(playerOneCards) + "--- " + Debug.GetCardsLog(tableCards), ConsoleColor.Blue);
-
-    Debug.LogColor($"advantageRankPlayerOne {advantageRankPlayerOne}", ConsoleColor.DarkCyan);
-    foreach (var kicker in kickerRanksPlayerOne)
-    {
-        Debug.LogColor($"kicker_player_1: {kicker}", ConsoleColor.Yellow);
-    }
-
-    ///////
     
-    Debug.LogColor($"combination_player_2: {resultPlayerTwo} ---> "
-                   + Debug.GetCardsLog(playerTwoCards) + "--- " + Debug.GetCardsLog(tableCards), ConsoleColor.Blue);
-
-    Debug.LogColor($"advantageRankPlayerTwo {advantageRankPlayerTwo}", ConsoleColor.DarkCyan);
-    foreach (var kicker in kickerRanksPlayerTwo)
-    {
-        Debug.LogColor($"kicker_player_2: {kicker}", ConsoleColor.Yellow);
-    }
+    combination.TestMockData(playerOneCards, tableCards);
+    Debug.LogColor(new string('-', 50), ConsoleColor.Blue);
+    combination.TestMockData(playerTwoCards, tableCards);
 }
