@@ -131,24 +131,23 @@ public class RoomPokerCombinationSystem : ISystem
         {
             if (tmpValue.HasValue)
             {
-                if (cardValue.Rank - tmpValue != 1)
+                if (cardValue.Rank - tmpValue.Value != 1)
                 {
-                    if (cardValue.Rank - tmpValue.Value != 1)
-                    {
-                        isOrdered = false;
-                        break;
-                    }
-
-                    tmpValue = cardValue.Rank;
+                    isOrdered = false;
+                    break;
                 }
                 else
                 {
                     tmpValue = cardValue.Rank;
                 }
             }
+            else
+            {
+                tmpValue = cardValue.Rank;
+            }
         }
         
-        //Debug.LogError($"tmpValue = {tmpValue}");
+        Debug.LogError($"tmpValue = {tmpValue}");
 
         var isHighAce = CardRank.Ace == tmpValue;
         
