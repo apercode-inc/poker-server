@@ -161,8 +161,17 @@ public class RoomPokerCombinationSystem : ISystem
 
             return CombinationType.Flush;
         }
-        
-        return CombinationType.HighCard;
+        else
+        {
+            if (isOrdered)
+            {
+                return CombinationType.Straight;
+            }
+            else
+            {
+                return CombinationType.HighCard;
+            }
+        }
     }
 
     public void Dispose()
