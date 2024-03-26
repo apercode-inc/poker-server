@@ -74,7 +74,7 @@ while (true)
 
 void TestCombination()
 {
-    var combination = new RoomPokerCombinationSystem();
+    var roomPokerCombinationSystem = new RoomPokerCombinationSystem();
 
     var playerTwoCards = new List<CardModel>
     {
@@ -97,9 +97,34 @@ void TestCombination()
         new(CardRank.Four, CardSuit.Hearts),
     };
     
-    Debug.LogColor("------------ Player_2 ------------", ConsoleColor.Magenta);
-    combination.TestMockData(playerTwoCards, tableCards);
+    Debug.LogColor("------------ Hands Player_2 ------------", ConsoleColor.Magenta);
+    Debug.LogColor($"{Debug.GetCardsLog(playerTwoCards)}", ConsoleColor.Cyan);
     
-    Debug.LogColor("------------ Player_1 ------------", ConsoleColor.Magenta);
-    combination.TestMockData(playerOneCards, tableCards);
+    Debug.LogColor("------------ Hands Player_1 ------------", ConsoleColor.Magenta);
+    Debug.LogColor($"{Debug.GetCardsLog(playerOneCards)}", ConsoleColor.Cyan);
+    
+    Debug.LogColor("------------ Table Cards ------------", ConsoleColor.Magenta);
+    Debug.LogColor($"{Debug.GetCardsLog(tableCards)}", ConsoleColor.Cyan);
+
+    
+    Console.WriteLine();
+
+
+    Debug.LogColor("------------ Combination Player_2 ------------", ConsoleColor.Magenta);
+    
+    //calculate player_2
+    var combinationTwoPlayer = roomPokerCombinationSystem.GetPokerCombination(playerTwoCards, tableCards, 
+        out var combinationOrdersCardsTwoPlayer);
+
+    Debug.LogColor($"{Debug.GetCardsLog(combinationOrdersCardsTwoPlayer, "^")}", ConsoleColor.Cyan);
+    Debug.LogColor($"{combinationTwoPlayer}", ConsoleColor.Cyan);
+
+    Debug.LogColor("------------ Combination Player_1 ------------", ConsoleColor.Magenta);
+    
+    //calculate player_
+    var combinationOnePlayer = roomPokerCombinationSystem.GetPokerCombination(playerOneCards, tableCards, 
+        out var combinationOrdersCardsOnePlayer);
+    
+    Debug.LogColor($"{Debug.GetCardsLog(combinationOrdersCardsOnePlayer, "^")}", ConsoleColor.Cyan);
+    Debug.LogColor($"{combinationOnePlayer}", ConsoleColor.Cyan);
 }

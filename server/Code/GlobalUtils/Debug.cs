@@ -24,24 +24,25 @@ public static class Debug
         Console.WriteLine(text);
     }
 
-    public static string GetCardsLog(List<CardModel> cardModels)
+    public static string GetCardsLog(List<CardModel> cardModels, string handSymbol = "")
     {
         var result = string.Empty;
 
         foreach (var card in cardModels)
         {
-            result += GetCardLog(card) + " ";
+            result += GetCardLog(card, handSymbol) + " ";
         }
 
         return result;
     }
 
-    public static string GetCardLog(CardModel cardModel)
+    public static string GetCardLog(CardModel cardModel, string handSymbol = "")
     {
         var result = string.Empty;
 
         var rank = cardModel.Rank;
         var suit = cardModel.Suit;
+        var isHand = cardModel.IsHands;
 
         switch (rank)
         {
@@ -100,6 +101,11 @@ public static class Debug
             case CardSuit.Clubs:
                 result += "♣";
                 break;
+        }
+
+        if (isHand)
+        {
+            result += handSymbol;
         }
 
         return result;

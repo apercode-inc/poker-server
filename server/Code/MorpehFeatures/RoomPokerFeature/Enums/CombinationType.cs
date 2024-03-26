@@ -5,7 +5,7 @@ public enum CombinationType : byte
     HighCard = 0,
     OnePair = 1,
     TwoPair = 2,
-    ThreeOfKing = 3,
+    ThreeOfKind = 3,
     Straight = 4,
     Flush = 5,
     FullHouse = 6,

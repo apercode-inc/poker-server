@@ -1,6 +1,6 @@
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Utils;
 
-public class CollectionsUtils
+public static class CombinationUtils
 {
     public static IEnumerable<List<T>> CombinationsRosettaWoRecursion<T>(T[] array, int m)
     {
@@ -14,11 +14,11 @@ public class CollectionsUtils
             throw new ArgumentException("Number of selected elements can't be less than 1");
         }
         
-        T[] result = new T[m];
+        var result = new T[m];
         
-        foreach (int[] j in CombinationsRosettaWoRecursion(m, array.Length))
+        foreach (var j in CombinationsRosettaWoRecursion(m, array.Length))
         {
-            for (int i = 0; i < m; i++)
+            for (var i = 0; i < m; i++)
             {
                 result[i] = array[j[i]];
             }
@@ -28,21 +28,26 @@ public class CollectionsUtils
     
     private static IEnumerable<int[]> CombinationsRosettaWoRecursion(int m, int n)
     {
-        int[] result = new int[m];
-        Stack<int> stack = new Stack<int>(m);
+        var result = new int[m];
+        var stack = new Stack<int>(m);
         
         stack.Push(0);
         
         while (stack.Count > 0)
         {
-            int index = stack.Count - 1;
-            int value = stack.Pop();
+            var index = stack.Count - 1;
+            var value = stack.Pop();
             
             while (value < n)
             {
                 result[index++] = value++;
+                
                 stack.Push(value);
-                if (index != m) continue;
+                if (index != m)
+                {
+                    continue;
+                }
+                
                 yield return (int[])result.Clone();
                 break;
             }

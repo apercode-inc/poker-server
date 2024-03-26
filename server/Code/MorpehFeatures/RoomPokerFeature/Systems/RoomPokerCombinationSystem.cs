@@ -52,39 +52,37 @@ public class RoomPokerCombinationSystem : ISystem
         }
     }
     
-    public void TestMockData(IEnumerable<CardModel> playerCards, IEnumerable<CardModel> tableCards)
+    public CombinationType GetPokerCombination(IEnumerable<CardModel> playerCards, IEnumerable<CardModel> tableCards, 
+        out List<CardModel> combinationOrderedCards)
     {
         var allCards = new List<CardModel>(playerCards);
         
         allCards.AddRange(tableCards);
         allCards.Sort((x, y) => y.Rank.CompareTo(x.Rank));
         
-        var subsetsForSeat = CollectionsUtils.CombinationsRosettaWoRecursion(allCards.ToArray(), 5);
+        var subsetsForSeat = CombinationUtils.CombinationsRosettaWoRecursion(allCards.ToArray(), 5);
         
-        CombinationType combinationMaxType = default;
+        CombinationType combinationTypeMax = default;
 
         var forSeat = subsetsForSeat as List<CardModel>[] ?? subsetsForSeat.ToArray();
-        var cardsModel = forSeat.First();
+        combinationOrderedCards = forSeat.First();
         
         foreach (var subset in forSeat)
         {
-            var combinationType = DetectCombination(subset);
-            if (combinationType > combinationMaxType)
+            var combinationType = DetectPokerCombination(subset);
+            
+            if (combinationType <= combinationTypeMax)
             {
-                combinationMaxType = combinationType;
-                cardsModel = subset;
+                continue;
             }
+            combinationTypeMax = combinationType;
+            combinationOrderedCards = subset;
         }
 
-        foreach (var cards in cardsModel)
-        {
-            Debug.LogColor($"Rank: {cards.Rank} | Suit: {cards.Suit} | IsHands: {cards.IsHands}", ConsoleColor.Cyan);
-        }
-        
-        Debug.LogColor($"Combination: {combinationMaxType}", ConsoleColor.Blue);
+        return combinationTypeMax;
     }
 
-    private static CombinationType DetectCombination(List<CardModel> cards)
+    private CombinationType DetectPokerCombination(List<CardModel> cards)
     {
         ulong handValue = 0;
 
@@ -118,64 +116,61 @@ public class RoomPokerCombinationSystem : ISystem
             case 10:
                 return CombinationType.FullHouse;
             case 9:
-                return CombinationType.ThreeOfKing;
+                return CombinationType.ThreeOfKind;
             case 7:
                 return CombinationType.TwoPair;
             case 6:
                 return CombinationType.OnePair;
         }
         
-        bool isSameSuit = cards.TrueForAll(card => card.Suit == cards[0].Suit);
-        bool isOrdered = true;
+        var isSameSuit = cards.TrueForAll(card => card.Suit == cards[0].Suit);
+        var isOrdered = true;
         CardRank? tmpValue = null;
         
-        foreach (var cardValue in cards.OrderBy(card => card.Rank))
+        var lowOrderCounter = 0;
+        foreach (var card in cards.OrderBy(card => card.Rank))
         {
+            if (card.Rank is CardRank.Ace or CardRank.Two or CardRank.Three or CardRank.Four or CardRank.Five)
+            {
+                lowOrderCounter++;
+            }
+            
             if (tmpValue.HasValue)
             {
-                if (cardValue.Rank - tmpValue.Value != 1)
+                if (card.Rank - tmpValue.Value != 1)
                 {
                     isOrdered = false;
                     break;
                 }
-                else
-                {
-                    tmpValue = cardValue.Rank;
-                }
-            }
-            else
-            {
-                tmpValue = cardValue.Rank;
-            }
-        }
-        
-        //Debug.LogError($"tmpValue = {tmpValue}");
-        //Debug.LogError($"isOrdered {isOrdered}");
-        
-        var isHighAce = CardRank.Ace == tmpValue;
-        
-        if (isSameSuit)
-        {
-            if (isOrdered)
-            {
-                return isHighAce ? CombinationType.RoyalFlush : CombinationType.StraightFlush;
-            }
 
-            return CombinationType.Flush;
-        }
-        else
-        {
-            if (isOrdered)
-            {
-                return CombinationType.Straight;
+                tmpValue = card.Rank;
             }
             else
             {
-                return CombinationType.HighCard;
+                tmpValue = card.Rank;
             }
         }
+
+        if (!isOrdered && lowOrderCounter == 5)
+        {
+            isOrdered = true;
+        }
+        
+        var isHighAce = tmpValue == CardRank.Ace;
+
+        if (!isSameSuit)
+        {
+            return isOrdered ? CombinationType.Straight : CombinationType.HighCard;
+        }
+        
+        if (isOrdered)
+        {
+            return isHighAce ? CombinationType.RoyalFlush : CombinationType.StraightFlush;
+        }
+
+        return CombinationType.Flush;
     }
-
+    
     public void Dispose()
     {
         _filter = null;
