@@ -16,7 +16,7 @@ public class RoomPokerCombinationSystem : ISystem
 
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerCombination> _playerCombination;
-    [Injectable] private Stash<PlayerNickname> _playerNickname; //todo test
+    [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
 
     private Filter _filter;
 
@@ -48,6 +48,15 @@ public class RoomPokerCombinationSystem : ISystem
                 {
                     continue;
                 }
+
+                var combination = GetPokerCombination(playerCards.Cards, roomPokerCardsToTable.Cards, 
+                    out var combinationOrderedCards);
+                
+                _playerPokerCombination.Set(player, new PlayerPokerCombination
+                {
+                    CombinationType = combination,
+                    CombinationCards = combinationOrderedCards,
+                });
             }
         }
     }

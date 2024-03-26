@@ -34,7 +34,7 @@ Time.Initialize();
 
 //todo test
 
-TestCombination();
+//TestCombination();
 
 //TODO test
 
