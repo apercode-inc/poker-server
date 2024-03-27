@@ -13,6 +13,7 @@ public class RoomPokerCombinationSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
+    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerCombination> _playerCombination;
@@ -38,6 +39,8 @@ public class RoomPokerCombinationSystem : ISystem
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
 
+            var combinationMax = CombinationType.HighCard;
+            
             foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var player = markedPlayer.Value;
@@ -57,10 +60,21 @@ public class RoomPokerCombinationSystem : ISystem
                     CombinationType = combination,
                     CombinationCards = combinationOrderedCards,
                 });
+                
+                if (combinationMax < combination)
+                {
+                    combinationMax = combination;
+                }
             }
+            
+            _roomPokerCombinationMax.Set(roomEntity, new RoomPokerCombinationMax
+            {
+                CombinationMax = combinationMax,
+            });
         }
     }
     
+    //todo сделать потом приватным
     public CombinationType GetPokerCombination(IEnumerable<CardModel> playerCards, IEnumerable<CardModel> tableCards, 
         out List<CardModel> combinationOrderedCards)
     {
