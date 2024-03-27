@@ -115,7 +115,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         };
         _server.SendInRoom(ref dataframe, roomEntity);
         
-        var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPoker);
+        var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
         _roomPokerSetCardsTickTimer.Set(roomEntity, new RoomPokerSetCardsTickTimer
         {
             Value = config.DealingCardTimeToTable,
