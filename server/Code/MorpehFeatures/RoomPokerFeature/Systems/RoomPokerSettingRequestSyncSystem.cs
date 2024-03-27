@@ -24,7 +24,7 @@ public class RoomPokerSettingRequestSyncSystem : IInitializer
 
     private void Handler(RoomPokerSettingsRequestDataframe dataframe, int clientId)
     {
-        var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPoker);
+        var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
 
         var betNetworkModels = new List<RoomPokerSettingsBetNetworkModel>();
 

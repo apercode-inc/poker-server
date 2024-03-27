@@ -10,19 +10,18 @@ namespace server.Code.MorpehFeatures.ConnectionFeature.Systems;
 
 public class StartServerSystem : ISystem
 {
+    [Injectable] private ServerParameters _serverParameters;
+    
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
 
-    private const int MaxPlayers = 10;
-    private const int Port = 8080;
-    
     public World World { get; set; }
 
     public void OnAwake()
     {
         NetFrameDataframeCollection.Initialize(Assembly.GetExecutingAssembly());
         
-        _server.Start(Port, MaxPlayers);
+        _server.Start(_serverParameters.Port, _serverParameters.MaxPlayers);
         Debug.LogColor("Server started...", ConsoleColor.Green);
 
         _server.ClientConnection += OnClientConnection;

@@ -61,7 +61,7 @@ public class RoomPokerStorage : IInitializer
         var roomEntity = World.CreateEntity();
         var seat = (byte) _random.Next(0, maxPlayers);
         
-        var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPoker);
+        var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
         var turnTime = isFastTurn ? config.PlayerTurnTimeFast : config.PlayerTurnTime;
 
         _roomPokerId.Set(roomEntity, new RoomPokerId
