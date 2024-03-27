@@ -91,9 +91,9 @@ void TestCombination()
     var tableCards = new List<CardModel> //A, 2, 3, 4, 5 не учитывает младший стрит (колесо)
     {
         new(CardRank.Two, CardSuit.Hearts),
-        new(CardRank.Jack, CardSuit.Clubs),
+        new(CardRank.Five, CardSuit.Clubs),
         new(CardRank.Ten, CardSuit.Spades),
-        new(CardRank.Nine, CardSuit.Spades),
+        new(CardRank.Three, CardSuit.Spades),
         new(CardRank.Four, CardSuit.Hearts),
     };
     

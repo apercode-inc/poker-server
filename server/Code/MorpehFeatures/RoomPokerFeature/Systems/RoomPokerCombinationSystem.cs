@@ -160,8 +160,12 @@ public class RoomPokerCombinationSystem : ISystem
             }
         }
 
-        if (!isOrdered && lowOrderCounter == 5)
+        if (!isOrdered && lowOrderCounter == cards.Count)
         {
+            var aceCard = cards.First();
+            cards.Remove(aceCard);
+            cards.Add(aceCard);
+            
             isOrdered = true;
         }
         
