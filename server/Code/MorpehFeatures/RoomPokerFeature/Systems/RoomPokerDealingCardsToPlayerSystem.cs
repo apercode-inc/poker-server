@@ -110,7 +110,7 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
 
             _roomPokerSetBlinds.Set(roomEntity, new RoomPokerSetBlinds());
 
-            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPoker);
+            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
             
             _pokerDealingTimer.Set(roomEntity,new RoomPokerDealingTimer
             {

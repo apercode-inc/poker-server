@@ -41,7 +41,7 @@ public class RoomPokerGameCheckStartSystem : ISystem
                 continue;
             }
 
-            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPoker);
+            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
 
             _roomPokerGameStartTimer.Set(roomEntity, new RoomPokerGameStartTimer
             {

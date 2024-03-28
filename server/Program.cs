@@ -13,6 +13,15 @@ var container = new SimpleDImple();
 var server = new NetFrameServer(2000);
 container.Register(server);
 
+//.Env
+var serverParameters = new ServerParameters
+{
+    Port = ServerEnvsUtil.ReadInt("SERVER_PORT"),
+    MaxPlayers = ServerEnvsUtil.ReadInt("MAX_PLAYERS"),
+    ConfigPath = ServerEnvsUtil.Read("CONFIG_PATH"),
+};
+container.Register(serverParameters);
+
 //Morpeh ECS
 WorldExtensions.InitializationDefaultWorld();
 var world = World.Default;
