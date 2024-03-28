@@ -76,26 +76,91 @@ public class RoomPokerCombinationCompareSystem : ISystem
             DefineStraightWinnings();
         }
 
-        if (combinationType == CombinationType.FourOfKind)
+        if (combinationType == CombinationType.FourOfKind) //todo 1 кикер
         {
-            DefineFourOfKind();
+            DefineFourOfKindWinnings();
+        }
+
+        if (combinationType == CombinationType.FullHouse)
+        {
+            DefineFullHouseWinnings();
+        }
+
+        if (combinationType == CombinationType.Flush)
+        {
+            //тут по идеи тоже самое что и стрит
+            ////нет не тоже самое вдруг первая карта будет одинаковой, значит надо сравнивать следующую и т.д
+            //DefineStraightWinnings(); 
+        }
+        
+        if (combinationType == CombinationType.Straight)
+        {
+            DefineStraightWinnings();
+        }
+
+        if (combinationType == CombinationType.ThreeOfKind) //todo 2 кикера
+        {
+            DefineThreeOfKindWinnings();
+        }
+        
+        if (combinationType == CombinationType.TwoPair) //todo 1 кикер
+        {
+            DefineTwoPairWinnings();
+        }
+        
+        if (combinationType == CombinationType.OnePair) //todo 3 кикера
+        {
+            DefineOnePairWinnings();
+        }
+        
+        if (combinationType == CombinationType.HighCard) //todo 4 кикера
+        {
+            DefineHighCardWinnings();
         }
     }
 
-    private void DefineFourOfKind()
+    private void DefineHighCardWinnings()
     {
-        var maxRank = CardRank.Two;
-        var kikerRank = CardRank.Two;
+        
+    }
 
-        foreach (var playerByCards in _playersByCards)
+    private void DefineOnePairWinnings()
+    {
+       
+    }
+
+    private void DefineTwoPairWinnings()
+    {
+        
+    }
+
+    private void DefineThreeOfKindWinnings()
+    {
+        
+    }
+
+    private void DefineFullHouseWinnings()
+    {
+        
+    }
+
+    private void DefineFourOfKindWinnings()
+    {
+        foreach (var playerByCards in _playersByCards) //todo подумать пока что хуйня выходит
         {
             var cards = playerByCards.Value;
-
-            var counterKind = 0;
-            var rankTemp = CardRank.Two;
-            foreach (var card in cards)
+            
+            var maxKikerRank = CardRank.Two;
+            var maxRankFourOfKind = cards[2].Rank;
+            
+            if (cards[0].Rank != maxRankFourOfKind) //A-5-5-5-5 
             {
-                //if (card.Rank )
+                maxKikerRank = cards[0].Rank;
+            }
+            
+            if (cards[4].Rank != maxRankFourOfKind) //A-A-A-A-5
+            {
+                maxKikerRank = cards[4].Rank;
             }
         }
     }
@@ -116,7 +181,7 @@ public class RoomPokerCombinationCompareSystem : ISystem
         {
             var cards = playerByCards.Value;
 
-            var highRank = cards.First().Rank;
+            var highRank = cards[0].Rank;
             if (maxRank < highRank)
             {
                 maxRank = highRank;
@@ -128,7 +193,7 @@ public class RoomPokerCombinationCompareSystem : ISystem
             var player = playersByCard.Key;
             var cards = playersByCard.Value;
 
-            var highRank = cards.First().Rank;
+            var highRank = cards[0].Rank;
 
             if (highRank == maxRank)
             {
