@@ -108,7 +108,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             };
             _server.Send(ref dataframe, playerEntity);
 
-            var timeDataframe = new RoomPokerSetTurnTimerDataframe
+            var timeDataframe = new RoomPokerSetTimerTurnDataframe
             {
                 PlayerId = playerId.Id,
                 Time = roomPokerStats.TurnTime,
