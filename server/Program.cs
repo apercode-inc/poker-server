@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using Sentry;
+using Sentry.Extensions.Logging;
 using server;
 using server.Code;
 using server.Code.GlobalUtils;
@@ -13,12 +16,15 @@ var container = new SimpleDImple();
 var server = new NetFrameServer(2000);
 container.Register(server);
 
-//.Env
+//.Server parameters
 var serverParameters = new ServerParameters
 {
+    IsProduction = ServerEnvsUtil.ReadBool("PRODUCTION"),
+    Version = "0.0.1",
     Port = ServerEnvsUtil.ReadInt("SERVER_PORT"),
     MaxPlayers = ServerEnvsUtil.ReadInt("MAX_PLAYERS"),
     ConfigPath = ServerEnvsUtil.Read("CONFIG_PATH"),
+    SentryDsn = ServerEnvsUtil.Read("SENTRY_DSN"),
 };
 container.Register(serverParameters);
 
@@ -36,6 +42,17 @@ var frameRateTimer = 0f;
 var framesPerSecond = 0;
 
 Time.Initialize();
+
+//Sentry Init
+using (SentrySdk.Init(options =>
+       {
+           options.Dsn = serverParameters.SentryDsn;
+           options.Debug = true;
+           options.TracesSampleRate = 0.0f;
+           options.SampleRate = 1.0f;
+           options.Release = serverParameters.Version;
+           options.Environment = serverParameters.IsProduction ? "prod" : "dev";
+       }))
 
 //todo test
 //MovingMarkersDictionaryTest.RunTest();
@@ -70,4 +87,5 @@ while (true)
     {
         Thread.Sleep(timeLeft);
     }
+    
 }

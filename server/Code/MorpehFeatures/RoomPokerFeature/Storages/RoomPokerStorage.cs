@@ -54,7 +54,7 @@ public class RoomPokerStorage : IInitializer
     {
         if (_playerRoomPoker.Has(createdPlayer))
         {
-            Debug.LogError($"[RoomPokerStorageSystem.Add] the player is already in the room");
+            Logger.Error($"[RoomPokerStorageSystem.Add] the player is already in the room", true);
             return;
         }
         
