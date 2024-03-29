@@ -51,7 +51,8 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         if (roomPokerPlayers.MarkedPlayersBySeat.Count >= roomPokerStats.MaxPlayers)
         {
-            Debug.LogError("отправить игроку нотиф о том что он не может присоединится из за того что игроков максимум");
+            //todo
+            Logger.Error("отправить игроку нотиф о том что он не может присоединится из за того что игроков максимум");
             return;
         }
         
@@ -64,7 +65,8 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         if (playerCurrency.CurrencyByType[roomPokerStats.CurrencyType] < roomPokerStats.Contribution)
         {
-            Debug.LogError("отправить игроку нотиф о том что он не может присоединится из за того что ему не хватает на взнос");
+            //todo
+            Logger.Error("отправить игроку нотиф о том что он не может присоединится из за того что ему не хватает на взнос");
             return;
         }
 

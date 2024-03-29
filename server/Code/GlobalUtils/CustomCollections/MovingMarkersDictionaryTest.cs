@@ -38,10 +38,10 @@ public static class MovingMarkersDictionaryTest
         var removePlayer = megPlayer;
         if (playersBySeat.Remove(removePlayer, _movedPlayersByMarker))
         {
-            Debug.LogColor($"remove player: {removePlayer.Nickname}", ConsoleColor.Magenta);
+            Logger.Debug($"remove player: {removePlayer.Nickname}", ConsoleColor.Magenta);
             foreach (var playerNewMarked in _movedPlayersByMarker)
             {
-                Debug.LogColor($"next marked {playerNewMarked.Key}: {playerNewMarked.Value.Nickname}" , ConsoleColor.Magenta);
+                Logger.Debug($"next marked {playerNewMarked.Key}: {playerNewMarked.Value.Nickname}" , ConsoleColor.Magenta);
             }
         }
         
@@ -50,7 +50,7 @@ public static class MovingMarkersDictionaryTest
         var moveMarker = PokerPlayerMarkerType.ActivePlayer;
         if (playersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out var nextMarkedPlayer))
         {
-            Debug.LogColor($"Move Marker {moveMarker}, next marked player: {nextMarkedPlayer.Value.Nickname}" , ConsoleColor.Magenta);
+            Logger.Debug($"Move Marker {moveMarker}, next marked player: {nextMarkedPlayer.Value.Nickname}" , ConsoleColor.Magenta);
         }
         
         ShowAllPlayers(playersBySeat);
@@ -58,7 +58,7 @@ public static class MovingMarkersDictionaryTest
         var resetMarker = PokerPlayerMarkerType.ActivePlayer;
         playersBySeat.ResetMarker(PokerPlayerMarkerType.ActivePlayer);
         
-        Debug.LogColor($"Reset marked {resetMarker}", ConsoleColor.Magenta);
+        Logger.Debug($"Reset marked {resetMarker}", ConsoleColor.Magenta);
         
         ShowAllPlayers(playersBySeat);
         
@@ -72,7 +72,7 @@ public static class MovingMarkersDictionaryTest
     {
         foreach (var playerBySeat in playersBySeat)
         {
-            Debug.LogColor(
+            Logger.Debug(
                 $"seat: {playerBySeat.Key} | player: {playerBySeat.Value.Nickname} | isDealer: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.DealerPlayer])} | isActive: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.ActivePlayer])}",
                 ConsoleColor.Green);
         }

@@ -35,13 +35,13 @@ namespace server.Code.GlobalUtils
                     }
                     catch
                     {
-                        Debug.LogError("Error reading line in dotenv");
+                        Logger.Error("Error reading line in dotenv");
                     }
                 }
             }
             catch
             {
-                Debug.Log("Unable to find dotenv file");
+                Logger.Error("Unable to find dotenv file");
             }
         }
 

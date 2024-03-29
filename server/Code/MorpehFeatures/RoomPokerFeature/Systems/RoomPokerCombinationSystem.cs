@@ -53,14 +53,14 @@ public class RoomPokerCombinationSystem : ISystem
 
                 ref var playerNickname = ref _playerNickname.Get(player);
 
-                Debug.LogColor(new string('-', 50), ConsoleColor.Yellow);
-                Debug.LogColor($"player: {playerNickname.Value} combination : {combination}", ConsoleColor.Magenta);
+                Logger.Debug(new string('-', 50), ConsoleColor.Yellow);
+                Logger.Debug($"player: {playerNickname.Value} combination : {combination}", ConsoleColor.Magenta);
 
                 foreach (var kicker in kickerRanks)
                 {
-                    Debug.LogColor($"kicker: {kicker}", ConsoleColor.Magenta);
+                    Logger.Debug($"kicker: {kicker}", ConsoleColor.Magenta);
                 }
-                Debug.LogColor(new string('-', 50), ConsoleColor.Yellow);
+                Logger.Debug(new string('-', 50), ConsoleColor.Yellow);
 
                 // _playerCombination.Set(player, new PlayerCombination
                 // {

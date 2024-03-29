@@ -14,7 +14,7 @@ public class StartServerSystem : ISystem
     
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
-
+    
     public World World { get; set; }
 
     public void OnAwake()
@@ -22,7 +22,7 @@ public class StartServerSystem : ISystem
         NetFrameDataframeCollection.Initialize(Assembly.GetExecutingAssembly());
         
         _server.Start(_serverParameters.Port, _serverParameters.MaxPlayers);
-        Debug.LogColor("Server started...", ConsoleColor.Green);
+        Logger.Debug("Server started...", ConsoleColor.Green);
 
         _server.ClientConnection += OnClientConnection;
         _server.ClientDisconnect += OnClientDisconnect;
@@ -35,13 +35,13 @@ public class StartServerSystem : ISystem
 
     private void OnClientConnection(int id)
     {
-        Debug.LogColor($"connected player id = {id}", ConsoleColor.Green);
+        Logger.Debug($"connected player id = {id}", ConsoleColor.Green);
         _playerStorage.Add(id);
     }
     
     private void OnClientDisconnect(int id)
     {
-        Debug.LogColor($"disconnected player id = {id}", ConsoleColor.Yellow);
+        Logger.Debug($"disconnected player id = {id}", ConsoleColor.Yellow);
         _playerStorage.Remove(id);
     }
 

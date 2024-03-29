@@ -42,7 +42,7 @@ public class RoomPokerCreateRequestSyncSystem : IInitializer
         if (playerCurrency.CurrencyByType[dataframe.CurrencyType] < dataframe.Contribution)
         {
             //todo
-            Debug.LogError("отправить игроку нотиф о том что он не может присоединится из за того что ему не хватает на взнос");
+            Logger.Error("отправить игроку нотиф о том что он не может присоединится из за того что ему не хватает на взнос");
             return;
         }
 
