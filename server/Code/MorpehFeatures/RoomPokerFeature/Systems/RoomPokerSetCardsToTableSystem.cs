@@ -80,7 +80,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         }
     }
 
-    private void SetCards(Entity roomEntity, CardToTableState cardToTableState, List<CardModel> cards, int cardCount)
+    private void SetCards(Entity roomEntity, CardToTableState cardToTableState, Queue<CardModel> cards, int cardCount)
     {
         ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
         ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
@@ -93,7 +93,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         {
             if (roomPokerCardDesk.CardDesk.TryRandomRemove(out var cardModel))
             {
-                cards.Add(cardModel);
+                cards.Enqueue(cardModel);
                 cardsNetworkModels.Add(new RoomPokerCardNetworkModel
                 {
                     Rank = cardModel.Rank,

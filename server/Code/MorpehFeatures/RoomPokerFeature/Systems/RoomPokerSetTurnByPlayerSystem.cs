@@ -117,8 +117,8 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             
             _playerTurnTimer.Set(playerEntity, new PlayerTurnTimer
             {
-                Timer = 0,
-                TurnTime = roomPokerStats.TurnTime,
+                TimeCurrent = 0,
+                TimeMax = roomPokerStats.TurnTime,
             });
         }
     }

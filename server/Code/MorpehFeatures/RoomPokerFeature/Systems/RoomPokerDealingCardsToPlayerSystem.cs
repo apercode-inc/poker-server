@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
@@ -116,6 +117,8 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
             {
                 Timer = config.DealingCardsTime,
             });
+            
+            Logger.Error($"call RoomPokerDealingCardsToPlayerSystem");
             _roomPokerDealingCardsToPlayer.Remove(roomEntity);
         }
     }

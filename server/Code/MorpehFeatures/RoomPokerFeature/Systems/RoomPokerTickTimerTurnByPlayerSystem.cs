@@ -42,9 +42,9 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
         {
             ref var playerTurnTimer = ref _playerTurnTimer.Get(playerEntity);
 
-            playerTurnTimer.Timer += deltaTime;
+            playerTurnTimer.TimeCurrent += deltaTime;
 
-            if (playerTurnTimer.Timer < playerTurnTimer.TurnTime)
+            if (playerTurnTimer.TimeCurrent < playerTurnTimer.TimeMax)
             {
                 continue;
             }

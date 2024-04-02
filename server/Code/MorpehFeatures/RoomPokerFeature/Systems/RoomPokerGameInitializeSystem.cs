@@ -11,10 +11,10 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
 public class RoomPokerGameInitializeSystem : ISystem
 {
-    [Injectable] private Stash<RoomPokerGameInitialize> _pokerInitialize;
-    [Injectable] private Stash<RoomPokerActive> _pokerActive;
+    [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
+    [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
-    [Injectable] private Stash<RoomPokerCardDesk> _pokerCardDesk;
+    [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
 
@@ -42,21 +42,21 @@ public class RoomPokerGameInitializeSystem : ISystem
     {
         foreach (var roomEntity in _filter)
         {
-            _pokerActive.Set(roomEntity);
+            _roomPokerActive.Set(roomEntity);
             _roomPokerBank.Set(roomEntity);
 
-            if (!_pokerCardDesk.Has(roomEntity))
+            if (!_roomPokerCardDesk.Has(roomEntity))
             {
-                _pokerCardDesk.Set(roomEntity, new RoomPokerCardDesk
+                _roomPokerCardDesk.Set(roomEntity, new RoomPokerCardDesk
                 {
                     CardDesk = _cardDeskService.CreateCardDeskPokerStandard()
                 });
             }
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-            roomPokerPlayers.MarkedPlayersBySeat.ResetAllMarkers();
             
+            roomPokerPlayers.MarkedPlayersBySeat.ResetAllMarkers();
+
             var count = 0;
             foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {
@@ -85,7 +85,7 @@ public class RoomPokerGameInitializeSystem : ISystem
             
             _roomPokerDealingCardsToPlayer.Set(roomEntity);
 
-            _pokerInitialize.Remove(roomEntity);
+            _roomPokerGameInitialize.Remove(roomEntity);
         }
     }
 

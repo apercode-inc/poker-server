@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CurrencyFeature.Dataframe;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
@@ -28,14 +27,43 @@ public class CurrencyPlayerService : IInitializer
     {
     }
 
+    public bool TryGiveBank(Entity room, Entity player, long cost)
+    {
+        ref var roomPokerBank = ref _roomPokerBank.Get(room);
+
+        if (roomPokerBank.OnTable <= 0)
+        {
+            return false;
+        }
+
+        ref var playerCurrency = ref _playerCurrency.Get(player);
+        ref var playerId = ref _playerId.Get(player);
+        ref var playerPokerContribution = ref _playerPokerContribution.Get(player);
+        
+        var currencyType = playerPokerContribution.CurrencyType;
+
+        playerPokerContribution.Value += cost;
+        playerCurrency.CurrencyByType[currencyType] += cost;
+
+        var dataframe = new RoomPokerPlayerGiveBankDataframe
+        {
+            ContributionBalance = playerPokerContribution.Value,
+            AllBalance = playerCurrency.CurrencyByType[currencyType],
+            PlayerId = playerId.Id,
+        };
+        _server.SendInRoom(ref dataframe, room);
+
+        Send(player, currencyType, playerCurrency.CurrencyByType[currencyType]);
+        
+        return true;
+    }
+
     public bool TrySetBet(Entity room, Entity player, long cost)
     {
         ref var playerCurrency = ref _playerCurrency.Get(player);
         ref var playerId = ref _playerId.Get(player);
         ref var playerPokerContribution = ref _playerPokerContribution.Get(player);
 
-        var currencyType = playerPokerContribution.CurrencyType;
-        
         if (playerPokerContribution.Value < cost)
         {
             return false;
@@ -48,6 +76,8 @@ public class CurrencyPlayerService : IInitializer
         {
             return false;
         }
+        
+        var currencyType = playerPokerContribution.CurrencyType;
 
         playerPokerContribution.Value -= cost;
         playerCurrency.CurrencyByType[currencyType] -= cost;

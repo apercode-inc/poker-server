@@ -12,6 +12,7 @@ public class RoomPokerCardDeskService : IInitializer
 {
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
+    [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
     
     public World World { get; set; }
 
@@ -91,7 +92,7 @@ public class RoomPokerCardDeskService : IInitializer
         return newCardDesk;
     }
     
-    public void ReturnCardInDesk(Entity roomEntity, Entity playerLeft)
+    public void ReturnCardsInDeskToPlayer(Entity roomEntity, Entity playerLeft)
     {
         ref var playerCards = ref _playerCards.Get(playerLeft);
 
@@ -109,6 +110,20 @@ public class RoomPokerCardDeskService : IInitializer
         }
 
         playerCards.CardsState = CardsState.Empty;
+    }
+
+    public void ReturnCardsInDeskToTable(Entity roomEntity)
+    {
+        ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
+        ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
+
+        while (roomPokerCardsToTable.Cards.Count > 0)
+        {
+            var card = roomPokerCardsToTable.Cards.Dequeue();
+            roomPokerCardDesk.CardDesk.Add(card);
+        }
+
+        roomPokerCardsToTable.State = CardToTableState.PreFlop;
     }
     
     public void Dispose()
