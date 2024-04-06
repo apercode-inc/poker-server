@@ -55,8 +55,9 @@ public class RoomPokerGameInitializeSystem : ISystem
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             
-            roomPokerPlayers.MarkedPlayersBySeat.ResetAllMarkers();
-
+            roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer, 
+                PokerPlayerMarkerType.NextRoundActivePlayer);
+            
             var count = 0;
             foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {

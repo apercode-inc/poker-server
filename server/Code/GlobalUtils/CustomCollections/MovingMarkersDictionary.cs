@@ -90,31 +90,20 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         }
     }
 
-    public void ResetMarker(TM marker)
+    public void ResetMarkers(params TM[] markers)
     {
         foreach (var item in _data)
         {
-            if (!item.Markers[marker])
+            foreach (var marker in markers)
             {
-                continue;
+                if (item.Markers[marker])
+                {
+                    item.Markers[marker] = false;
+                }
             }
-            
-            item.Markers[marker] = false;
-            break;
         }
     }
 
-    public void ResetAllMarkers()
-    {
-        foreach (var item in _data)
-        {
-            foreach (var markerType in item.Markers.Keys)
-            {
-                item.Markers[markerType] = false;
-            }
-        }
-    }
-    
     public bool TryMoveMarker(TM marker, out MarkedItem<T, TM> newMarkedValue)
     {
         for (var index = 0; index < _data.Length; index++)

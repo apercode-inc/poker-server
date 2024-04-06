@@ -57,11 +57,10 @@ public static class MovingMarkersDictionaryTest
         
         ShowAllPlayers(playersBySeat);
         ShowNextActivePlayer(playersBySeat);
-
-        var resetMarker = PokerPlayerMarkerType.ActivePlayer;
-        playersBySeat.ResetMarker(PokerPlayerMarkerType.ActivePlayer);
         
-        Logger.Debug($"Reset marked {resetMarker}", ConsoleColor.Magenta);
+        playersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer, PokerPlayerMarkerType.DealerPlayer);
+        
+        Logger.Debug($"Reset all markers", ConsoleColor.Magenta);
         
         ShowAllPlayers(playersBySeat);
         ShowNextActivePlayer(playersBySeat);
