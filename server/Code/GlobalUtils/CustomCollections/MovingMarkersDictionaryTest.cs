@@ -32,6 +32,7 @@ public static class MovingMarkersDictionaryTest
         playersBySeat.SetMarker(megPlayer, PokerPlayerMarkerType.ActivePlayer);
         
         ShowAllPlayers(playersBySeat);
+        ShowNextActivePlayer(playersBySeat);
 
         //playersBySeat.TryMoveMarker(PokerPlayerMarkerType.DealerPlayer, out var newDealerPlayerByType);
         _movedPlayersByMarker.Clear();
@@ -46,6 +47,7 @@ public static class MovingMarkersDictionaryTest
         }
         
         ShowAllPlayers(playersBySeat);
+        ShowNextActivePlayer(playersBySeat);
 
         var moveMarker = PokerPlayerMarkerType.ActivePlayer;
         if (playersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out var nextMarkedPlayer))
@@ -54,6 +56,7 @@ public static class MovingMarkersDictionaryTest
         }
         
         ShowAllPlayers(playersBySeat);
+        ShowNextActivePlayer(playersBySeat);
 
         var resetMarker = PokerPlayerMarkerType.ActivePlayer;
         playersBySeat.ResetMarker(PokerPlayerMarkerType.ActivePlayer);
@@ -61,11 +64,24 @@ public static class MovingMarkersDictionaryTest
         Logger.Debug($"Reset marked {resetMarker}", ConsoleColor.Magenta);
         
         ShowAllPlayers(playersBySeat);
+        ShowNextActivePlayer(playersBySeat);
         
         Console.WriteLine(new string('-', 40));
         Console.WriteLine(new string('-', 40));
         Console.WriteLine(new string('-', 40));
         Console.WriteLine(new string('-', 40));
+    }
+
+    private static void ShowNextActivePlayer(MovingMarkersDictionary<PlayerEntity, PokerPlayerMarkerType> playersBySeat)
+    {
+        if (playersBySeat.TryGetNext(PokerPlayerMarkerType.ActivePlayer, out var nextActive))
+        {
+            Logger.Debug($"next player after active: {nextActive.Value.Nickname}", ConsoleColor.Yellow);
+        }
+        else
+        {
+            Logger.Error($"NO next active player");
+        }
     }
 
     private static void ShowAllPlayers(MovingMarkersDictionary<PlayerEntity, PokerPlayerMarkerType> playersBySeat)

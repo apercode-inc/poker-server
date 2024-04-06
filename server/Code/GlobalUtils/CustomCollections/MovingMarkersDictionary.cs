@@ -214,6 +214,45 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return false;
     }
 
+    public bool TryGetNext(TM marker, out MarkedItem<T, TM> value)
+    {
+        for (var index = 0; index < _data.Length; index++)
+        {
+            if (Count < 2)
+            {
+                value = default;
+                return false;
+            }
+
+            if (!_data[index].Markers[marker])
+            {
+                continue;
+            }
+            
+            var iterationCount = 0;
+
+            for (var i = index + 1; iterationCount < _data.Length; i++)
+            {
+                var nextIndex = i % _data.Length;
+                iterationCount++;
+
+                if (_data[nextIndex].Value == null)
+                {
+                    continue;
+                }
+
+                value = _data[nextIndex];
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        value = default;
+        return false;
+    }
+
     public bool TryGetValueByMarked(TM marker, out MarkedItem<T, TM> value)
     {
         foreach (var item in _data)

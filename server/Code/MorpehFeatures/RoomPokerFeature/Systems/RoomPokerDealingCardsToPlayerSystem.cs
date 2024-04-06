@@ -118,7 +118,6 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
                 Timer = config.DealingCardsTime,
             });
             
-            Logger.Error($"call RoomPokerDealingCardsToPlayerSystem");
             _roomPokerDealingCardsToPlayer.Remove(roomEntity);
         }
     }

@@ -107,7 +107,8 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
             //todo следующая раздача - надо реализовать, возможно переделать RoomPokerGameInitializeSystem
             if (_roomPokerActive.Has(roomEntity))
             {
-                _roomPokerDealingCardsToPlayer.Set(roomEntity);
+                _roomPokerGameInitialize.Set(roomEntity);
+                //_roomPokerDealingCardsToPlayer.Set(roomEntity);
             }
 
             _roomPokerPlayersGivenBank.Remove(roomEntity);
