@@ -1,7 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -128,22 +127,6 @@ public class RoomPokerService : IInitializer
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
 
-        markedPlayersBySeat.TryGetValueByMarkers(playerSeat.SeatIndex, out var playerByMarkers);
-
-        foreach (var marker in playerByMarkers.Markers)
-        {
-            var isMarked = marker.Value;
-            var markerType = marker.Key;
-
-            if (isMarked && markerType == PokerPlayerMarkerType.ActivePlayer)
-            {
-                if (markedPlayersBySeat.TryMoveMarker(markerType, out var nextPlayerActive))
-                {
-                    SetActivePlayerMarker(nextPlayerActive.Value);
-                }
-            }
-        }
-        
         var withCardsPlayers = new FastList<Entity>();
         
         foreach (var playerMarked in markedPlayersBySeat)
@@ -166,6 +149,24 @@ public class RoomPokerService : IInitializer
             {
                 Players = withCardsPlayers,
             });
+        }
+        else
+        {
+            markedPlayersBySeat.TryGetValueByMarkers(playerSeat.SeatIndex, out var playerByMarkers);
+
+            foreach (var marker in playerByMarkers.Markers)
+            {
+                var isMarked = marker.Value;
+                var markerType = marker.Key;
+
+                if (isMarked && markerType == PokerPlayerMarkerType.ActivePlayer)
+                {
+                    if (markedPlayersBySeat.TryMoveMarker(markerType, out var nextPlayerActive))
+                    {
+                        SetActivePlayerMarker(nextPlayerActive.Value);
+                    }
+                }
+            }
         }
     }
 
