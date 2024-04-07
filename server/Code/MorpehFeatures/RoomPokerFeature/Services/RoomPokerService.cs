@@ -152,7 +152,7 @@ public class RoomPokerService : IInitializer
             
             ref var playerCards = ref _playerCards.Get(player);
 
-            if (playerCards.CardsState != CardsState.Empty)
+            if (playerCards.CardsState == CardsState.Empty)
             {
                 continue;
             }
@@ -160,7 +160,7 @@ public class RoomPokerService : IInitializer
             withCardsPlayers.Add(player);
         }
 
-        if (withCardsPlayers.data.Length == 1)
+        if (withCardsPlayers.length == 1)
         {
             _roomPokerPlayersGivenBank.Set(roomEntity, new RoomPokerPlayersGivenBank
             {
