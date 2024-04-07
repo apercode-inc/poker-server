@@ -1,9 +1,13 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.ConfigsFeature.Constants;
+using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.CurrencyFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
@@ -21,7 +25,7 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
-    [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
+    [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
     
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
     [Injectable] private Stash<PlayerId> _playerId;
@@ -29,7 +33,8 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
     
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
     [Injectable] private NetFrameServer _server;
-    [Injectable] private CurrencyPlayerService _currencyPlayerService; 
+    [Injectable] private CurrencyPlayerService _currencyPlayerService;
+    [Injectable] private ConfigsService _configsService;
     
     private Filter _filter;
     
@@ -104,13 +109,16 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
             };
             _server.SendInRoom(ref cardsToTableDataframe, roomEntity);
             
-            //todo следующая раздача - надо реализовать, возможно переделать RoomPokerGameInitializeSystem
             if (_roomPokerActive.Has(roomEntity))
             {
-                _roomPokerGameInitialize.Set(roomEntity);
-                //_roomPokerDealingCardsToPlayer.Set(roomEntity);
+                var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
+                
+                _roomPokerNextDealingTimer.Set(roomEntity,new RoomPokerNextDealingTimer
+                {
+                    Value = config.DelayBeforeNextDealingCards
+                });
             }
-
+            
             _roomPokerPlayersGivenBank.Remove(roomEntity);
         }
     }

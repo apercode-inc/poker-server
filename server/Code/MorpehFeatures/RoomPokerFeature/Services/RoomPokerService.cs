@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -155,11 +156,11 @@ public class RoomPokerService : IInitializer
             {
                 continue;
             }
-
+            
             withCardsPlayers.Add(player);
         }
 
-        if (withCardsPlayers.length == 1)
+        if (withCardsPlayers.data.Length == 1)
         {
             _roomPokerPlayersGivenBank.Set(roomEntity, new RoomPokerPlayersGivenBank
             {

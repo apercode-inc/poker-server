@@ -11,7 +11,6 @@ public class RoomPokerSettingsConfig
     [JsonProperty("dealing_cards_time")] public int DealingCardsTime;
     [JsonProperty("dealing_card_time_to_table")] public int DealingCardTimeToTable;
     [JsonProperty("delay_before_next_dealing_cards")] public int DelayBeforeNextDealingCards;
-    [JsonProperty("next_dealing_time")] public int NextDealingTime;
     [JsonProperty("seat_counts")] public List<int> SeatCounts;
     [JsonProperty("bets")] public List<RoomPokerBetsConfig> Bets;
 }

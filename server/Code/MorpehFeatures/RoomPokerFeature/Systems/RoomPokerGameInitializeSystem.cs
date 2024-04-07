@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -57,35 +58,43 @@ public class RoomPokerGameInitializeSystem : ISystem
             
             roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer, 
                 PokerPlayerMarkerType.NextRoundActivePlayer);
-            
-            var count = 0;
-            foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
+
+            int dealerPlayerId;
+
+            if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.DealerPlayer, 
+                    out var markedPlayer))
             {
-                var playerEntity = playerBySeat.Value;
-
-                ref var playerId = ref _playerId.Get(playerEntity);
-
-                if (count == 0)
-                {
-                    roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.DealerPlayer);
-                    var dataframe = new RoomPokerSetDealerDataframe
-                    {
-                        PlayerId = playerId.Id
-                    };
-                    _server.SendInRoom(ref dataframe, roomEntity);
-                }
-                else if (count == 1)
-                {
-                    roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.ActivePlayer);
-                    roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.NextRoundActivePlayer);
-                    break;
-                }
+                var playerEntity = markedPlayer.Value;
                 
-                count++;
+                ref var playerId = ref _playerId.Get(playerEntity);
+                dealerPlayerId = playerId.Id;
+            }
+            else
+            {
+                markedPlayer = roomPokerPlayers.MarkedPlayersBySeat.GetFirst();
+                    
+                var playerEntity = markedPlayer.Value;
+                roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.DealerPlayer);
+                    
+                ref var playerId = ref _playerId.Get(playerEntity);
+                dealerPlayerId = playerId.Id;
+            }
+
+            if (roomPokerPlayers.MarkedPlayersBySeat.TryGetNext(PokerPlayerMarkerType.DealerPlayer, out markedPlayer))
+            {
+                var playerEntity = markedPlayer.Value;
+                
+                roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.ActivePlayer);
+                roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.NextRoundActivePlayer);
             }
             
+            var dataframe = new RoomPokerSetDealerDataframe
+            {
+                PlayerId = dealerPlayerId
+            };
+            _server.SendInRoom(ref dataframe, roomEntity);
+            
             _roomPokerDealingCardsToPlayer.Set(roomEntity);
-
             _roomPokerGameInitialize.Remove(roomEntity);
         }
     }

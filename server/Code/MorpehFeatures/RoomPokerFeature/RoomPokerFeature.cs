@@ -69,6 +69,7 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
 
         systemsGroup.AddSystem(container.New<RoomPokerPlayersGivenBankSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerNextDealingDelaySystem>());
         
         
         world.AddSystemsGroup(index++, systemsGroup);
