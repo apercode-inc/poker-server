@@ -82,9 +82,7 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
                 ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
                 playerPokerCurrentBet.Value = 0;
             }
-            
-            roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer);
-            
+
             _playerSetPokerTurn.Remove(playerEntity);
             _roomPokerSetCardsToTable.Set(roomEntity);
         }

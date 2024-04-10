@@ -59,6 +59,7 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
             
             var activePlayer = markedPlayer.Value;
                 
+            roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer);
             roomPokerPlayers.MarkedPlayersBySeat.SetMarker(activePlayer, PokerPlayerMarkerType.ActivePlayer);
             
             _playerSetPokerTurn.Set(activePlayer);
