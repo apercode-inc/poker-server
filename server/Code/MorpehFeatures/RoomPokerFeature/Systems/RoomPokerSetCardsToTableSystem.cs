@@ -5,6 +5,7 @@ using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
+using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
@@ -28,6 +29,10 @@ public class RoomPokerSetCardsToTableSystem : ISystem
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
     [Injectable] private Stash<RoomPokerSetCardsTickTimer> _roomPokerSetCardsTickTimer;
     [Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdownTimer;
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
+
+    [Injectable] private Stash<PlayerCards> _playerCards;
 
     [Injectable] private RoomPokerCardDeskService _cardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -70,7 +75,8 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                     SetCards(roomEntity, roomPokerCardsToTable.State, cards, CardRiverCount);
                     break;
                 case CardToTableState.Showdown:
-                    _roomPokerShowdownTimer.Set(roomEntity);
+                    //_roomPokerShowdownTimer.Set(roomEntity);
+                    StubToContinueCycleGame(roomEntity);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -80,7 +86,34 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         }
     }
 
-    private void SetCards(Entity roomEntity, CardToTableState cardToTableState, List<CardModel> cards, int cardCount)
+    //todo заглушка чтобы просто замкнуть игровой цикл игры в покер (сделать следующую раздачу)
+    private void StubToContinueCycleGame(Entity roomEntity)
+    {
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+
+        var playerGivenBank = new FastList<Entity>();
+        
+        foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
+        {
+            var player = markedPlayer.Value;
+
+            ref var playerCards = ref _playerCards.Get(player);
+
+            if (playerCards.CardsState == CardsState.Empty)
+            {
+                continue;
+            }
+
+            playerGivenBank.Add(player);
+        }
+        
+        _roomPokerPlayersGivenBank.Set(roomEntity, new RoomPokerPlayersGivenBank
+        {
+            Players = playerGivenBank,
+        });
+    }
+
+    private void SetCards(Entity roomEntity, CardToTableState cardToTableState, Queue<CardModel> cards, int cardCount)
     {
         ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
         ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
@@ -93,7 +126,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         {
             if (roomPokerCardDesk.CardDesk.TryRandomRemove(out var cardModel))
             {
-                cards.Add(cardModel);
+                cards.Enqueue(cardModel);
                 cardsNetworkModels.Add(new RoomPokerCardNetworkModel
                 {
                     Rank = cardModel.Rank,

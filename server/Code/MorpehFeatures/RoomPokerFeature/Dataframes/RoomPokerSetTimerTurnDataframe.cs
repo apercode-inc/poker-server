@@ -3,7 +3,7 @@ using NetFrame.WriteAndRead;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
-public struct RoomPokerSetTurnTimerDataframe : INetworkDataframe
+public struct RoomPokerSetTimerTurnDataframe : INetworkDataframe
 {
     public int PlayerId;
     public float Time;

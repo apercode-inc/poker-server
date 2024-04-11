@@ -90,44 +90,33 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         }
     }
 
-    public void ResetMarker(TM marker)
+    public void ResetMarkers(params TM[] markers)
     {
         foreach (var item in _data)
         {
-            if (!item.Markers[marker])
+            foreach (var marker in markers)
             {
-                continue;
+                if (item.Markers[marker])
+                {
+                    item.Markers[marker] = false;
+                }
             }
-            
-            item.Markers[marker] = false;
-            break;
         }
     }
 
-    public void ResetAllMarkers()
-    {
-        foreach (var item in _data)
-        {
-            foreach (var markerType in item.Markers.Keys)
-            {
-                item.Markers[markerType] = false;
-            }
-        }
-    }
-    
     public bool TryMoveMarker(TM marker, out MarkedItem<T, TM> newMarkedValue)
     {
         for (var index = 0; index < _data.Length; index++)
         {
-            if (Count < 2)
-            {
-                newMarkedValue = default;
-                return false;
-            }
-
             if (!_data[index].Markers[marker])
             {
                 continue;
+            }
+            
+            if (Count < 2)
+            {
+                newMarkedValue = _data[index];
+                return true;
             }
 
             if (_markerSettings[marker].IsMoveForwardDirection)
@@ -191,25 +180,54 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
         return false;
     }
 
-    public bool TryGetFirst(out MarkedItem<T, TM> value)
+    public MarkedItem<T, TM> GetFirst()
     {
-        if (Count == 0)
-        {
-            value = default;
-            return false;
-        }
-        
         foreach (var item in this)
         {
-            if (item.Value == null)
+            if (item.Value != null)
+            {
+                return item;
+            }
+        }
+        
+        return default;
+    }
+
+    public bool TryGetNext(TM marker, out MarkedItem<T, TM> value)
+    {
+        for (var index = 0; index < _data.Length; index++)
+        {
+            if (Count < 2)
+            {
+                value = default;
+                return false;
+            }
+
+            if (!_data[index].Markers[marker])
             {
                 continue;
             }
+            
+            var iterationCount = 0;
 
-            value = item;
-            return true;
+            for (var i = index + 1; iterationCount < _data.Length; i++)
+            {
+                var nextIndex = i % _data.Length;
+                iterationCount++;
+
+                if (_data[nextIndex].Value == null)
+                {
+                    continue;
+                }
+
+                value = _data[nextIndex];
+                return true;
+            }
+
+            value = default;
+            return false;
         }
-        
+
         value = default;
         return false;
     }

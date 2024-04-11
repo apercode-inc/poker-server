@@ -13,6 +13,7 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
 
     [Injectable] private Stash<PlayerDropCards> _playerDropCards;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
@@ -40,8 +41,13 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
         {
             return;
         }
-        
+
         var roomEntity = playerRoomPoker.RoomEntity;
+
+        if (_roomPokerNextDealingTimer.Has(roomEntity))
+        {
+            return;
+        }
 
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 

@@ -1,4 +1,5 @@
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -58,6 +59,7 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
             
             var activePlayer = markedPlayer.Value;
                 
+            roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer);
             roomPokerPlayers.MarkedPlayersBySeat.SetMarker(activePlayer, PokerPlayerMarkerType.ActivePlayer);
             
             _playerSetPokerTurn.Set(activePlayer);

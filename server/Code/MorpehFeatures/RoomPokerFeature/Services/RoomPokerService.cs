@@ -1,6 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
+using Scellecs.Morpeh.Collections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -16,6 +16,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
     [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
+    [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
 
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
@@ -48,18 +49,18 @@ public class RoomPokerService : IInitializer
         var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
 
         _markersByPlayer.Clear();
-        _roomPokerCardDeskService.ReturnCardInDesk(roomEntity, playerLeft);
+        _roomPokerCardDeskService.ReturnCardsInDeskToPlayer(roomEntity, playerLeft);
         
         var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);
+        var overOnePlayerToTable = markedPlayersBySeat.Count > 1;
 
-        if (isRemove)
+        if (isRemove && overOnePlayerToTable)
         {
             foreach (var markerByPlayer in _markersByPlayer)
             {
                 var marker = markerByPlayer.Key;
                 var nextPlayerMarked = markerByPlayer.Value;
-
-                ref var nickname = ref nextPlayerMarked.GetComponent<PlayerNickname>();
+                
                 switch (marker)
                 {
                     case PokerPlayerMarkerType.DealerPlayer:
@@ -104,7 +105,7 @@ public class RoomPokerService : IInitializer
 
     public void DropCards(Entity roomEntity, Entity playerEntity)
     {
-        _roomPokerCardDeskService.ReturnCardInDesk(roomEntity, playerEntity);
+        _roomPokerCardDeskService.ReturnCardsInDeskToPlayer(roomEntity, playerEntity);
 
         ref var playerId = ref _playerId.Get(playerEntity);
         ref var playerSeat = ref _playerSeat.Get(playerEntity);
@@ -126,18 +127,44 @@ public class RoomPokerService : IInitializer
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
 
-        markedPlayersBySeat.TryGetValueByMarkers(playerSeat.SeatIndex, out var playerByMarkers);
-
-        foreach (var marker in playerByMarkers.Markers)
+        var withCardsPlayers = new FastList<Entity>();
+        
+        foreach (var playerMarked in markedPlayersBySeat)
         {
-            var isMarked = marker.Value;
-            var markerType = marker.Key;
+            var player = playerMarked.Value;
+            
+            ref var playerCards = ref _playerCards.Get(player);
 
-            if (isMarked && markerType == PokerPlayerMarkerType.ActivePlayer)
+            if (playerCards.CardsState == CardsState.Empty)
             {
-                if (markedPlayersBySeat.TryMoveMarker(markerType, out var nextPlayerActive))
+                continue;
+            }
+            
+            withCardsPlayers.Add(player);
+        }
+
+        if (withCardsPlayers.length == 1)
+        {
+            _roomPokerPlayersGivenBank.Set(roomEntity, new RoomPokerPlayersGivenBank
+            {
+                Players = withCardsPlayers,
+            });
+        }
+        else
+        {
+            markedPlayersBySeat.TryGetValueByMarkers(playerSeat.SeatIndex, out var playerByMarkers);
+
+            foreach (var marker in playerByMarkers.Markers)
+            {
+                var isMarked = marker.Value;
+                var markerType = marker.Key;
+
+                if (isMarked && markerType == PokerPlayerMarkerType.ActivePlayer)
                 {
-                    SetActivePlayerMarker(nextPlayerActive.Value);
+                    if (markedPlayersBySeat.TryMoveMarker(markerType, out var nextPlayerActive))
+                    {
+                        SetActivePlayerMarker(nextPlayerActive.Value);
+                    }
                 }
             }
         }

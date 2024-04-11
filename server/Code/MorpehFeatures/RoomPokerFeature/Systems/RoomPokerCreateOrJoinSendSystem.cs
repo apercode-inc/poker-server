@@ -96,7 +96,8 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                     ContributionBalance = playerPokerContribution.Value,
                     AllBalance = playerCurrency.CurrencyByType[roomPokerStats.CurrencyType],
                     CurrentBet = playerPokerCurrentBet.Value,
-                    TurnTime = turnTimerExist ? playerTurnTimer.TurnTime - playerTurnTimer.Timer : 0,
+                    TurnTimeCurrent = turnTimerExist ? playerTurnTimer.TimeCurrent : 0,
+                    TurnTimeMax = turnTimerExist ? playerTurnTimer.TimeMax : 0,
                     CardsState = playerCards.CardsState,
                     CardsModel = cardsModel,
                 };

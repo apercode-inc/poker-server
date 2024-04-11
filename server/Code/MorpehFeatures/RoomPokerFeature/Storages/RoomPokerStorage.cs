@@ -54,7 +54,7 @@ public class RoomPokerStorage : IInitializer
     {
         if (_playerRoomPoker.Has(createdPlayer))
         {
-            Debug.LogError($"[RoomPokerStorageSystem.Add] the player is already in the room");
+            Logger.Error($"[RoomPokerStorageSystem.Add] the player is already in the room", true);
             return;
         }
         
@@ -91,7 +91,7 @@ public class RoomPokerStorage : IInitializer
         _roomPokerCardsToTable.Set(roomEntity, new RoomPokerCardsToTable
         {
             State = CardToTableState.PreFlop,
-            Cards = new List<CardModel>(),
+            Cards = new Queue<CardModel>(),
         });
 
         _playerStorage.CreateForRoomAndSync(createdPlayer, currencyType, contribution, roomEntity, seat);

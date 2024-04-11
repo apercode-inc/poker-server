@@ -51,7 +51,7 @@ public class RoomPokerCombinationSystem : ISystem
                 {
                     continue;
                 }
-
+                
                 var combination = GetPokerCombination(playerCards.Cards, roomPokerCardsToTable.Cards, 
                     out var combinationOrderedCards);
                 

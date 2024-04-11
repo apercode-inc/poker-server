@@ -16,10 +16,10 @@ public struct RoomPokerSetCardsToTableDataframe : INetworkDataframe
         writer.WriteLong(Bank);
         writer.WriteByte((byte) CardToTableState);
         
-        var hasUsers = Cards != null;
-        writer.WriteBool(hasUsers);
+        var hasCards = Cards != null;
+        writer.WriteBool(hasCards);
 
-        if (hasUsers)
+        if (hasCards)
         {
             writer.WriteInt(Cards.Count);
 

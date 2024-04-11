@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using Sentry;
+using Sentry.Extensions.Logging;
 using server;
 using server.Code;
 using server.Code.GlobalUtils;
@@ -8,7 +11,6 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 using server.Code.MorpehFeatures.RoomPokerFeature.Systems;
-using Debug = server.Code.GlobalUtils.Debug;
 
 //Injection
 var container = new SimpleDImple();
@@ -17,12 +19,15 @@ var container = new SimpleDImple();
 var server = new NetFrameServer(2000);
 container.Register(server);
 
-//.Env
+//.Server parameters
 var serverParameters = new ServerParameters
 {
+    IsProduction = ServerEnvsUtil.ReadBool("PRODUCTION"),
+    Version = "0.0.1",
     Port = ServerEnvsUtil.ReadInt("SERVER_PORT"),
     MaxPlayers = ServerEnvsUtil.ReadInt("MAX_PLAYERS"),
     ConfigPath = ServerEnvsUtil.Read("CONFIG_PATH"),
+    SentryDsn = ServerEnvsUtil.Read("SENTRY_DSN"),
 };
 container.Register(serverParameters);
 
@@ -40,6 +45,17 @@ var frameRateTimer = 0f;
 var framesPerSecond = 0;
 
 Time.Initialize();
+
+//Sentry Init
+using (SentrySdk.Init(options =>
+       {
+           options.Dsn = serverParameters.SentryDsn;
+           options.Debug = true;
+           options.TracesSampleRate = 0.0f;
+           options.SampleRate = 1.0f;
+           options.Release = serverParameters.Version;
+           options.Environment = serverParameters.IsProduction ? "prod" : "dev";
+       }))
 
 //todo test
 
@@ -106,34 +122,34 @@ void TestCombination()
         new(CardRank.Four, CardSuit.Hearts),
     };
     
-    Debug.LogColor("------------ Hands Player_2 ------------", ConsoleColor.Magenta);
-    Debug.LogColor($"{Debug.GetCardsLog(playerTwoCards)}", ConsoleColor.Cyan);
+    Logger.Debug("------------ Hands Player_2 ------------", ConsoleColor.Magenta);
+    Logger.Debug($"{Logger.GetCardsLog(playerTwoCards)}", ConsoleColor.Cyan);
     
-    Debug.LogColor("------------ Hands Player_1 ------------", ConsoleColor.Magenta);
-    Debug.LogColor($"{Debug.GetCardsLog(playerOneCards)}", ConsoleColor.Cyan);
+    Logger.Debug("------------ Hands Player_1 ------------", ConsoleColor.Magenta);
+    Logger.Debug($"{Logger.GetCardsLog(playerOneCards)}", ConsoleColor.Cyan);
     
-    Debug.LogColor("------------ Table Cards ------------", ConsoleColor.Magenta);
-    Debug.LogColor($"{Debug.GetCardsLog(tableCards)}", ConsoleColor.Cyan);
-
+    Logger.Debug("------------ Table Cards ------------", ConsoleColor.Magenta);
+    Logger.Debug($"{Logger.GetCardsLog(tableCards)}", ConsoleColor.Cyan);
+    
     
     Console.WriteLine();
-
-
-    Debug.LogColor("------------ Combination Player_2 ------------", ConsoleColor.Magenta);
+    
+    
+    Logger.Debug("------------ Combination Player_2 ------------", ConsoleColor.Magenta);
     
     //calculate player_2
     var combinationTwoPlayer = roomPokerCombinationSystem.GetPokerCombination(playerTwoCards, tableCards, 
         out var combinationOrdersCardsTwoPlayer);
-
-    Debug.LogColor($"{Debug.GetCardsLog(combinationOrdersCardsTwoPlayer, "^")}", ConsoleColor.Cyan);
-    Debug.LogColor($"{combinationTwoPlayer}", ConsoleColor.Cyan);
-
-    Debug.LogColor("------------ Combination Player_1 ------------", ConsoleColor.Magenta);
+    
+    Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsTwoPlayer, "^")}", ConsoleColor.Cyan);
+    Logger.Debug($"{combinationTwoPlayer}", ConsoleColor.Cyan);
+    
+    Logger.Debug("------------ Combination Player_1 ------------", ConsoleColor.Magenta);
     
     //calculate player_
     var combinationOnePlayer = roomPokerCombinationSystem.GetPokerCombination(playerOneCards, tableCards, 
         out var combinationOrdersCardsOnePlayer);
     
-    Debug.LogColor($"{Debug.GetCardsLog(combinationOrdersCardsOnePlayer, "^")}", ConsoleColor.Cyan);
-    Debug.LogColor($"{combinationOnePlayer}", ConsoleColor.Cyan);
+    Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsOnePlayer, "^")}", ConsoleColor.Cyan);
+    Logger.Debug($"{combinationOnePlayer}", ConsoleColor.Cyan);
 }
