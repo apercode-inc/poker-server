@@ -99,7 +99,7 @@ while (true)
 
 void TestCombination()
 {
-    var roomPokerCombinationSystem = new RoomPokerCombinationSystem();
+    var roomPokerCombinationSystem = new RoomPokerDetectCombinationSystem();
 
     var playerTwoCards = new List<CardModel>
     {

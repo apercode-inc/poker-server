@@ -10,7 +10,7 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerCombinationCompareSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    [Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdown;
+    //[Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdown;
     [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax; //todo сбросить после победы
     
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination; //todo сбросить после победы
@@ -28,7 +28,7 @@ public class RoomPokerCombinationCompareSystem : ISystem
             .With<RoomPokerCardsToTable>()
             .With<RoomPokerPlayers>()
             .With<RoomPokerCombinationMax>()
-            .With<RoomPokerShowdown>()
+            //.With<RoomPokerShowdown>()
             .Build();
     }
 
@@ -40,7 +40,7 @@ public class RoomPokerCombinationCompareSystem : ISystem
             var combinationMax = roomPokerCombinationMax.CombinationMax;
 
             _roomPokerCombinationMax.Remove(roomEntity);
-            _roomPokerShowdown.Remove(roomEntity); //todo не должен тут сниматься, должен идти дальше в следующую систему вскрытия и победы
+            //_roomPokerShowdown.Remove(roomEntity); //todo не должен тут сниматься, должен идти дальше в следующую систему вскрытия и победы
             
             _playersByCards.Clear();
             

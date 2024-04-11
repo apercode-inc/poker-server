@@ -1,5 +1,4 @@
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -9,7 +8,7 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Utils;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerCombinationSystem : ISystem
+public class RoomPokerDetectCombinationSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
@@ -28,7 +27,7 @@ public class RoomPokerCombinationSystem : ISystem
         _filter = World.Filter
             .With<RoomPokerCardsToTable>()
             .With<RoomPokerPlayers>()
-            .With<RoomPokerShowdown>()
+            .With<RoomPokerDetectCombination>()
             .Build();
     }
 

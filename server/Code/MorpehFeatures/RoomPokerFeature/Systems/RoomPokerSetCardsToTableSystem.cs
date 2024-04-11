@@ -28,7 +28,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
     [Injectable] private Stash<RoomPokerSetCardsTickTimer> _roomPokerSetCardsTickTimer;
-    [Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdownTimer;
+    [Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdown;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
 
@@ -75,7 +75,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                     SetCards(roomEntity, roomPokerCardsToTable.State, cards, CardRiverCount);
                     break;
                 case CardToTableState.Showdown:
-                    //_roomPokerShowdownTimer.Set(roomEntity);
+                    //_roomPokerShowdown.Set(roomEntity);
                     StubToContinueCycleGame(roomEntity);
                     break;
                 default:

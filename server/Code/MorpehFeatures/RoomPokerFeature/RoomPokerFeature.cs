@@ -63,7 +63,7 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerSetCardsToTableSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerSetCardsTickTimerAndNextStateTableSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerTestSystem>());
-        //systemsGroup.AddSystem(container.New<RoomPokerCombinationSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerDetectCombinationSystem>());
         //systemsGroup.AddSystem(container.New<RoomPokerCombinationCompareSystem>());
         
         systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
