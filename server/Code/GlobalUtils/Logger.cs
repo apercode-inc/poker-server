@@ -1,3 +1,5 @@
+using server.Code.MorpehFeatures.RoomPokerFeature.Models;
+
 namespace server.Code.GlobalUtils;
 
 public static class Logger
@@ -36,5 +38,10 @@ public static class Logger
         {
             SentrySdk.CaptureMessage(text, SentryLevel.Warning);  
         }
+    }
+
+    public static string GetCardsLog(List<CardModel> cards, string sf = "")
+    {
+        return "";
     }
 }
