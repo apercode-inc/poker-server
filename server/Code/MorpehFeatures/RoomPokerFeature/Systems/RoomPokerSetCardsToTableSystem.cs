@@ -75,8 +75,8 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                     SetCards(roomEntity, roomPokerCardsToTable.State, cards, CardRiverCount);
                     break;
                 case CardToTableState.Showdown:
-                    //_roomPokerShowdown.Set(roomEntity);
-                    StubToContinueCycleGame(roomEntity);
+                    _roomPokerShowdown.Set(roomEntity);
+                    //StubToContinueCycleGame(roomEntity);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
