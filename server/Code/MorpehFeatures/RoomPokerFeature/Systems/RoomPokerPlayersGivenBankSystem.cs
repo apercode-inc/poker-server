@@ -24,14 +24,13 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
-    [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
+    [Injectable] private Stash<RoomPokerReturnAllCardsToDestTimer> _roomPokerReturnAllCardsToDestTimer;
     
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
-    [Injectable] private NetFrameServer _server;
     [Injectable] private CurrencyPlayerService _currencyPlayerService;
     [Injectable] private ConfigsService _configsService;
     
@@ -88,22 +87,14 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
 
             roomPokerBank.Total = 0;
             roomPokerBank.OnTable = 0;
-            
-            var cardsToTableDataframe = new RoomPokerSetCardsToTableDataframe
-            {
-                Bank = roomPokerBank.OnTable,
-                CardToTableState = CardToTableState.PreFlop,
-                Cards = new List<RoomPokerCardNetworkModel>(),
-            };
-            _server.SendInRoom(ref cardsToTableDataframe, roomEntity);
-            
+
             if (_roomPokerActive.Has(roomEntity))
             {
                 var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
                 
-                _roomPokerNextDealingTimer.Set(roomEntity,new RoomPokerNextDealingTimer
+                _roomPokerReturnAllCardsToDestTimer.Set(roomEntity,new RoomPokerReturnAllCardsToDestTimer
                 {
-                    Value = config.DelayBeforeNextDealingCards
+                    Value = config.DelayShowdownAndWin,
                 });
             }
             

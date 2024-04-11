@@ -1,0 +1,102 @@
+using NetFrame.Server;
+using Scellecs.Morpeh;
+using server.Code.Injection;
+using server.Code.MorpehFeatures.ConfigsFeature.Constants;
+using server.Code.MorpehFeatures.ConfigsFeature.Services;
+using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
+using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
+
+namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
+
+public class RoomPokerReturnAllCardsToDeskSystem : ISystem
+{
+    [Injectable] private Stash<RoomPokerReturnAllCardsToDestTimer> _roomPokerReturnAllCardsToDestTimer;
+    [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
+    [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
+    [Injectable] private Stash<PlayerId> _playerId;
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
+
+    [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
+    [Injectable] private NetFrameServer _server;
+    [Injectable] private ConfigsService _configsService;
+
+    private Filter _filter;
+    
+    public World World { get; set; }
+
+    public void OnAwake()
+    {
+        _filter = World.Filter
+            .With<RoomPokerReturnAllCardsToDestTimer>()
+            .With<RoomPokerPlayers>()
+            .Build();
+    }
+
+    public void OnUpdate(float deltaTime)
+    {
+        foreach (var roomEntity in _filter)
+        {
+            if (!_roomPokerActive.Has(roomEntity))
+            {
+                _roomPokerReturnAllCardsToDestTimer.Remove(roomEntity);
+            }
+
+            ref var roomPokerNextDealingTimer = ref _roomPokerReturnAllCardsToDestTimer.Get(roomEntity);
+
+            roomPokerNextDealingTimer.Value -= deltaTime;
+
+            if (roomPokerNextDealingTimer.Value > 0)
+            {
+                continue;
+            }
+            
+            _roomPokerCardDeskService.ReturnCardsInDeskToTable(roomEntity);
+
+            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+
+            foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
+            {
+                var player = markedPlayer.Value;
+                
+                _roomPokerCardDeskService.ReturnCardsInDeskToPlayer(roomEntity, player);
+
+                ref var playerId = ref _playerId.Get(player);
+
+                var cardsDataframe = new RoomPokerSetCardsByPlayerDataframe
+                {
+                    CardsState = CardsState.Empty,
+                    PlayerId = playerId.Id,
+                };
+                _server.SendInRoom(ref cardsDataframe, roomEntity);
+            }
+            
+            var cardsToTableDataframe = new RoomPokerSetCardsToTableDataframe
+            {
+                Bank = 0,
+                CardToTableState = CardToTableState.PreFlop,
+                Cards = new List<RoomPokerCardNetworkModel>(),
+            };
+            _server.SendInRoom(ref cardsToTableDataframe, roomEntity);
+
+            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
+            
+            _roomPokerReturnAllCardsToDestTimer.Remove(roomEntity);
+            _roomPokerNextDealingTimer.Set(roomEntity, new RoomPokerNextDealingTimer
+            {
+                Value = config.DelayBeforeNextDealingCards,
+            });
+  
+        }
+    }
+
+    public void Dispose()
+    {
+        _filter = null;
+    }
+}

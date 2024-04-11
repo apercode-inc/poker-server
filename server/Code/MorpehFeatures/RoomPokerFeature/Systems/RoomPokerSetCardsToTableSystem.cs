@@ -76,7 +76,6 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                     break;
                 case CardToTableState.Showdown:
                     _roomPokerShowdown.Set(roomEntity);
-                    //StubToContinueCycleGame(roomEntity);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -84,33 +83,6 @@ public class RoomPokerSetCardsToTableSystem : ISystem
 
             _roomPokerSetCardsToTable.Remove(roomEntity);
         }
-    }
-
-    //todo заглушка чтобы просто замкнуть игровой цикл игры в покер (сделать следующую раздачу)
-    private void StubToContinueCycleGame(Entity roomEntity)
-    {
-        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-        var playerGivenBank = new FastList<Entity>();
-        
-        foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
-        {
-            var player = markedPlayer.Value;
-
-            ref var playerCards = ref _playerCards.Get(player);
-
-            if (playerCards.CardsState == CardsState.Empty)
-            {
-                continue;
-            }
-
-            playerGivenBank.Add(player);
-        }
-        
-        _roomPokerPlayersGivenBank.Set(roomEntity, new RoomPokerPlayersGivenBank
-        {
-            Players = playerGivenBank,
-        });
     }
 
     private void SetCards(Entity roomEntity, CardToTableState cardToTableState, Queue<CardModel> cards, int cardCount)
