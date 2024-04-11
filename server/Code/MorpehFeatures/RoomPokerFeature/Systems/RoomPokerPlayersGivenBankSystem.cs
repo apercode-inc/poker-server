@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
@@ -64,7 +63,6 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
             roomPokerBank.OnTable = roomPokerBank.Total;
             
             _roomPokerSetCardsTickTimer.Remove(roomEntity);
-            _roomPokerCardDeskService.ReturnCardsInDeskToTable(roomEntity);
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
@@ -73,16 +71,6 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
                 var player = markedPlayer.Value;
                 
                 _playerTurnTimerReset.Set(player);
-                _roomPokerCardDeskService.ReturnCardsInDeskToPlayer(roomEntity, player);
-
-                ref var playerId = ref _playerId.Get(player);
-
-                var cardsDataframe = new RoomPokerSetCardsByPlayerDataframe
-                {
-                    CardsState = CardsState.Empty,
-                    PlayerId = playerId.Id,
-                };
-                _server.SendInRoom(ref cardsDataframe, roomEntity);
 
                 ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
                 playerPokerCurrentBet.Value = 0;
