@@ -108,15 +108,15 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
     {
         for (var index = 0; index < _data.Length; index++)
         {
-            if (Count < 2)
-            {
-                newMarkedValue = default;
-                return false;
-            }
-
             if (!_data[index].Markers[marker])
             {
                 continue;
+            }
+            
+            if (Count < 2)
+            {
+                newMarkedValue = _data[index];
+                return true;
             }
 
             if (_markerSettings[marker].IsMoveForwardDirection)
