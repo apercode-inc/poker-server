@@ -21,6 +21,7 @@ public class RoomPokerReturnAllCardsToDeskSystem : ISystem
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
+    [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
 
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -42,12 +43,12 @@ public class RoomPokerReturnAllCardsToDeskSystem : ISystem
     {
         foreach (var roomEntity in _filter)
         {
+            ref var roomPokerNextDealingTimer = ref _roomPokerReturnAllCardsToDestTimer.Get(roomEntity);
+            
             if (!_roomPokerActive.Has(roomEntity))
             {
-                _roomPokerReturnAllCardsToDestTimer.Remove(roomEntity);
+                roomPokerNextDealingTimer.Value = 0;
             }
-
-            ref var roomPokerNextDealingTimer = ref _roomPokerReturnAllCardsToDestTimer.Get(roomEntity);
 
             roomPokerNextDealingTimer.Value -= deltaTime;
 
@@ -55,7 +56,7 @@ public class RoomPokerReturnAllCardsToDeskSystem : ISystem
             {
                 continue;
             }
-            
+
             _roomPokerCardDeskService.ReturnCardsInDeskToTable(roomEntity);
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
@@ -68,6 +69,7 @@ public class RoomPokerReturnAllCardsToDeskSystem : ISystem
 
                 ref var playerId = ref _playerId.Get(player);
 
+                _playerTurnCompleteFlag.Remove(player);
                 var cardsDataframe = new RoomPokerSetCardsByPlayerDataframe
                 {
                     CardsState = CardsState.Empty,
@@ -87,6 +89,12 @@ public class RoomPokerReturnAllCardsToDeskSystem : ISystem
             var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
             
             _roomPokerReturnAllCardsToDestTimer.Remove(roomEntity);
+            
+            if (!_roomPokerActive.Has(roomEntity))
+            {
+                continue;
+            }
+            
             _roomPokerNextDealingTimer.Set(roomEntity, new RoomPokerNextDealingTimer
             {
                 Value = config.DelayBeforeNextDealingCards,

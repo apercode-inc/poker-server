@@ -1,4 +1,3 @@
-using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
@@ -7,9 +6,6 @@ using server.Code.MorpehFeatures.CurrencyFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
-using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
-using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
-using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -88,15 +84,12 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
             roomPokerBank.Total = 0;
             roomPokerBank.OnTable = 0;
 
-            if (_roomPokerActive.Has(roomEntity))
+            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
+            
+            _roomPokerReturnAllCardsToDestTimer.Set(roomEntity,new RoomPokerReturnAllCardsToDestTimer
             {
-                var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
-                
-                _roomPokerReturnAllCardsToDestTimer.Set(roomEntity,new RoomPokerReturnAllCardsToDestTimer
-                {
-                    Value = config.DelayShowdownAndWin,
-                });
-            }
+                Value = config.DelayShowdownAndWin,
+            });
             
             _roomPokerPlayersGivenBank.Remove(roomEntity);
         }
