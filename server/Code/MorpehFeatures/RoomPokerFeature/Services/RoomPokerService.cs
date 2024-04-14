@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -67,7 +68,7 @@ public class RoomPokerService : IInitializer
                         SetDealerPlayerMarker(roomEntity, nextPlayerMarked);
                         break;
                     case PokerPlayerMarkerType.ActivePlayer:
-                        SetActivePlayerMarker(nextPlayerMarked);
+                        SetActivePlayerMarkerOrGivenBank(roomEntity);
                         break;
                     case PokerPlayerMarkerType.NextRoundActivePlayer:
                         break;
@@ -127,45 +128,16 @@ public class RoomPokerService : IInitializer
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
 
-        var withCardsPlayers = new FastList<Entity>();
-        
-        foreach (var playerMarked in markedPlayersBySeat)
+        markedPlayersBySeat.TryGetValueByMarkers(playerSeat.SeatIndex, out var playerByMarkers);
+
+        foreach (var marker in playerByMarkers.Markers)
         {
-            var player = playerMarked.Value;
-            
-            ref var playerCards = ref _playerCards.Get(player);
+            var isMarked = marker.Value;
+            var markerType = marker.Key;
 
-            if (playerCards.CardsState == CardsState.Empty)
+            if (isMarked && markerType == PokerPlayerMarkerType.ActivePlayer)
             {
-                continue;
-            }
-            
-            withCardsPlayers.Add(player);
-        }
-
-        if (withCardsPlayers.length == 1)
-        {
-            _roomPokerPlayersGivenBank.Set(roomEntity, new RoomPokerPlayersGivenBank
-            {
-                Players = withCardsPlayers,
-            });
-        }
-        else
-        {
-            markedPlayersBySeat.TryGetValueByMarkers(playerSeat.SeatIndex, out var playerByMarkers);
-
-            foreach (var marker in playerByMarkers.Markers)
-            {
-                var isMarked = marker.Value;
-                var markerType = marker.Key;
-
-                if (isMarked && markerType == PokerPlayerMarkerType.ActivePlayer)
-                {
-                    if (markedPlayersBySeat.TryMoveMarker(markerType, out var nextPlayerActive))
-                    {
-                        SetActivePlayerMarker(nextPlayerActive.Value);
-                    }
-                }
+                SetActivePlayerMarkerOrGivenBank(roomEntity);
             }
         }
     }
@@ -182,10 +154,42 @@ public class RoomPokerService : IInitializer
         };
         _server.SendInRoom(ref dataframe, roomEntity);
     }
-    
-    private void SetActivePlayerMarker(Entity nextMarkedPlayer)
+
+    private void SetActivePlayerMarkerOrGivenBank(Entity roomEntity)
     {
-        _playerSetPokerTurn.Set(nextMarkedPlayer);
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+        var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
+        
+        var withCardsPlayers = new FastList<Entity>();
+        
+        foreach (var playerMarked in markedPlayersBySeat)
+        {
+            var player = playerMarked.Value;
+            
+            ref var playerCards = ref _playerCards.Get(player);
+
+            if (playerCards.CardsState == CardsState.Empty)
+            {
+                continue;
+            }
+            
+            withCardsPlayers.Add(player);
+        }
+        
+        if (withCardsPlayers.length == 1)
+        {
+            _roomPokerPlayersGivenBank.Set(roomEntity, new RoomPokerPlayersGivenBank
+            {
+                Players = withCardsPlayers,
+            });
+        }
+        else
+        {
+            if (markedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out var nextPlayerActive))
+            {
+                _playerSetPokerTurn.Set(nextPlayerActive.Value);
+            }
+        }
     }
 
     public void Dispose()
