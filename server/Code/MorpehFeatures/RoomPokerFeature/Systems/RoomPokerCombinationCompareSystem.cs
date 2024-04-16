@@ -1,6 +1,5 @@
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -14,8 +13,8 @@ public class RoomPokerCombinationCompareSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
     
-    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax; //todo сбросить после победы
-    [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination; //todo сбросить после победы
+    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
+    [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
     
     private Filter _filter;
     private Dictionary<Entity, List<CardModel>> _playersByCards;
@@ -78,8 +77,8 @@ public class RoomPokerCombinationCompareSystem : ISystem
         }
     }
 
-    public FastList<T> DefineWinningPlayersByCombination<T>(CombinationType combinationType,
-        Dictionary<T, List<CardModel>> playersByCards) where T: class
+    private FastList<T> DefineWinningPlayersByCombination<T>(CombinationType combinationType,
+        Dictionary<T, List<CardModel>> playersByCards) where T : class
     {
         FastList<T> winningPlayers = null;
 
@@ -93,51 +92,51 @@ public class RoomPokerCombinationCompareSystem : ISystem
             case CombinationType.ThreeOfKind:
             case CombinationType.TwoPair:
             case CombinationType.OnePair:
-                winningPlayers = DefineWinningPlayersByCardsSeniority(playersByCards, true);
+                winningPlayers = DefineWinningPlayersByCombinationSeniority(playersByCards, true);
                 break;
             case CombinationType.StraightFlush:
             case CombinationType.Flush:
             case CombinationType.Straight:
             case CombinationType.HighCard:
-                winningPlayers = DefineWinningPlayersByCardsSeniority(playersByCards, false);
+                winningPlayers = DefineWinningPlayersByCombinationSeniority(playersByCards, false);
                 break;
         }
 
         return winningPlayers;
     }
 
-    private FastList<T> DefineWinningPlayersByCardsSeniority<T>(Dictionary<T, List<CardModel>> playersByCards, bool kickersSort) where T: class
+    private FastList<T> DefineWinningPlayersByCombinationSeniority<T>(Dictionary<T, List<CardModel>> playersByCards, 
+        bool isPrioritySort) where T: class
     {
         var winningPlayers = new FastList<T>();
         
         foreach (var playerByCards in playersByCards)
         {
-            if (kickersSort)
+            if (isPrioritySort)
             {
-                playersByCards[playerByCards.Key] = GetSortCombinationAndKickers(playerByCards.Value);
+                playersByCards[playerByCards.Key] = GetSortCombinationByPriority(playerByCards.Value);
             }
             
             winningPlayers.Add(playerByCards.Key);
         }
         
-        // Сравниваем карты каждого игрока с картами других игроков
-        foreach (var player1 in playersByCards.Keys)
+        foreach (var playerOne in playersByCards.Keys)
         {
-            foreach (var player2 in playersByCards.Keys)
+            foreach (var playerTwo in playersByCards.Keys)
             {
-                if (player1.Equals(player2))
+                if (playerOne.Equals(playerTwo))
                 {
                     continue;
                 }
 
-                var player1Cards = playersByCards[player1];
-                var player2Cards = playersByCards[player2];
+                var playerOneCards = playersByCards[playerOne];
+                var playerTwoCards = playersByCards[playerTwo];
 
-                var player1Wins = CompareCards(player1Cards, player2Cards);
+                var player1Wins = CompareCards(playerOneCards, playerTwoCards);
 
                 if (!player1Wins)
                 {
-                    winningPlayers.Remove(player1);
+                    winningPlayers.Remove(playerOne);
                     break;
                 }
             }
@@ -146,41 +145,39 @@ public class RoomPokerCombinationCompareSystem : ISystem
         return winningPlayers;
     }
     
-    private List<CardModel> GetSortCombinationAndKickers(List<CardModel> cards)
+    private List<CardModel> GetSortCombinationByPriority(IEnumerable<CardModel> cards)
     {
-        var groupedCards = cards.GroupBy(c => c.Rank)
-            .OrderByDescending(g => g.Count())
-            .ThenByDescending(g => g.Key);
+        var groupedCards = cards.GroupBy(card => card.Rank)
+            .OrderByDescending(group => group.Count())
+            .ThenByDescending(group => group.Key);
         
         var sortedGroups = groupedCards
-            .OrderByDescending(g => g.Count())
-            .ThenByDescending(g => g.Key);
+            .OrderByDescending(group => group.Count())
+            .ThenByDescending(group => group.Key);
         
         var sortedCards = sortedGroups
-            .SelectMany(g => g)
+            .SelectMany(group => group)
             .ToList();
-        
-        Logger.Debug($"Сортировка (комбинации, кикеры) === {Logger.GetCardsLog(cards)}", ConsoleColor.DarkBlue);
-        
+
         return sortedCards;
     }
     
-    private bool CompareCards(IReadOnlyList<CardModel> cards1, IReadOnlyList<CardModel> cards2)
+    private bool CompareCards(IReadOnlyList<CardModel> cardsOne, IReadOnlyList<CardModel> cardsTwo)
     {
-        // Последовательно сравниваем карты каждого игрока
-        for (int i = 0; i < cards1.Count; i++)
+        for (var i = 0; i < cardsOne.Count; i++)
         {
-            int comparisonResult = cards1[i].Rank.CompareTo(cards2[i].Rank); // Сравниваем ранги карт
+            var comparisonResult = cardsOne[i].Rank.CompareTo(cardsTwo[i].Rank);
+            
             if (comparisonResult != 0)
             {
-                return comparisonResult > 0; // Возвращаем true, если карта игрока 1 лучше, иначе false
+                return comparisonResult > 0;
             }
         }
 
-        return true; //TODO так не должно быть (Если все карты игрока 1 равны картам игрока 2, игрок 1 побеждает)
+        return true;
     }
 
-    private FastList<T> DefineAllWinnings<T>(Dictionary<T, List<CardModel>> playersByCards) where T: class
+    private FastList<T> DefineAllWinnings<T>(Dictionary<T, List<CardModel>> playersByCards) where T : class
     {
         var winningPlayers = new FastList<T>();
 

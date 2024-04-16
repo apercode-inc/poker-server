@@ -56,10 +56,11 @@ public class RoomPokerDetectCombinationSystem : ISystem
                 var combination = GetPokerCombination(playerCards.Cards, roomPokerCardsToTable.Cards, 
                     out var combinationOrderedCards);
 
-                ref var playerNickname = ref player.GetComponent<PlayerNickname>();
+                //todo debug
+                //ref var playerNickname = ref player.GetComponent<PlayerNickname>();
                 
-                Logger.Debug($"player: {playerNickname.Value} | combination: {combination} | cards: " +
-                             $"{Logger.GetCardsLog(combinationOrderedCards, "^")}", ConsoleColor.Blue);
+                // Logger.Debug($"player: {playerNickname.Value} | combination: {combination} | cards: " +
+                //              $"{Logger.GetCardsLog(combinationOrderedCards, "^")}", ConsoleColor.Blue);
                 
                 _playerPokerCombination.Set(player, new PlayerPokerCombination
                 {
@@ -73,7 +74,8 @@ public class RoomPokerDetectCombinationSystem : ISystem
                 }
             }
             
-            Logger.Debug($"combination max: {combinationMax}");
+            //todo debug
+            //Logger.Debug($"combination max: {combinationMax}");
             _roomPokerCombinationMax.Set(roomEntity, new RoomPokerCombinationMax
             {
                 CombinationMax = combinationMax,
@@ -82,8 +84,8 @@ public class RoomPokerDetectCombinationSystem : ISystem
             _roomPokerDetectCombination.Remove(roomEntity);
         }
     }
-    
-    public CombinationType GetPokerCombination(IEnumerable<CardModel> playerCards, IEnumerable<CardModel> tableCards, 
+
+    private CombinationType GetPokerCombination(IEnumerable<CardModel> playerCards, IEnumerable<CardModel> tableCards, 
         out List<CardModel> combinationOrderedCards)
     {
         var allCards = new List<CardModel>(playerCards);
