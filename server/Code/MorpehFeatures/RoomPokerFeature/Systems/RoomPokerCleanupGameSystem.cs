@@ -13,15 +13,18 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerReturnAllCardsToDeskSystem : ISystem
+public class RoomPokerCleanupGameSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerReturnAllCardsToDestTimer> _roomPokerReturnAllCardsToDestTimer;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
-    [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
+    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
+    
+    [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
+    [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
 
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -70,6 +73,8 @@ public class RoomPokerReturnAllCardsToDeskSystem : ISystem
                 ref var playerId = ref _playerId.Get(player);
 
                 _playerTurnCompleteFlag.Remove(player);
+                _playerPokerCombination.Remove(player);
+                
                 var cardsDataframe = new RoomPokerSetCardsByPlayerDataframe
                 {
                     CardsState = CardsState.Empty,

@@ -1,4 +1,6 @@
 using Scellecs.Morpeh;
+using Scellecs.Morpeh.Collections;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -10,11 +12,10 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerCombinationCompareSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    //[Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdown;
-    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax; //todo сбросить после победы
+    [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
     
+    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax; //todo сбросить после победы
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination; //todo сбросить после победы
-    [Injectable] private Stash<PlayerPokerWin> _playerPokerWin; //todo сбросить послен победы
     
     private Filter _filter;
     private Dictionary<Entity, List<CardModel>> _playersByCards;
@@ -24,11 +25,11 @@ public class RoomPokerCombinationCompareSystem : ISystem
     public void OnAwake()
     {
         _playersByCards = new Dictionary<Entity, List<CardModel>>();
+        
         _filter = World.Filter
             .With<RoomPokerCardsToTable>()
             .With<RoomPokerPlayers>()
             .With<RoomPokerCombinationMax>()
-            //.With<RoomPokerShowdown>()
             .Build();
     }
 
@@ -40,9 +41,9 @@ public class RoomPokerCombinationCompareSystem : ISystem
             var combinationMax = roomPokerCombinationMax.CombinationMax;
 
             _roomPokerCombinationMax.Remove(roomEntity);
-            //_roomPokerShowdown.Remove(roomEntity); //todo не должен тут сниматься, должен идти дальше в следующую систему вскрытия и победы
             
-            _playersByCards.Clear();
+            //_playersByCards.Clear();
+            var playerGivenBank = new FastList<Entity>(); //todo заглушка выигрывают все со старшей комбинацией
             
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
@@ -57,11 +58,34 @@ public class RoomPokerCombinationCompareSystem : ISystem
                     continue;
                 }
                 
-                _playersByCards.Add(player, playerPokerCombination.CombinationCards);
+                playerGivenBank.Add(player); //todo заглушка выигрывают все со старшей комбинацией
+                //_playersByCards.Add(player, playerPokerCombination.CombinationCards);
             }
+            
+            roomEntity.SetComponent(new RoomPokerPlayersGivenBank
+            {
+                Players = playerGivenBank,
+            });
 
-            CompareCombination(combinationMax);
+            //CompareCombination(combinationMax);
         }
+    }
+    
+    public void SortCombinationAndKicker(List<CardModel> cards)
+    {
+        var groupedCards = cards.GroupBy(c => c.Rank)
+            .OrderByDescending(g => g.Count())
+            .ThenByDescending(g => g.Key);
+        
+        var sortedGroups = groupedCards
+            .OrderByDescending(g => g.Count())
+            .ThenByDescending(g => g.Key);
+        
+        var sortedCards = sortedGroups
+            .SelectMany(g => g)
+            .ToList();
+        
+        Logger.Debug($"Сортировка (комбинации, кикеры) === {Logger.GetCardsLog(sortedCards)}", ConsoleColor.DarkBlue);
     }
 
     private void CompareCombination(CombinationType combinationType)
@@ -169,7 +193,7 @@ public class RoomPokerCombinationCompareSystem : ISystem
     {
         foreach (var playerByCards in _playersByCards)
         {
-            _playerPokerWin.Set(playerByCards.Key);
+            //_playerPokerWin.Set(playerByCards.Key);
         }
     }
 
@@ -197,7 +221,7 @@ public class RoomPokerCombinationCompareSystem : ISystem
 
             if (highRank == maxRank)
             {
-                _playerPokerWin.Set(player);
+                //_playerPokerWin.Set(player);
             }
         }
     }

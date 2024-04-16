@@ -59,7 +59,7 @@ using (SentrySdk.Init(options =>
 
 //todo test
 
-//TestCombination();
+TestCombination();
 
 //TODO test
 
@@ -113,7 +113,7 @@ void TestCombination()
         new(CardRank.Seven, CardSuit.Diamonds) { IsHands = true },
     };
 
-    var tableCards = new List<CardModel> //A, 2, 3, 4, 5 не учитывает младший стрит (колесо)
+    var tableCards = new List<CardModel>
     {
         new(CardRank.Two, CardSuit.Hearts),
         new(CardRank.Five, CardSuit.Clubs),
@@ -131,25 +131,37 @@ void TestCombination()
     Logger.Debug("------------ Table Cards ------------", ConsoleColor.Magenta);
     Logger.Debug($"{Logger.GetCardsLog(tableCards)}", ConsoleColor.Cyan);
     
+    var roomPokerCombinationCompareSystem = new RoomPokerCombinationCompareSystem();
+    
+    var compareTestCards = new List<CardModel>
+    {
+        new(CardRank.Queen, CardSuit.Hearts),
+        new(CardRank.Jack, CardSuit.Clubs),
+        new(CardRank.Jack, CardSuit.Spades),
+        new(CardRank.Three, CardSuit.Spades),
+        new(CardRank.Three, CardSuit.Hearts),
+    };
+
+    roomPokerCombinationCompareSystem.SortCombinationAndKicker(compareTestCards);
     
     Console.WriteLine();
     
     
     Logger.Debug("------------ Combination Player_2 ------------", ConsoleColor.Magenta);
     
-    //calculate player_2
-    var combinationTwoPlayer = roomPokerCombinationSystem.GetPokerCombination(playerTwoCards, tableCards, 
-        out var combinationOrdersCardsTwoPlayer);
-    
-    Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsTwoPlayer, "^")}", ConsoleColor.Cyan);
-    Logger.Debug($"{combinationTwoPlayer}", ConsoleColor.Cyan);
-    
-    Logger.Debug("------------ Combination Player_1 ------------", ConsoleColor.Magenta);
-    
-    //calculate player_
-    var combinationOnePlayer = roomPokerCombinationSystem.GetPokerCombination(playerOneCards, tableCards, 
-        out var combinationOrdersCardsOnePlayer);
-    
-    Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsOnePlayer, "^")}", ConsoleColor.Cyan);
-    Logger.Debug($"{combinationOnePlayer}", ConsoleColor.Cyan);
+    // //calculate player_2
+    // var combinationTwoPlayer = roomPokerCombinationSystem.GetPokerCombination(playerTwoCards, tableCards, 
+    //     out var combinationOrdersCardsTwoPlayer);
+    //
+    // Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsTwoPlayer, "^")}", ConsoleColor.Cyan);
+    // Logger.Debug($"{combinationTwoPlayer}", ConsoleColor.Cyan);
+    //
+    // Logger.Debug("------------ Combination Player_1 ------------", ConsoleColor.Magenta);
+    //
+    // //calculate player_
+    // var combinationOnePlayer = roomPokerCombinationSystem.GetPokerCombination(playerOneCards, tableCards, 
+    //     out var combinationOrdersCardsOnePlayer);
+    //
+    // Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsOnePlayer, "^")}", ConsoleColor.Cyan);
+    // Logger.Debug($"{combinationOnePlayer}", ConsoleColor.Cyan);
 }

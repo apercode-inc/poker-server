@@ -14,6 +14,7 @@ public class RoomPokerShowdownSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdown;
+    [Injectable] private Stash<RoomPokerDetectCombination> _roomPokerDetectCombination;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
@@ -80,37 +81,10 @@ public class RoomPokerShowdownSystem : ISystem
             };
             _server.SendInRoom(ref dataframe, roomEntity);
 
-            StubToContinueCycleGame(roomEntity);
+            _roomPokerDetectCombination.Set(roomEntity);
 
             _roomPokerShowdown.Remove(roomEntity);
         }
-    }
-    
-    //todo заглушка чтобы просто замкнуть игровой цикл игры в покер (сделать следующую раздачу)
-    private void StubToContinueCycleGame(Entity roomEntity)
-    {
-        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-        var playerGivenBank = new FastList<Entity>();
-        
-        foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
-        {
-            var player = markedPlayer.Value;
-
-            ref var playerCards = ref _playerCards.Get(player);
-
-            if (playerCards.CardsState == CardsState.Empty)
-            {
-                continue;
-            }
-
-            playerGivenBank.Add(player);
-        }
-
-        roomEntity.SetComponent(new RoomPokerPlayersGivenBank
-        {
-            Players = playerGivenBank,
-        });
     }
 
     public void Dispose()
