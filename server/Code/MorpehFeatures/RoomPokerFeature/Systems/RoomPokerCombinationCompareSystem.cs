@@ -71,7 +71,7 @@ public class RoomPokerCombinationCompareSystem : ISystem
         }
     }
     
-    public void SortCombinationAndKickers(List<CardModel> cards)
+    public void SortCombinationAndKickers(List<CardModel> cards) //Использовать для: FourOfKind, ThreeOfKind, TwoPair, OnePair
     {
         var groupedCards = cards.GroupBy(c => c.Rank)
             .OrderByDescending(g => g.Count())
