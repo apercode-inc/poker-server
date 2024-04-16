@@ -71,7 +71,7 @@ public class RoomPokerCombinationCompareSystem : ISystem
         }
     }
     
-    public void SortCombinationAndKicker(List<CardModel> cards)
+    public void SortCombinationAndKickers(List<CardModel> cards)
     {
         var groupedCards = cards.GroupBy(c => c.Rank)
             .OrderByDescending(g => g.Count())

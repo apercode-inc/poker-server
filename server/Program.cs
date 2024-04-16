@@ -142,7 +142,7 @@ void TestCombination()
         new(CardRank.Three, CardSuit.Hearts),
     };
 
-    roomPokerCombinationCompareSystem.SortCombinationAndKicker(compareTestCards);
+    roomPokerCombinationCompareSystem.SortCombinationAndKickers(compareTestCards);
     
     Console.WriteLine();
     
