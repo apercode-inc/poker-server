@@ -83,7 +83,7 @@ public class RoomPokerDetectCombinationSystem : ISystem
         }
     }
     
-    private CombinationType GetPokerCombination(IEnumerable<CardModel> playerCards, IEnumerable<CardModel> tableCards, 
+    public CombinationType GetPokerCombination(IEnumerable<CardModel> playerCards, IEnumerable<CardModel> tableCards, 
         out List<CardModel> combinationOrderedCards)
     {
         var allCards = new List<CardModel>(playerCards);
@@ -113,7 +113,7 @@ public class RoomPokerDetectCombinationSystem : ISystem
         return combinationTypeMax;
     }
 
-    private CombinationType DetectPokerCombination(List<CardModel> cards)
+    public CombinationType DetectPokerCombination(List<CardModel> cards)
     {
         ulong handValue = 0;
 

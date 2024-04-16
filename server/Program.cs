@@ -101,67 +101,135 @@ void TestCombination()
 {
     var roomPokerCombinationSystem = new RoomPokerDetectCombinationSystem();
 
-    var playerTwoCards = new List<CardModel>
+    var playerOneCards = new List<CardModel> //Vasya
     {
-        new(CardRank.Queen, CardSuit.Diamonds) { IsHands = true },
-        new(CardRank.Seven, CardSuit.Spades) { IsHands = true },
+        new(CardRank.King, CardSuit.Clubs) { IsHands = true },
+        new(CardRank.Ace, CardSuit.Diamonds) { IsHands = true },
     };
     
-    var playerOneCards = new List<CardModel>
+    var playerTwoCards = new List<CardModel> //Evgeniy
     {
-        new(CardRank.Ace, CardSuit.Hearts) { IsHands = true },
-        new(CardRank.Seven, CardSuit.Diamonds) { IsHands = true },
+        new(CardRank.King, CardSuit.Clubs) { IsHands = true },
+        new(CardRank.Seven, CardSuit.Hearts) { IsHands = true },
+    };
+    
+    var playerThreeCards = new List<CardModel> //Kate
+    {
+        new(CardRank.Nine, CardSuit.Hearts) { IsHands = true },
+        new(CardRank.Nine, CardSuit.Clubs) { IsHands = true },
     };
 
     var tableCards = new List<CardModel>
     {
-        new(CardRank.Two, CardSuit.Hearts),
-        new(CardRank.Five, CardSuit.Clubs),
-        new(CardRank.Ten, CardSuit.Spades),
-        new(CardRank.Three, CardSuit.Spades),
-        new(CardRank.Four, CardSuit.Hearts),
-    };
-    
-    Logger.Debug("------------ Hands Player_2 ------------", ConsoleColor.Magenta);
-    Logger.Debug($"{Logger.GetCardsLog(playerTwoCards)}", ConsoleColor.Cyan);
-    
-    Logger.Debug("------------ Hands Player_1 ------------", ConsoleColor.Magenta);
-    Logger.Debug($"{Logger.GetCardsLog(playerOneCards)}", ConsoleColor.Cyan);
-    
-    Logger.Debug("------------ Table Cards ------------", ConsoleColor.Magenta);
-    Logger.Debug($"{Logger.GetCardsLog(tableCards)}", ConsoleColor.Cyan);
-    
-    var roomPokerCombinationCompareSystem = new RoomPokerCombinationCompareSystem();
-    
-    var compareTestCards = new List<CardModel>
-    {
-        new(CardRank.Queen, CardSuit.Hearts),
-        new(CardRank.Jack, CardSuit.Clubs),
-        new(CardRank.Jack, CardSuit.Spades),
-        new(CardRank.Three, CardSuit.Spades),
-        new(CardRank.Three, CardSuit.Hearts),
+        new(CardRank.Seven, CardSuit.Clubs),
+        new(CardRank.Two, CardSuit.Spades),
+        new(CardRank.Seven, CardSuit.Diamonds),
+        new(CardRank.Nine, CardSuit.Spades),
+        new(CardRank.King, CardSuit.Diamonds),
     };
 
-    roomPokerCombinationCompareSystem.SortCombinationAndKickers(compareTestCards);
+    Logger.Debug("------------ Hands Player_1 ------------", ConsoleColor.Magenta);
+    Logger.Debug($"Vasya:   {Logger.GetCardsLog(playerOneCards)}", ConsoleColor.Cyan);
     
+    Logger.Debug("------------ Hands Player_2 ------------", ConsoleColor.Magenta);
+    Logger.Debug($"Evgeniy: {Logger.GetCardsLog(playerTwoCards)}", ConsoleColor.Cyan);
+    
+    Logger.Debug("------------ Hands Player_3------------", ConsoleColor.Magenta);
+    Logger.Debug($"Kate:    {Logger.GetCardsLog(playerThreeCards)}", ConsoleColor.Cyan);
+
+    Logger.Debug("------------ Table Cards ------------", ConsoleColor.Magenta);
+    Logger.Debug($"{Logger.GetCardsLog(tableCards)}", ConsoleColor.Cyan);
+
     Console.WriteLine();
     
+    Logger.Debug("------------ Combination Player_1 ------------", ConsoleColor.Magenta);
+    
+    //calculate player_
+    var combinationOnePlayer = roomPokerCombinationSystem.GetPokerCombination(playerOneCards, tableCards, 
+        out var combinationOrdersCardsOnePlayer);
+    
+    Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsOnePlayer, "^")}", ConsoleColor.Cyan);
+    Logger.Debug($"Vasya:   {combinationOnePlayer}", ConsoleColor.Cyan);
     
     Logger.Debug("------------ Combination Player_2 ------------", ConsoleColor.Magenta);
     
-    // //calculate player_2
-    // var combinationTwoPlayer = roomPokerCombinationSystem.GetPokerCombination(playerTwoCards, tableCards, 
-    //     out var combinationOrdersCardsTwoPlayer);
-    //
-    // Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsTwoPlayer, "^")}", ConsoleColor.Cyan);
-    // Logger.Debug($"{combinationTwoPlayer}", ConsoleColor.Cyan);
-    //
-    // Logger.Debug("------------ Combination Player_1 ------------", ConsoleColor.Magenta);
-    //
-    // //calculate player_
-    // var combinationOnePlayer = roomPokerCombinationSystem.GetPokerCombination(playerOneCards, tableCards, 
-    //     out var combinationOrdersCardsOnePlayer);
-    //
-    // Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsOnePlayer, "^")}", ConsoleColor.Cyan);
-    // Logger.Debug($"{combinationOnePlayer}", ConsoleColor.Cyan);
+    //calculate player_2
+    var combinationTwoPlayer = roomPokerCombinationSystem.GetPokerCombination(playerTwoCards, tableCards, 
+        out var combinationOrdersCardsTwoPlayer);
+    
+    Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsTwoPlayer, "^")}", ConsoleColor.Cyan);
+    Logger.Debug($"Evgeniy: {combinationTwoPlayer}", ConsoleColor.Cyan);
+    
+    Logger.Debug("------------ Combination Player_3 ------------", ConsoleColor.Magenta);
+    
+    //calculate player_3
+    var combinationThreePlayer = roomPokerCombinationSystem.GetPokerCombination(playerThreeCards, tableCards, 
+        out var combinationOrdersCardsThreePlayer);
+    
+    Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsThreePlayer, "^")}", ConsoleColor.Cyan);
+    Logger.Debug($"Kate:    {combinationThreePlayer}", ConsoleColor.Cyan);
+    
+    var playerByCardsCombinations = new Dictionary<Player, List<CardModel>>
+    {
+        [new Player("Vasya", 27, combinationOnePlayer)] = combinationOrdersCardsOnePlayer,
+        [new Player("Evgeniy", 32, combinationTwoPlayer)] = combinationOrdersCardsTwoPlayer,
+        [new Player("Kate", 25, combinationThreePlayer)] = combinationOrdersCardsThreePlayer,
+    };
+
+    //Max combination
+    var maxCombination = CombinationType.HighCard;
+    var combinations = new List<CombinationType>
+    {
+        combinationOnePlayer, combinationTwoPlayer, combinationThreePlayer,
+    };
+    
+    foreach (var combination in combinations)
+    {
+        if (combination > maxCombination)
+        {
+            maxCombination = combination;
+        }
+    }
+
+    var removedPlayers = new List<Player>();
+
+    foreach (var playerByCards in playerByCardsCombinations)
+    {
+        if (playerByCards.Key.CombinationType != maxCombination)
+        {
+            removedPlayers.Add(playerByCards.Key);
+        }
+    }
+
+    foreach (var removedPlayer in removedPlayers)
+    {
+        playerByCardsCombinations.Remove(removedPlayer);
+    }
+
+    Logger.Debug($"MAX combination: {maxCombination}", ConsoleColor.Magenta);
+
+    var roomPokerCombinationCompareSystem = new RoomPokerCombinationCompareSystem();
+
+    var winningPlayers = roomPokerCombinationCompareSystem.DefineWinningPlayersByCombination(maxCombination, playerByCardsCombinations);
+
+
+    foreach (var winningPlayer in winningPlayers)
+    {
+        Logger.Debug($"WIN PLAYER ---> Nickname: {winningPlayer.Nickname} | Age: {winningPlayer.Age}", ConsoleColor.Yellow);
+    }
+    
+}
+
+public class Player
+{
+    public string Nickname;
+    public int Age;
+    public CombinationType CombinationType;
+
+    public Player(string nickname, int age, CombinationType combinationType)
+    {
+        Nickname = nickname;
+        Age = age;
+        CombinationType = combinationType;
+    }
 }

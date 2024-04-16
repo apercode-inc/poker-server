@@ -42,9 +42,8 @@ public class RoomPokerCombinationCompareSystem : ISystem
 
             _roomPokerCombinationMax.Remove(roomEntity);
             
-            //_playersByCards.Clear();
-            var playerGivenBank = new FastList<Entity>(); //todo заглушка выигрывают все со старшей комбинацией
-            
+            _playersByCards.Clear();
+
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
             foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
@@ -58,20 +57,96 @@ public class RoomPokerCombinationCompareSystem : ISystem
                     continue;
                 }
                 
-                playerGivenBank.Add(player); //todo заглушка выигрывают все со старшей комбинацией
-                //_playersByCards.Add(player, playerPokerCombination.CombinationCards);
+                _playersByCards.Add(player, playerPokerCombination.CombinationCards);
+            }
+
+            var winningPlayers = new FastList<Entity>();
+            
+            if (_playersByCards.Count == 1)
+            {
+                winningPlayers.Add(_playersByCards.First().Key);
+            }
+            else
+            {
+                winningPlayers = DefineWinningPlayersByCombination(combinationMax, _playersByCards);
             }
             
             roomEntity.SetComponent(new RoomPokerPlayersGivenBank
             {
-                Players = playerGivenBank,
+                Players = winningPlayers,
             });
-
-            //CompareCombination(combinationMax);
         }
     }
+
+    public FastList<T> DefineWinningPlayersByCombination<T>(CombinationType combinationType,
+        Dictionary<T, List<CardModel>> playersByCards) where T: class
+    {
+        FastList<T> winningPlayers = null;
+
+        switch (combinationType)
+        {
+            case CombinationType.RoyalFlush:
+                winningPlayers = DefineAllWinnings(playersByCards);
+                break;
+            case CombinationType.FourOfKind: 
+            case CombinationType.FullHouse:
+            case CombinationType.ThreeOfKind:
+            case CombinationType.TwoPair:
+            case CombinationType.OnePair:
+                winningPlayers = DefineWinningPlayersByCardsSeniority(playersByCards, true);
+                break;
+            case CombinationType.StraightFlush:
+            case CombinationType.Flush:
+            case CombinationType.Straight:
+            case CombinationType.HighCard:
+                winningPlayers = DefineWinningPlayersByCardsSeniority(playersByCards, false);
+                break;
+        }
+
+        return winningPlayers;
+    }
+
+    private FastList<T> DefineWinningPlayersByCardsSeniority<T>(Dictionary<T, List<CardModel>> playersByCards, bool kickersSort) where T: class
+    {
+        var winningPlayers = new FastList<T>();
+        
+        foreach (var playerByCards in playersByCards)
+        {
+            if (kickersSort)
+            {
+                playersByCards[playerByCards.Key] = GetSortCombinationAndKickers(playerByCards.Value);
+            }
+            
+            winningPlayers.Add(playerByCards.Key);
+        }
+        
+        // Сравниваем карты каждого игрока с картами других игроков
+        foreach (var player1 in playersByCards.Keys)
+        {
+            foreach (var player2 in playersByCards.Keys)
+            {
+                if (player1.Equals(player2))
+                {
+                    continue;
+                }
+
+                var player1Cards = playersByCards[player1];
+                var player2Cards = playersByCards[player2];
+
+                var player1Wins = CompareCards(player1Cards, player2Cards);
+
+                if (!player1Wins)
+                {
+                    winningPlayers.Remove(player1);
+                    break;
+                }
+            }
+        }
+
+        return winningPlayers;
+    }
     
-    public void SortCombinationAndKickers(List<CardModel> cards) //Использовать для: FourOfKind, ThreeOfKind, TwoPair, OnePair
+    private List<CardModel> GetSortCombinationAndKickers(List<CardModel> cards)
     {
         var groupedCards = cards.GroupBy(c => c.Rank)
             .OrderByDescending(g => g.Count())
@@ -85,145 +160,36 @@ public class RoomPokerCombinationCompareSystem : ISystem
             .SelectMany(g => g)
             .ToList();
         
-        Logger.Debug($"Сортировка (комбинации, кикеры) === {Logger.GetCardsLog(sortedCards)}", ConsoleColor.DarkBlue);
+        Logger.Debug($"Сортировка (комбинации, кикеры) === {Logger.GetCardsLog(cards)}", ConsoleColor.DarkBlue);
+        
+        return sortedCards;
     }
-
-    private void CompareCombination(CombinationType combinationType)
+    
+    private bool CompareCards(IReadOnlyList<CardModel> cards1, IReadOnlyList<CardModel> cards2)
     {
-        if (combinationType == CombinationType.RoyalFlush)
+        // Последовательно сравниваем карты каждого игрока
+        for (int i = 0; i < cards1.Count; i++)
         {
-            DefineAllWinnings();
-        }
-
-        if (combinationType == CombinationType.StraightFlush)
-        {
-            DefineStraightWinnings();
-        }
-
-        if (combinationType == CombinationType.FourOfKind) //todo 1 кикер
-        {
-            DefineFourOfKindWinnings();
-        }
-
-        if (combinationType == CombinationType.FullHouse)
-        {
-            DefineFullHouseWinnings();
-        }
-
-        if (combinationType == CombinationType.Flush)
-        {
-            //тут по идеи тоже самое что и стрит
-            ////нет не тоже самое вдруг первая карта будет одинаковой, значит надо сравнивать следующую и т.д
-            //DefineStraightWinnings(); 
-        }
-        
-        if (combinationType == CombinationType.Straight)
-        {
-            DefineStraightWinnings();
-        }
-
-        if (combinationType == CombinationType.ThreeOfKind) //todo 2 кикера
-        {
-            DefineThreeOfKindWinnings();
-        }
-        
-        if (combinationType == CombinationType.TwoPair) //todo 1 кикер
-        {
-            DefineTwoPairWinnings();
-        }
-        
-        if (combinationType == CombinationType.OnePair) //todo 3 кикера
-        {
-            DefineOnePairWinnings();
-        }
-        
-        if (combinationType == CombinationType.HighCard) //todo 4 кикера
-        {
-            DefineHighCardWinnings();
-        }
-    }
-
-    private void DefineHighCardWinnings()
-    {
-        
-    }
-
-    private void DefineOnePairWinnings()
-    {
-       
-    }
-
-    private void DefineTwoPairWinnings()
-    {
-        
-    }
-
-    private void DefineThreeOfKindWinnings()
-    {
-        
-    }
-
-    private void DefineFullHouseWinnings()
-    {
-        
-    }
-
-    private void DefineFourOfKindWinnings()
-    {
-        foreach (var playerByCards in _playersByCards) //todo подумать пока что хуйня выходит
-        {
-            var cards = playerByCards.Value;
-            
-            var maxKikerRank = CardRank.Two;
-            var maxRankFourOfKind = cards[2].Rank;
-            
-            if (cards[0].Rank != maxRankFourOfKind) //A-5-5-5-5 
+            int comparisonResult = cards1[i].Rank.CompareTo(cards2[i].Rank); // Сравниваем ранги карт
+            if (comparisonResult != 0)
             {
-                maxKikerRank = cards[0].Rank;
-            }
-            
-            if (cards[4].Rank != maxRankFourOfKind) //A-A-A-A-5
-            {
-                maxKikerRank = cards[4].Rank;
-            }
-        }
-    }
-
-    private void DefineAllWinnings()
-    {
-        foreach (var playerByCards in _playersByCards)
-        {
-            //_playerPokerWin.Set(playerByCards.Key);
-        }
-    }
-
-    private void DefineStraightWinnings()
-    {
-        var maxRank = CardRank.Two;
-
-        foreach (var playerByCards in _playersByCards)
-        {
-            var cards = playerByCards.Value;
-
-            var highRank = cards[0].Rank;
-            if (maxRank < highRank)
-            {
-                maxRank = highRank;
+                return comparisonResult > 0; // Возвращаем true, если карта игрока 1 лучше, иначе false
             }
         }
 
-        foreach (var playersByCard in _playersByCards)
+        return true; //TODO так не должно быть (Если все карты игрока 1 равны картам игрока 2, игрок 1 побеждает)
+    }
+
+    private FastList<T> DefineAllWinnings<T>(Dictionary<T, List<CardModel>> playersByCards) where T: class
+    {
+        var winningPlayers = new FastList<T>();
+
+        foreach (var playersByCard in playersByCards)
         {
-            var player = playersByCard.Key;
-            var cards = playersByCard.Value;
-
-            var highRank = cards[0].Rank;
-
-            if (highRank == maxRank)
-            {
-                //_playerPokerWin.Set(player);
-            }
+            winningPlayers.Add(playersByCard.Key);
         }
+
+        return winningPlayers;
     }
 
     public void Dispose()
