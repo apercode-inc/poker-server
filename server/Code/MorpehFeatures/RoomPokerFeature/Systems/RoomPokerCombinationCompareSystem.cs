@@ -12,6 +12,7 @@ public class RoomPokerCombinationCompareSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
+    [Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdown;
     
     [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
@@ -70,10 +71,11 @@ public class RoomPokerCombinationCompareSystem : ISystem
                 winningPlayers = DefineWinningPlayersByCombination(combinationMax, _playersByCards);
             }
             
-            roomEntity.SetComponent(new RoomPokerPlayersGivenBank
+            _roomPokerPlayersGivenBank.Set(roomEntity, new RoomPokerPlayersGivenBank
             {
                 Players = winningPlayers,
             });
+            _roomPokerShowdown.Set(roomEntity);
         }
     }
 

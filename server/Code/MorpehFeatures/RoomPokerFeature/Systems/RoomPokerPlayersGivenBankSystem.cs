@@ -60,6 +60,7 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
             _roomPokerSetCardsTickTimer.Remove(roomEntity);
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+            ref var roomPokerPlayersGivenBank = ref _roomPokerPlayersGivenBank.Get(roomEntity);
 
             foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
             {
@@ -71,8 +72,6 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
                 playerPokerCurrentBet.Value = 0;
             }
 
-            ref var roomPokerPlayersGivenBank = ref _roomPokerPlayersGivenBank.Get(roomEntity);
-            
             //todo без учета all-in и все такое
             var winnings = roomPokerBank.OnTable / roomPokerPlayersGivenBank.Players.length;
             
