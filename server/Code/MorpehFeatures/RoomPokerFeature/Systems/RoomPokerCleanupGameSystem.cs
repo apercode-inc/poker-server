@@ -15,12 +15,14 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
 public class RoomPokerCleanupGameSystem : ISystem
 {
-    [Injectable] private Stash<RoomPokerReturnAllCardsToDestTimer> _roomPokerReturnAllCardsToDestTimer;
+    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
     [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
+    [Injectable] private Stash<RoomPokerShowOrHideCards> _roomPokerShowOrHideCards;
+    [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
     
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
@@ -37,7 +39,7 @@ public class RoomPokerCleanupGameSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
-            .With<RoomPokerReturnAllCardsToDestTimer>()
+            .With<RoomPokerCleanupTimer>()
             .With<RoomPokerPlayers>()
             .Build();
     }
@@ -46,7 +48,7 @@ public class RoomPokerCleanupGameSystem : ISystem
     {
         foreach (var roomEntity in _filter)
         {
-            ref var roomPokerNextDealingTimer = ref _roomPokerReturnAllCardsToDestTimer.Get(roomEntity);
+            ref var roomPokerNextDealingTimer = ref _roomPokerCleanupTimer.Get(roomEntity);
             
             if (!_roomPokerActive.Has(roomEntity))
             {
@@ -92,8 +94,13 @@ public class RoomPokerCleanupGameSystem : ISystem
             _server.SendInRoom(ref cardsToTableDataframe, roomEntity);
 
             var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
+
+            if (_roomPokerShowOrHideCards.Has(roomEntity))
+            {
+                _roomPokerShowOrHideCardsActivate.Set(roomEntity);
+            }
             
-            _roomPokerReturnAllCardsToDestTimer.Remove(roomEntity);
+            _roomPokerCleanupTimer.Remove(roomEntity);
             
             if (!_roomPokerActive.Has(roomEntity))
             {
@@ -104,7 +111,6 @@ public class RoomPokerCleanupGameSystem : ISystem
             {
                 Value = config.DelayBeforeNextDealingCards,
             });
-  
         }
     }
 

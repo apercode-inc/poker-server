@@ -6,10 +6,13 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
 public struct RoomPokerShowdownDataframe : INetworkDataframe
 {
+    public long Bank;
     public List<RoomPokerShowdownNetworkModel> ShowdownModels;
 
     public void Write(NetFrameWriter writer)
     {
+        writer.WriteLong(Bank);
+        
         var hasModels = ShowdownModels != null;
         writer.WriteBool(hasModels);
 
@@ -26,6 +29,8 @@ public struct RoomPokerShowdownDataframe : INetworkDataframe
 
     public void Read(NetFrameReader reader)
     {
+        Bank = reader.ReadLong();
+        
         if (reader.ReadBool())
         {
             var count = reader.ReadInt();

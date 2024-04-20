@@ -18,6 +18,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
     [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
     [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
+    [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
 
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
@@ -28,6 +29,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
     [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
+    [Injectable] private Stash<PlayerShowOrHideTimer> _playerShowOrHideTimer;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
 
     [Injectable] private NetFrameServer _server;
@@ -54,6 +56,12 @@ public class RoomPokerService : IInitializer
         
         var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);
         var overOnePlayerToTable = markedPlayersBySeat.Count > 1;
+
+        if (_playerShowOrHideTimer.Has(playerLeft))
+        {
+            _roomPokerShowOrHideCardsActivate.Set(roomEntity);
+            _playerShowOrHideTimer.Remove(playerLeft);
+        }
 
         if (isRemove && overOnePlayerToTable)
         {
@@ -104,7 +112,7 @@ public class RoomPokerService : IInitializer
         _roomPokerStorage.Remove(roomPokerId.Value);
     }
 
-    public void DropCards(Entity roomEntity, Entity playerEntity)
+    public void DropCards(Entity roomEntity, Entity playerEntity, bool isNextTurn = true)
     {
         _roomPokerCardDeskService.ReturnCardsInDeskToPlayer(roomEntity, playerEntity);
 
@@ -124,6 +132,11 @@ public class RoomPokerService : IInitializer
             Cards = null,
         };
         _server.SendInRoom(ref dataframe, roomEntity);
+        
+        if (!isNextTurn)
+        {
+            return;
+        }
         
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;

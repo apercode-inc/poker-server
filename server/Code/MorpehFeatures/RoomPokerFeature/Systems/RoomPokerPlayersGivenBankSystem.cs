@@ -20,7 +20,7 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
-    [Injectable] private Stash<RoomPokerReturnAllCardsToDestTimer> _roomPokerReturnAllCardsToDestTimer;
+    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
     
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
     [Injectable] private Stash<PlayerId> _playerId;
@@ -85,7 +85,7 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
 
             var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
             
-            _roomPokerReturnAllCardsToDestTimer.Set(roomEntity,new RoomPokerReturnAllCardsToDestTimer
+            _roomPokerCleanupTimer.Set(roomEntity,new RoomPokerCleanupTimer
             {
                 Value = config.DelayShowdownAndWin,
             });

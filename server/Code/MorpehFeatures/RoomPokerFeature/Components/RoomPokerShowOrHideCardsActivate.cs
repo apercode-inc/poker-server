@@ -2,7 +2,6 @@ using Scellecs.Morpeh;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
-public struct RoomPokerReturnAllCardsToDestTimer : IComponent
+public struct RoomPokerShowOrHideCardsActivate : IComponent
 {
-    public float Value;
 }
