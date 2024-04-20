@@ -65,12 +65,13 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerDetectCombinationSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerCombinationCompareSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerShowdownSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerShowOrHideCardsActivateSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerTickTimerShowOrHideByPlayerSystem>());
-        
+
         systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
 
         systemsGroup.AddSystem(container.New<RoomPokerPlayersGivenBankSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownTimerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerShowOrHideCardsActivateSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerTickTimerShowOrHideByPlayerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerCleanupGameSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerNextDealingDelaySystem>());
         

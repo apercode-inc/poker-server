@@ -1,9 +1,11 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
@@ -14,10 +16,12 @@ public class RoomPokerShowOrHideCardsActivateSystem : ISystem
     [Injectable] private Stash<RoomPokerShowOrHideCards> _roomPokerShowOrHideCards;
     [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
+    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
 
     [Injectable] private Stash<PlayerShowOrHideTimer> _playerShowOrHideTimer;
     [Injectable] private Stash<PlayerId> _playerId;
 
+    [Injectable] private ConfigsService _configsService;
     [Injectable] private NetFrameServer _server;
 
     private Filter _filter;
@@ -75,6 +79,12 @@ public class RoomPokerShowOrHideCardsActivateSystem : ISystem
             }
             else
             {
+                var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
+                
+                _roomPokerCleanupTimer.Set(roomEntity,new RoomPokerCleanupTimer
+                {
+                    Value = config.DelayCleanup,
+                });
                 _roomPokerShowOrHideCards.Remove(roomEntity);
             }
         }

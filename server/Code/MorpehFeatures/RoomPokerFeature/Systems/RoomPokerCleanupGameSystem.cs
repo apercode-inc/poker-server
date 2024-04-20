@@ -21,8 +21,6 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
     [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
-    [Injectable] private Stash<RoomPokerShowOrHideCards> _roomPokerShowOrHideCards;
-    [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
     
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
@@ -41,6 +39,7 @@ public class RoomPokerCleanupGameSystem : ISystem
         _filter = World.Filter
             .With<RoomPokerCleanupTimer>()
             .With<RoomPokerPlayers>()
+            .Without<RoomPokerShowOrHideCards>()
             .Build();
     }
 
@@ -94,11 +93,6 @@ public class RoomPokerCleanupGameSystem : ISystem
             _server.SendInRoom(ref cardsToTableDataframe, roomEntity);
 
             var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
-
-            if (_roomPokerShowOrHideCards.Has(roomEntity))
-            {
-                _roomPokerShowOrHideCardsActivate.Set(roomEntity);
-            }
             
             _roomPokerCleanupTimer.Remove(roomEntity);
             
