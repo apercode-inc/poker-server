@@ -42,7 +42,7 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerPlayerLeftSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerDestroySystem>());
 
-        //poker game logic
+        //Poker game logic
         systemsGroup.AddSystem(container.New<RoomPokerGameCheckStartSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerGameStartTimerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerGameInitializeSystem>());
@@ -68,13 +68,13 @@ public static class RoomPokerFeature
 
         systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
 
+        //End game logic
         systemsGroup.AddSystem(container.New<RoomPokerPlayersGivenBankSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerShowdownTimerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownTickTimerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerShowOrHideCardsActivateSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerTickTimerShowOrHideByPlayerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerCleanupGameSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerNextDealingDelaySystem>());
-        
         
         world.AddSystemsGroup(index++, systemsGroup);
     }

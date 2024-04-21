@@ -1,7 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -57,12 +56,6 @@ public class RoomPokerService : IInitializer
         var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);
         var overOnePlayerToTable = markedPlayersBySeat.Count > 1;
 
-        if (_playerShowOrHideTimer.Has(playerLeft))
-        {
-            _roomPokerShowOrHideCardsActivate.Set(roomEntity);
-            _playerShowOrHideTimer.Remove(playerLeft);
-        }
-
         if (isRemove && overOnePlayerToTable)
         {
             foreach (var markerByPlayer in _markersByPlayer)
@@ -73,17 +66,30 @@ public class RoomPokerService : IInitializer
                 switch (marker)
                 {
                     case PokerPlayerMarkerType.DealerPlayer:
+                    {
                         SetDealerPlayerMarker(roomEntity, nextPlayerMarked);
                         break;
+                    }
                     case PokerPlayerMarkerType.ActivePlayer:
-                        SetActivePlayerMarkerOrGivenBank(roomEntity);
+                    {
+                        if (!_playerShowOrHideTimer.Has(playerLeft))
+                        {
+                            SetActivePlayerMarkerOrGivenBank(roomEntity);
+                        }
                         break;
+                    }
                     case PokerPlayerMarkerType.NextRoundActivePlayer:
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
             }
+        }
+        
+        if (_playerShowOrHideTimer.Has(playerLeft))
+        {
+            _roomPokerShowOrHideCardsActivate.Set(roomEntity);
+            _playerShowOrHideTimer.Remove(playerLeft);
         }
         
         ref var playerId = ref _playerId.Get(playerLeft);

@@ -22,8 +22,7 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
     [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
     [Injectable] private Stash<RoomPokerShowdownTimer> _roomPokerShowdownTimer;
-    [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
-    
+
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
@@ -86,12 +85,21 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
             roomPokerBank.OnTable = 0;
 
             var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
-            
-            _roomPokerShowOrHideCardsActivate.Set(roomEntity);
-            _roomPokerShowdownTimer.Set(roomEntity, new RoomPokerShowdownTimer
+
+            if (_roomPokerActive.Has(roomEntity))
             {
-                Value = config.DelayShowdown,
-            });
+                _roomPokerShowdownTimer.Set(roomEntity, new RoomPokerShowdownTimer
+                {
+                    Value = config.DelayShowdown,
+                });
+            }
+            else
+            {
+                _roomPokerCleanupTimer.Set(roomEntity, new RoomPokerCleanupTimer
+                {
+                    Value = 0,
+                });
+            }
 
             _roomPokerPlayersGivenBank.Remove(roomEntity);
         }

@@ -32,7 +32,6 @@ public class RoomPokerShowOrHideCardsActivateSystem : ISystem
     {
         _filter = World.Filter
             .With<RoomPokerStats>()
-            .With<RoomPokerShowOrHideCards>()
             .With<RoomPokerShowOrHideCardsActivate>()
             .Build();
     }
@@ -43,7 +42,18 @@ public class RoomPokerShowOrHideCardsActivateSystem : ISystem
         {
             _roomPokerShowOrHideCardsActivate.Remove(roomEntity);
             
-            ref var roomPokerShowOrHideCards = ref _roomPokerShowOrHideCards.Get(roomEntity);
+            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
+            
+            ref var roomPokerShowOrHideCards = ref _roomPokerShowOrHideCards.Get(roomEntity, out var showOrHideExist);
+
+            if (!showOrHideExist)
+            {
+                _roomPokerCleanupTimer.Set(roomEntity,new RoomPokerCleanupTimer
+                {
+                    Value = config.DelayCleanup,
+                });
+                continue;
+            }
 
             if (roomPokerShowOrHideCards.Players.TryDequeue(out var playerEntity))
             {
@@ -79,8 +89,6 @@ public class RoomPokerShowOrHideCardsActivateSystem : ISystem
             }
             else
             {
-                var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
-                
                 _roomPokerCleanupTimer.Set(roomEntity,new RoomPokerCleanupTimer
                 {
                     Value = config.DelayCleanup,

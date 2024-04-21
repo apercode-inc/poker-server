@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.StartTimer;
@@ -12,6 +13,8 @@ public class RoomPokerCheckStopGameSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
+    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
+    [Injectable] private Stash<RoomPokerShowOrHideCards> _roomPokerShowOrHideCards;
     
     [Injectable] private NetFrameServer _server;
     
@@ -54,7 +57,7 @@ public class RoomPokerCheckStopGameSystem : ISystem
             {
                 Players = playerGivenBank
             });
-            
+
             var dataframe = new RoomPokerStopGameResetTimerDataframe();
             _server.SendInRoom(ref dataframe, roomEntity);
         }

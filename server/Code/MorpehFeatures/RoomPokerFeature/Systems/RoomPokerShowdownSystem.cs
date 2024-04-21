@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -16,7 +17,6 @@ public class RoomPokerShowdownSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
     [Injectable] private Stash<RoomPokerShowOrHideCards> _roomPokerShowOrHideCards;
-    [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
@@ -48,7 +48,9 @@ public class RoomPokerShowdownSystem : ISystem
             roomPokerBank.OnTable = roomPokerBank.Total;
 
             var showdownModels = new List<RoomPokerShowdownNetworkModel>();
-            
+
+            var players = new Queue<Entity>();
+
             foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var player = markedPlayer.Value;
@@ -70,7 +72,7 @@ public class RoomPokerShowdownSystem : ISystem
                     }
                 }
 
-                if (isWinPlayer)
+                if (isWinPlayer) //true
                 {
                     playerCards.CardsState = CardsState.Open;
                     var cards = playerCards.Cards;
@@ -96,24 +98,14 @@ public class RoomPokerShowdownSystem : ISystem
                 }
                 else
                 {
-                    ref var roomPokerShowOrHideCards = ref _roomPokerShowOrHideCards.Get(roomEntity, out var exist);
-
-                    if (exist)
-                    {
-                        roomPokerShowOrHideCards.Players.Enqueue(player);
-                    }
-                    else
-                    {
-                        var players = new Queue<Entity>();
-                        players.Enqueue(player);
-                        
-                        _roomPokerShowOrHideCards.Set(roomEntity, new RoomPokerShowOrHideCards
-                        {
-                            Players = players,
-                        });
-                    }
+                    players.Enqueue(player);
                 }
             }
+            
+            _roomPokerShowOrHideCards.Set(roomEntity, new RoomPokerShowOrHideCards
+            {
+                Players = players,
+            });
 
             var dataframe = new RoomPokerShowdownDataframe
             {

@@ -4,7 +4,7 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerShowdownTimerSystem : ISystem
+public class RoomPokerShowdownTickTimerSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
     [Injectable] private Stash<RoomPokerShowdownTimer> _roomPokerShowdownTimer;
