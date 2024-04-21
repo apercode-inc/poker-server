@@ -6,12 +6,18 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
 public struct RoomPokerShowdownDataframe : INetworkDataframe
 {
+    public bool IsBankSync;
     public long Bank;
     public List<RoomPokerShowdownNetworkModel> ShowdownModels;
 
     public void Write(NetFrameWriter writer)
     {
-        writer.WriteLong(Bank);
+        writer.WriteBool(IsBankSync);
+
+        if (IsBankSync)
+        {
+            writer.WriteLong(Bank);
+        }
         
         var hasModels = ShowdownModels != null;
         writer.WriteBool(hasModels);
@@ -29,7 +35,12 @@ public struct RoomPokerShowdownDataframe : INetworkDataframe
 
     public void Read(NetFrameReader reader)
     {
-        Bank = reader.ReadLong();
+        IsBankSync = reader.ReadBool();
+
+        if (IsBankSync)
+        {
+            Bank = reader.ReadLong();
+        }
         
         if (reader.ReadBool())
         {

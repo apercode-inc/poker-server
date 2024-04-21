@@ -37,6 +37,8 @@ public static class RoomPokerFeature
         systemsGroup.AddInitializer(container.New<RoomPokerHudSetBetRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerHudFoldRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerHudCheckRequestSyncSystem>());
+        systemsGroup.AddInitializer(container.New<RoomPokerHudHideCardsSyncSystem>());
+        systemsGroup.AddInitializer(container.New<RoomPokerHudShowCardsSyncSystem>());
 
         systemsGroup.AddSystem(container.New<RoomPokerCreateOrJoinSendSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerLeftSystem>());

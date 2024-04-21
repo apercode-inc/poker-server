@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -72,7 +71,7 @@ public class RoomPokerShowdownSystem : ISystem
                     }
                 }
 
-                if (isWinPlayer) //true
+                if (isWinPlayer)
                 {
                     playerCards.CardsState = CardsState.Open;
                     var cards = playerCards.Cards;
@@ -109,6 +108,7 @@ public class RoomPokerShowdownSystem : ISystem
 
             var dataframe = new RoomPokerShowdownDataframe
             {
+                IsBankSync = true,
                 Bank = roomPokerBank.OnTable,
                 ShowdownModels = showdownModels,
             };
