@@ -44,7 +44,7 @@ public class RoomPokerCreateRequestSyncSystem : IInitializer
 
         if (playerCurrency.CurrencyByType[dataframe.CurrencyType] < dataframe.Contribution)
         {
-            _notificationService.Show(player, "не достаточно средств для взноса", NotificationKind.Error);
+            _notificationService.Show(player, "не достаточно средств для взноса", NotificationType.Error);
             return;
         }
 

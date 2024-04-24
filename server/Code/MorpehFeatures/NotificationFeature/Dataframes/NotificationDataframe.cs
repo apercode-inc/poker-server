@@ -6,18 +6,18 @@ namespace server.Code.MorpehFeatures.NotificationFeature.Dataframes
 {
     public struct NotificationDataframe : INetworkDataframe
     {
-        public NotificationKind Kind;
+        public NotificationType Type;
         public string MessageText;
 
         public void Write(NetFrameWriter writer)
         {
-            writer.WriteByte((byte)Kind);
+            writer.WriteByte((byte) Type);
             writer.WriteString(MessageText);
         }
 
         public void Read(NetFrameReader reader)
         {
-            Kind = (NotificationKind)reader.ReadByte();
+            Type = (NotificationType) reader.ReadByte();
             MessageText = reader.ReadString();
         }
     }

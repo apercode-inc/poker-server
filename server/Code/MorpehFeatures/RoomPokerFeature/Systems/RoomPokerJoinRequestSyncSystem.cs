@@ -54,7 +54,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         if (roomPokerPlayers.MarkedPlayersBySeat.Count >= roomPokerStats.MaxPlayers)
         {
-            _notificationService.Show(player, "нет свободного места", NotificationKind.Error);
+            _notificationService.Show(player, "нет свободного места", NotificationType.Error);
             return;
         }
         
@@ -67,7 +67,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         if (playerCurrency.CurrencyByType[roomPokerStats.CurrencyType] < roomPokerStats.Contribution)
         {
-            _notificationService.Show(player, "не достаточно средств для взноса", NotificationKind.Error);
+            _notificationService.Show(player, "не достаточно средств для взноса", NotificationType.Error);
             return;
         }
 

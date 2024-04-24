@@ -16,12 +16,12 @@ namespace server.Code.MorpehFeatures.NotificationFeature.Systems
         {
         }
 
-        public void Show(Entity playerEntity, string messageText, NotificationKind kind)
+        public void Show(Entity playerEntity, string messageText, NotificationType type)
         {
             var dataframe = new NotificationDataframe
             {
                 MessageText = messageText,
-                Kind = kind
+                Type = type
             };
 
             _server.Send(ref dataframe, playerEntity);

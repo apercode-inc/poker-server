@@ -1,6 +1,6 @@
 ﻿namespace server.Code.MorpehFeatures.NotificationFeature.Enums
 {
-    public enum NotificationKind : byte
+    public enum NotificationType : byte
     {
         Info,
         Error,
