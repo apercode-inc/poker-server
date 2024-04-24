@@ -22,6 +22,11 @@ var serverParameters = new ServerParameters
     MaxPlayers = ServerEnvsUtil.ReadInt("MAX_PLAYERS"),
     ConfigPath = ServerEnvsUtil.Read("CONFIG_PATH"),
     SentryDsn = ServerEnvsUtil.Read("SENTRY_DSN"),
+    SqlHost = ServerEnvsUtil.Read("MYSQL_HOST"),
+    SqlPort = int.Parse(ServerEnvsUtil.Read("MYSQL_PORT", "3306")),
+    SqlUser = ServerEnvsUtil.Read("MYSQL_USER"),
+    SqlPassword = ServerEnvsUtil.Read("MYSQL_PASSWORD"),
+    SqlDatabase = ServerEnvsUtil.Read("MYSQL_DATABASE")
 };
 container.Register(serverParameters);
 
