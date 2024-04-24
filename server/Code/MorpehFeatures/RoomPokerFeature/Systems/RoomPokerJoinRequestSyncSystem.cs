@@ -1,13 +1,14 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
+using server.Code.MorpehFeatures.NotificationFeature.Systems;
+using server.Code.MorpehFeatures.NotificationFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -23,6 +24,8 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
     [Injectable] private PlayerStorage _playerStorage;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
+
+    [Injectable] private NotificationService _notificationService;
 
     private Random _random;
     
@@ -51,8 +54,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         if (roomPokerPlayers.MarkedPlayersBySeat.Count >= roomPokerStats.MaxPlayers)
         {
-            //todo
-            Logger.Error("отправить игроку нотиф о том что он не может присоединится из за того что игроков максимум");
+            _notificationService.Show(player, "нет свободного места", NotificationKind.Error);
             return;
         }
         
@@ -65,8 +67,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         if (playerCurrency.CurrencyByType[roomPokerStats.CurrencyType] < roomPokerStats.Contribution)
         {
-            //todo
-            Logger.Error("отправить игроку нотиф о том что он не может присоединится из за того что ему не хватает на взнос");
+            _notificationService.Show(player, "не достаточно средств для взноса", NotificationKind.Error);
             return;
         }
 

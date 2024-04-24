@@ -1,7 +1,8 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.NotificationFeature.Enums;
+using server.Code.MorpehFeatures.NotificationFeature.Systems;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
@@ -17,7 +18,9 @@ public class RoomPokerCreateRequestSyncSystem : IInitializer
 
     [Injectable] private PlayerStorage _playerStorage;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
-    
+
+    [Injectable] private NotificationService _notificationService;
+
     public World World { get; set; }
 
     public void OnAwake()
@@ -41,8 +44,7 @@ public class RoomPokerCreateRequestSyncSystem : IInitializer
 
         if (playerCurrency.CurrencyByType[dataframe.CurrencyType] < dataframe.Contribution)
         {
-            //todo
-            Logger.Error("отправить игроку нотиф о том что он не может присоединится из за того что ему не хватает на взнос");
+            _notificationService.Show(player, "не достаточно средств для взноса", NotificationKind.Error);
             return;
         }
 

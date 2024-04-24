@@ -7,6 +7,7 @@ using server.Code.MorpehFeatures.PlayersFeature;
 using server.Code.MorpehFeatures.RoomPokerFeature;
 using server.Code.MorpehFeatures.CurrencyFeature;
 using server.Code.MorpehFeatures.TestFeature;
+using server.Code.MorpehFeatures.NotificationFeature;
 
 namespace server.Code;
 
@@ -23,7 +24,8 @@ public static class MorpehInitializer
         PlayersFeature.AddStorage(world, ref groupIndex, container);
         RoomPokerFeature.AddStorage(world, ref groupIndex, container);
         CurrencyFeature.AddStorage(world, ref groupIndex, container);
-            
+        NotificationFeature.AddStorage(world, ref groupIndex, container);
+
         //Systems
         ConfigsFeature.Add(world, ref groupIndex, container);
         ConnectionFeature.Add(world, ref groupIndex, container);
