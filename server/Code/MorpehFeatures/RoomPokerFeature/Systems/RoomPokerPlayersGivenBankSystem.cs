@@ -20,8 +20,9 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
-    [Injectable] private Stash<RoomPokerReturnAllCardsToDestTimer> _roomPokerReturnAllCardsToDestTimer;
-    
+    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
+    [Injectable] private Stash<RoomPokerShowdownTimer> _roomPokerShowdownTimer;
+
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
@@ -60,6 +61,7 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
             _roomPokerSetCardsTickTimer.Remove(roomEntity);
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+            ref var roomPokerPlayersGivenBank = ref _roomPokerPlayersGivenBank.Get(roomEntity);
 
             foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
             {
@@ -71,8 +73,6 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
                 playerPokerCurrentBet.Value = 0;
             }
 
-            ref var roomPokerPlayersGivenBank = ref _roomPokerPlayersGivenBank.Get(roomEntity);
-            
             //todo без учета all-in и все такое
             var winnings = roomPokerBank.OnTable / roomPokerPlayersGivenBank.Players.length;
             
@@ -85,12 +85,22 @@ public class RoomPokerPlayersGivenBankSystem : ISystem
             roomPokerBank.OnTable = 0;
 
             var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
-            
-            _roomPokerReturnAllCardsToDestTimer.Set(roomEntity,new RoomPokerReturnAllCardsToDestTimer
+
+            if (_roomPokerActive.Has(roomEntity))
             {
-                Value = config.DelayShowdownAndWin,
-            });
-            
+                _roomPokerShowdownTimer.Set(roomEntity, new RoomPokerShowdownTimer
+                {
+                    Value = config.DelayShowdown,
+                });
+            }
+            else
+            {
+                _roomPokerCleanupTimer.Set(roomEntity, new RoomPokerCleanupTimer
+                {
+                    Value = 0,
+                });
+            }
+
             _roomPokerPlayersGivenBank.Remove(roomEntity);
         }
     }
