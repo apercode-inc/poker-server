@@ -10,7 +10,8 @@ public static class TestFeature
     {
         var systemsGroup = world.CreateSystemsGroup();
 
-        systemsGroup.AddSystem(container.New<RoomPokerCheckCardDeskTestSystem>());
+        //systemsGroup.AddSystem(container.New<RoomPokerCheckCardDeskTestSystem>());
+        systemsGroup.AddSystem(container.New<TestCreateRecordInPlayersTable>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }

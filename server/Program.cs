@@ -5,6 +5,8 @@ using server;
 using server.Code;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.DataBaseFeature.Utils;
+using Server.GlobalUtils;
 
 //Injection
 var container = new SimpleDImple();
@@ -29,6 +31,14 @@ var serverParameters = new ServerParameters
     SqlDatabase = ServerEnvsUtil.Read("MYSQL_DATABASE")
 };
 container.Register(serverParameters);
+
+//Data base
+var redLockFactory = new DistributedLockFactory();
+container.Register(redLockFactory);
+
+var distributedLockFactory = container.Get<DistributedLockFactory>();
+var databaseInitialization = new DatabaseInitialization(distributedLockFactory);
+container.Register(databaseInitialization);
 
 //Morpeh ECS
 WorldExtensions.InitializationDefaultWorld();
