@@ -38,21 +38,8 @@ public class RoomChatMessagesSyncInitializer : IInitializer
         {
             return;
         }
-        
-        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(room.RoomEntity, out exist);
-        if (!exist)
-        {
-            return;
-        }
 
-        foreach (var markedItem in roomPokerPlayers.MarkedPlayersBySeat)
-        {
-            ref var playerId = ref _playerId.Get(markedItem.Value);
-            if (playerId.Id != senderId)
-            {
-                _server.Send(ref message, playerId.Id);
-            }
-        }
+        _server.SendInRoomExcept(ref message, room.RoomEntity, player);
     }
 
     public void Dispose()
