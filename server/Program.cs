@@ -1,16 +1,10 @@
 ﻿using System.Diagnostics;
-using Microsoft.Extensions.Logging;
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using Sentry;
-using Sentry.Extensions.Logging;
 using server;
 using server.Code;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
-using server.Code.MorpehFeatures.RoomPokerFeature.Models;
-using server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
 //Injection
 var container = new SimpleDImple();
@@ -56,15 +50,7 @@ using (SentrySdk.Init(options =>
            options.Release = serverParameters.Version;
            options.Environment = serverParameters.IsProduction ? "prod" : "dev";
        }))
-
-//todo test
-
-//TestCombination();
-
-//TODO test
-
-//TODO end
-
+    
 while (true)
 {
     stopWatch.Reset();
@@ -95,61 +81,4 @@ while (true)
     {
         Thread.Sleep(timeLeft);
     }
-}
-
-void TestCombination()
-{
-    var roomPokerCombinationSystem = new RoomPokerDetectCombinationSystem();
-
-    var playerTwoCards = new List<CardModel>
-    {
-        new(CardRank.Queen, CardSuit.Diamonds) { IsHands = true },
-        new(CardRank.Seven, CardSuit.Spades) { IsHands = true },
-    };
-    
-    var playerOneCards = new List<CardModel>
-    {
-        new(CardRank.Ace, CardSuit.Hearts) { IsHands = true },
-        new(CardRank.Seven, CardSuit.Diamonds) { IsHands = true },
-    };
-
-    var tableCards = new List<CardModel> //A, 2, 3, 4, 5 не учитывает младший стрит (колесо)
-    {
-        new(CardRank.Two, CardSuit.Hearts),
-        new(CardRank.Five, CardSuit.Clubs),
-        new(CardRank.Ten, CardSuit.Spades),
-        new(CardRank.Three, CardSuit.Spades),
-        new(CardRank.Four, CardSuit.Hearts),
-    };
-    
-    Logger.Debug("------------ Hands Player_2 ------------", ConsoleColor.Magenta);
-    Logger.Debug($"{Logger.GetCardsLog(playerTwoCards)}", ConsoleColor.Cyan);
-    
-    Logger.Debug("------------ Hands Player_1 ------------", ConsoleColor.Magenta);
-    Logger.Debug($"{Logger.GetCardsLog(playerOneCards)}", ConsoleColor.Cyan);
-    
-    Logger.Debug("------------ Table Cards ------------", ConsoleColor.Magenta);
-    Logger.Debug($"{Logger.GetCardsLog(tableCards)}", ConsoleColor.Cyan);
-    
-    
-    Console.WriteLine();
-    
-    
-    Logger.Debug("------------ Combination Player_2 ------------", ConsoleColor.Magenta);
-    
-    //calculate player_2
-    var combinationTwoPlayer = roomPokerCombinationSystem.GetPokerCombination(playerTwoCards, tableCards, 
-        out var combinationOrdersCardsTwoPlayer);
-    
-    Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsTwoPlayer, "^")}", ConsoleColor.Cyan);
-    Logger.Debug($"{combinationTwoPlayer}", ConsoleColor.Cyan);
-    
-    Logger.Debug("------------ Combination Player_1 ------------", ConsoleColor.Magenta);
-    
-    //calculate player_
-    var combinationOnePlayer = roomPokerCombinationSystem.GetPokerCombination(playerOneCards, tableCards, 
-        out var combinationOrdersCardsOnePlayer);
-    
-    Logger.Debug($"{Logger.GetCardsLog(combinationOrdersCardsOnePlayer, "^")}", ConsoleColor.Cyan);
-    Logger.Debug($"{combinationOnePlayer}", ConsoleColor.Cyan);
 }

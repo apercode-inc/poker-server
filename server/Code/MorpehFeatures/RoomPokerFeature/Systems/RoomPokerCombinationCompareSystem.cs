@@ -1,4 +1,5 @@
 using Scellecs.Morpeh;
+using Scellecs.Morpeh.Collections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -10,11 +11,11 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerCombinationCompareSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    //[Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdown;
-    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax; //todo сбросить после победы
+    [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
+    [Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdown;
     
-    [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination; //todo сбросить после победы
-    [Injectable] private Stash<PlayerPokerWin> _playerPokerWin; //todo сбросить послен победы
+    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
+    [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
     
     private Filter _filter;
     private Dictionary<Entity, List<CardModel>> _playersByCards;
@@ -24,11 +25,11 @@ public class RoomPokerCombinationCompareSystem : ISystem
     public void OnAwake()
     {
         _playersByCards = new Dictionary<Entity, List<CardModel>>();
+        
         _filter = World.Filter
             .With<RoomPokerCardsToTable>()
             .With<RoomPokerPlayers>()
             .With<RoomPokerCombinationMax>()
-            //.With<RoomPokerShowdown>()
             .Build();
     }
 
@@ -40,10 +41,9 @@ public class RoomPokerCombinationCompareSystem : ISystem
             var combinationMax = roomPokerCombinationMax.CombinationMax;
 
             _roomPokerCombinationMax.Remove(roomEntity);
-            //_roomPokerShowdown.Remove(roomEntity); //todo не должен тут сниматься, должен идти дальше в следующую систему вскрытия и победы
             
             _playersByCards.Clear();
-            
+
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
             foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
@@ -60,146 +60,135 @@ public class RoomPokerCombinationCompareSystem : ISystem
                 _playersByCards.Add(player, playerPokerCombination.CombinationCards);
             }
 
-            CompareCombination(combinationMax);
-        }
-    }
-
-    private void CompareCombination(CombinationType combinationType)
-    {
-        if (combinationType == CombinationType.RoyalFlush)
-        {
-            DefineAllWinnings();
-        }
-
-        if (combinationType == CombinationType.StraightFlush)
-        {
-            DefineStraightWinnings();
-        }
-
-        if (combinationType == CombinationType.FourOfKind) //todo 1 кикер
-        {
-            DefineFourOfKindWinnings();
-        }
-
-        if (combinationType == CombinationType.FullHouse)
-        {
-            DefineFullHouseWinnings();
-        }
-
-        if (combinationType == CombinationType.Flush)
-        {
-            //тут по идеи тоже самое что и стрит
-            ////нет не тоже самое вдруг первая карта будет одинаковой, значит надо сравнивать следующую и т.д
-            //DefineStraightWinnings(); 
-        }
-        
-        if (combinationType == CombinationType.Straight)
-        {
-            DefineStraightWinnings();
-        }
-
-        if (combinationType == CombinationType.ThreeOfKind) //todo 2 кикера
-        {
-            DefineThreeOfKindWinnings();
-        }
-        
-        if (combinationType == CombinationType.TwoPair) //todo 1 кикер
-        {
-            DefineTwoPairWinnings();
-        }
-        
-        if (combinationType == CombinationType.OnePair) //todo 3 кикера
-        {
-            DefineOnePairWinnings();
-        }
-        
-        if (combinationType == CombinationType.HighCard) //todo 4 кикера
-        {
-            DefineHighCardWinnings();
-        }
-    }
-
-    private void DefineHighCardWinnings()
-    {
-        
-    }
-
-    private void DefineOnePairWinnings()
-    {
-       
-    }
-
-    private void DefineTwoPairWinnings()
-    {
-        
-    }
-
-    private void DefineThreeOfKindWinnings()
-    {
-        
-    }
-
-    private void DefineFullHouseWinnings()
-    {
-        
-    }
-
-    private void DefineFourOfKindWinnings()
-    {
-        foreach (var playerByCards in _playersByCards) //todo подумать пока что хуйня выходит
-        {
-            var cards = playerByCards.Value;
+            var winningPlayers = new FastList<Entity>();
             
-            var maxKikerRank = CardRank.Two;
-            var maxRankFourOfKind = cards[2].Rank;
-            
-            if (cards[0].Rank != maxRankFourOfKind) //A-5-5-5-5 
+            if (_playersByCards.Count == 1)
             {
-                maxKikerRank = cards[0].Rank;
+                winningPlayers.Add(_playersByCards.First().Key);
+            }
+            else
+            {
+                winningPlayers = DefineWinningPlayersByCombination(combinationMax, _playersByCards);
             }
             
-            if (cards[4].Rank != maxRankFourOfKind) //A-A-A-A-5
+            _roomPokerPlayersGivenBank.Set(roomEntity, new RoomPokerPlayersGivenBank
             {
-                maxKikerRank = cards[4].Rank;
-            }
+                Players = winningPlayers,
+            });
+            _roomPokerShowdown.Set(roomEntity);
         }
     }
 
-    private void DefineAllWinnings()
+    private FastList<T> DefineWinningPlayersByCombination<T>(CombinationType combinationType,
+        Dictionary<T, List<CardModel>> playersByCards) where T : class
     {
-        foreach (var playerByCards in _playersByCards)
+        FastList<T> winningPlayers = null;
+
+        switch (combinationType)
         {
-            _playerPokerWin.Set(playerByCards.Key);
+            case CombinationType.RoyalFlush:
+                winningPlayers = DefineAllWinnings(playersByCards);
+                break;
+            case CombinationType.FourOfKind: 
+            case CombinationType.FullHouse:
+            case CombinationType.ThreeOfKind:
+            case CombinationType.TwoPair:
+            case CombinationType.OnePair:
+                winningPlayers = DefineWinningPlayersByCombinationSeniority(playersByCards, true);
+                break;
+            case CombinationType.StraightFlush:
+            case CombinationType.Flush:
+            case CombinationType.Straight:
+            case CombinationType.HighCard:
+                winningPlayers = DefineWinningPlayersByCombinationSeniority(playersByCards, false);
+                break;
         }
+
+        return winningPlayers;
     }
 
-    private void DefineStraightWinnings()
+    private FastList<T> DefineWinningPlayersByCombinationSeniority<T>(Dictionary<T, List<CardModel>> playersByCards, 
+        bool isPrioritySort) where T: class
     {
-        var maxRank = CardRank.Two;
-
-        foreach (var playerByCards in _playersByCards)
+        var winningPlayers = new FastList<T>();
+        
+        foreach (var playerByCards in playersByCards)
         {
-            var cards = playerByCards.Value;
-
-            var highRank = cards[0].Rank;
-            if (maxRank < highRank)
+            if (isPrioritySort)
             {
-                maxRank = highRank;
+                playersByCards[playerByCards.Key] = GetSortCombinationByPriority(playerByCards.Value);
+            }
+            
+            winningPlayers.Add(playerByCards.Key);
+        }
+        
+        foreach (var playerOne in playersByCards.Keys)
+        {
+            foreach (var playerTwo in playersByCards.Keys)
+            {
+                if (playerOne.Equals(playerTwo))
+                {
+                    continue;
+                }
+
+                var playerOneCards = playersByCards[playerOne];
+                var playerTwoCards = playersByCards[playerTwo];
+
+                var player1Wins = CompareCards(playerOneCards, playerTwoCards);
+
+                if (!player1Wins)
+                {
+                    winningPlayers.Remove(playerOne);
+                    break;
+                }
             }
         }
 
-        foreach (var playersByCard in _playersByCards)
+        return winningPlayers;
+    }
+    
+    private List<CardModel> GetSortCombinationByPriority(IEnumerable<CardModel> cards)
+    {
+        var groupedCards = cards.GroupBy(card => card.Rank)
+            .OrderByDescending(group => group.Count())
+            .ThenByDescending(group => group.Key);
+        
+        var sortedGroups = groupedCards
+            .OrderByDescending(group => group.Count())
+            .ThenByDescending(group => group.Key);
+        
+        var sortedCards = sortedGroups
+            .SelectMany(group => group)
+            .ToList();
+
+        return sortedCards;
+    }
+    
+    private bool CompareCards(IReadOnlyList<CardModel> cardsOne, IReadOnlyList<CardModel> cardsTwo)
+    {
+        for (var i = 0; i < cardsOne.Count; i++)
         {
-            var player = playersByCard.Key;
-            var cards = playersByCard.Value;
-
-            var highRank = cards[0].Rank;
-
-            if (highRank == maxRank)
+            var comparisonResult = cardsOne[i].Rank.CompareTo(cardsTwo[i].Rank);
+            
+            if (comparisonResult != 0)
             {
-                _playerPokerWin.Set(player);
+                return comparisonResult > 0;
             }
         }
+
+        return true;
+    }
+
+    private FastList<T> DefineAllWinnings<T>(Dictionary<T, List<CardModel>> playersByCards) where T : class
+    {
+        var winningPlayers = new FastList<T>();
+
+        foreach (var playersByCard in playersByCards)
+        {
+            winningPlayers.Add(playersByCard.Key);
+        }
+
+        return winningPlayers;
     }
 
     public void Dispose()

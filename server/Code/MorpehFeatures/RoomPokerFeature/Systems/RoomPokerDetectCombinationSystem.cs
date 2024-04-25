@@ -1,4 +1,5 @@
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -17,6 +18,7 @@ public class RoomPokerDetectCombinationSystem : ISystem
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerCombination> _playerCombination;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
+    [Injectable] private Stash<RoomPokerDetectCombination> _roomPokerDetectCombination;
 
     private Filter _filter;
 
@@ -53,6 +55,12 @@ public class RoomPokerDetectCombinationSystem : ISystem
                 
                 var combination = GetPokerCombination(playerCards.Cards, roomPokerCardsToTable.Cards, 
                     out var combinationOrderedCards);
+
+                //todo debug
+                ref var playerNickname = ref player.GetComponent<PlayerNickname>();
+                
+                 Logger.Debug($"player: {playerNickname.Value} | combination: {combination} | cards: " +
+                              $"{Logger.GetCardsLog(combinationOrderedCards, "^")}", ConsoleColor.Blue);
                 
                 _playerPokerCombination.Set(player, new PlayerPokerCombination
                 {
@@ -66,15 +74,18 @@ public class RoomPokerDetectCombinationSystem : ISystem
                 }
             }
             
+            //todo debug
+            Logger.Debug($"combination max: {combinationMax}");
             _roomPokerCombinationMax.Set(roomEntity, new RoomPokerCombinationMax
             {
                 CombinationMax = combinationMax,
             });
+
+            _roomPokerDetectCombination.Remove(roomEntity);
         }
     }
-    
-    //todo сделать потом приватным
-    public CombinationType GetPokerCombination(IEnumerable<CardModel> playerCards, IEnumerable<CardModel> tableCards, 
+
+    private CombinationType GetPokerCombination(IEnumerable<CardModel> playerCards, IEnumerable<CardModel> tableCards, 
         out List<CardModel> combinationOrderedCards)
     {
         var allCards = new List<CardModel>(playerCards);
@@ -104,7 +115,7 @@ public class RoomPokerDetectCombinationSystem : ISystem
         return combinationTypeMax;
     }
 
-    private CombinationType DetectPokerCombination(List<CardModel> cards)
+    public CombinationType DetectPokerCombination(List<CardModel> cards)
     {
         ulong handValue = 0;
 

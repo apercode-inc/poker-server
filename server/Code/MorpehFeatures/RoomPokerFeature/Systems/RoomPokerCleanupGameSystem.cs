@@ -13,15 +13,18 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerReturnAllCardsToDeskSystem : ISystem
+public class RoomPokerCleanupGameSystem : ISystem
 {
-    [Injectable] private Stash<RoomPokerReturnAllCardsToDestTimer> _roomPokerReturnAllCardsToDestTimer;
+    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
-    [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
+    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
+    
+    [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
+    [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
 
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -34,8 +37,9 @@ public class RoomPokerReturnAllCardsToDeskSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
-            .With<RoomPokerReturnAllCardsToDestTimer>()
+            .With<RoomPokerCleanupTimer>()
             .With<RoomPokerPlayers>()
+            .Without<RoomPokerShowOrHideCards>()
             .Build();
     }
 
@@ -43,7 +47,7 @@ public class RoomPokerReturnAllCardsToDeskSystem : ISystem
     {
         foreach (var roomEntity in _filter)
         {
-            ref var roomPokerNextDealingTimer = ref _roomPokerReturnAllCardsToDestTimer.Get(roomEntity);
+            ref var roomPokerNextDealingTimer = ref _roomPokerCleanupTimer.Get(roomEntity);
             
             if (!_roomPokerActive.Has(roomEntity))
             {
@@ -70,6 +74,8 @@ public class RoomPokerReturnAllCardsToDeskSystem : ISystem
                 ref var playerId = ref _playerId.Get(player);
 
                 _playerTurnCompleteFlag.Remove(player);
+                _playerPokerCombination.Remove(player);
+                
                 var cardsDataframe = new RoomPokerSetCardsByPlayerDataframe
                 {
                     CardsState = CardsState.Empty,
@@ -88,7 +94,7 @@ public class RoomPokerReturnAllCardsToDeskSystem : ISystem
 
             var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
             
-            _roomPokerReturnAllCardsToDestTimer.Remove(roomEntity);
+            _roomPokerCleanupTimer.Remove(roomEntity);
             
             if (!_roomPokerActive.Has(roomEntity))
             {
@@ -99,7 +105,6 @@ public class RoomPokerReturnAllCardsToDeskSystem : ISystem
             {
                 Value = config.DelayBeforeNextDealingCards,
             });
-  
         }
     }
 

@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using Scellecs.Morpeh.Collections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -14,6 +13,9 @@ public class RoomPokerShowdownSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdown;
+    [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
+    [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
+    [Injectable] private Stash<RoomPokerShowOrHideCards> _roomPokerShowOrHideCards;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
@@ -29,6 +31,8 @@ public class RoomPokerShowdownSystem : ISystem
         _filter = World.Filter
             .With<RoomPokerShowdown>()
             .With<RoomPokerPlayers>()
+            .With<RoomPokerBank>()
+            .With<RoomPokerPlayersGivenBank>()
             .Build();
     }
 
@@ -37,80 +41,81 @@ public class RoomPokerShowdownSystem : ISystem
         foreach (var roomEntity in _filter)
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+            ref var roomPokerPlayersGivenBank = ref _roomPokerPlayersGivenBank.Get(roomEntity);
+            ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
+
+            roomPokerBank.OnTable = roomPokerBank.Total;
 
             var showdownModels = new List<RoomPokerShowdownNetworkModel>();
+
+            var players = new Queue<Entity>();
 
             foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var player = markedPlayer.Value;
-
+                var isWinPlayer = false;
+                
                 ref var playerCards = ref _playerCards.Get(player);
-
+                
                 if (playerCards.CardsState != CardsState.Close)
                 {
                     continue;
                 }
 
-                playerCards.CardsState = CardsState.Open;
-                var cards = playerCards.Cards;
-
-                var cardsNetworkModels = new List<RoomPokerCardNetworkModel>();
-
-                foreach (var card in cards)
+                foreach (var winPlayer in roomPokerPlayersGivenBank.Players)
                 {
-                    cardsNetworkModels.Add(new RoomPokerCardNetworkModel
+                    if (player == winPlayer)
                     {
-                        Rank = card.Rank,
-                        Suit = card.Suit,
-                    });
+                        isWinPlayer = true;
+                        break;
+                    }
                 }
 
-                ref var playerId = ref _playerId.Get(player);
-                
-                showdownModels.Add(new RoomPokerShowdownNetworkModel
+                if (isWinPlayer)
                 {
-                    PlayerId = playerId.Id,
-                    Cards = cardsNetworkModels,
-                });
+                    playerCards.CardsState = CardsState.Open;
+                    var cards = playerCards.Cards;
+
+                    var cardsNetworkModels = new List<RoomPokerCardNetworkModel>();
+
+                    foreach (var card in cards)
+                    {
+                        cardsNetworkModels.Add(new RoomPokerCardNetworkModel
+                        {
+                            Rank = card.Rank,
+                            Suit = card.Suit,
+                        });
+                    }
+
+                    ref var playerId = ref _playerId.Get(player);
+                
+                    showdownModels.Add(new RoomPokerShowdownNetworkModel
+                    {
+                        PlayerId = playerId.Id,
+                        Cards = cardsNetworkModels,
+                    });
+                }
+                else
+                {
+                    players.Enqueue(player);
+                }
             }
+            
+            _roomPokerShowOrHideCards.Set(roomEntity, new RoomPokerShowOrHideCards
+            {
+                Players = players,
+            });
 
             var dataframe = new RoomPokerShowdownDataframe
             {
+                IsBankSync = true,
+                Bank = roomPokerBank.OnTable,
                 ShowdownModels = showdownModels,
             };
             _server.SendInRoom(ref dataframe, roomEntity);
 
-            StubToContinueCycleGame(roomEntity);
-
             _roomPokerShowdown.Remove(roomEntity);
         }
-    }
-    
-    //todo заглушка чтобы просто замкнуть игровой цикл игры в покер (сделать следующую раздачу)
-    private void StubToContinueCycleGame(Entity roomEntity)
-    {
-        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-        var playerGivenBank = new FastList<Entity>();
-        
-        foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
-        {
-            var player = markedPlayer.Value;
-
-            ref var playerCards = ref _playerCards.Get(player);
-
-            if (playerCards.CardsState == CardsState.Empty)
-            {
-                continue;
-            }
-
-            playerGivenBank.Add(player);
-        }
-
-        roomEntity.SetComponent(new RoomPokerPlayersGivenBank
-        {
-            Players = playerGivenBank,
-        });
     }
 
     public void Dispose()
