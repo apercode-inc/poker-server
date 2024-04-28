@@ -32,14 +32,6 @@ var serverParameters = new ServerParameters
 };
 container.Register(serverParameters);
 
-//Data base
-var redLockFactory = new DistributedLockFactory();
-container.Register(redLockFactory);
-
-var distributedLockFactory = container.Get<DistributedLockFactory>();
-var databaseInitialization = new DatabaseInitialization(distributedLockFactory);
-container.Register(databaseInitialization);
-
 //Morpeh ECS
 WorldExtensions.InitializationDefaultWorld();
 var world = World.Default;

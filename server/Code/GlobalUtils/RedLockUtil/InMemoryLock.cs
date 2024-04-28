@@ -3,7 +3,6 @@ using server.Code.MorpehFeatures.DataBaseFeature.Utils;
 
 namespace Server.GlobalUtils
 {
-    [Obsolete]
     public class InMemoryLock : IDistributedLock
     {
         // Parameters
@@ -26,8 +25,7 @@ namespace Server.GlobalUtils
 
             _lockId = Guid.NewGuid().ToString();
         }
-
-        [Obsolete]
+        
         public Task TryAcquireAsync()
         {
             _isAcquired = false;
@@ -36,8 +34,7 @@ namespace Server.GlobalUtils
             
             return Task.CompletedTask;
         }
-
-        [Obsolete]
+        
         public Task TryReleaseAsync()
         {
             _isAcquired = false;
@@ -46,8 +43,7 @@ namespace Server.GlobalUtils
             
             return Task.CompletedTask;
         }
-
-        [Obsolete]
+        
         public async Task WaitUntilReleased(TimeSpan retryInterval)
         {
             if (IsAcquired)
@@ -61,8 +57,7 @@ namespace Server.GlobalUtils
             }
             while (_keysToLockIdStorage.ContainsKey(_resource));
         }
-
-        [Obsolete]
+        
         public void TryAcquire(Action<IDistributedLock> callback)
         {
             Task.Run(async () =>
@@ -82,8 +77,7 @@ namespace Server.GlobalUtils
                 // });
             }).Forget();
         }
-
-        [Obsolete]
+        
         public void TryRelease(Action<IDistributedLock> callback = null)
         {
             Task.Run(async () =>

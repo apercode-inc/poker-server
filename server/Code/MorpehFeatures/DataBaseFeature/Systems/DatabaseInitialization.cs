@@ -1,15 +1,14 @@
 using System.Reflection;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
+using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
 using Server.GlobalUtils;
 
-namespace server.Code.MorpehFeatures.DataBaseFeature.Utils;
+namespace server.Code.MorpehFeatures.DataBaseFeature.Systems;
 
-public class DatabaseInitialization
+public class DatabaseInitialization : IInitializer
 {
-    public string ConnectionString; //todo refactor
-    
     private DistributedLockFactory _distributedLockFactory;
     private const string AsyncOperationLockId = "database_schema_operation";
 
@@ -17,15 +16,17 @@ public class DatabaseInitialization
 
     private bool _ready = false;
     private Action isReadyAction;
-
-    public DatabaseInitialization(DistributedLockFactory distributedLockFactory)
+    
+    public World World { get; set; }
+    
+    public void OnAwake()
     {
-        _distributedLockFactory = distributedLockFactory;
+        _distributedLockFactory = new DistributedLockFactory();
     }
 
-    public void StartProcessTables()
+    public void StartProcessTables(string connectionString)
     {
-        Task.Run(ProcessTables);
+        Task.Run(() => ProcessTables(connectionString));
     }
 
     public void Subscribe(Action action)
@@ -51,7 +52,7 @@ public class DatabaseInitialization
         isReadyAction = null;
     }
 
-    private async Task ProcessTables()
+    private async Task ProcessTables(string connectionString)
     {
         try
         {
@@ -67,7 +68,7 @@ public class DatabaseInitialization
 
             if (opLock.IsAcquired)
             {
-                var services = CreateServices();
+                var services = CreateServices(connectionString);
 
                 using var scope = services.CreateScope();
                 UpdateDatabase(scope.ServiceProvider);
@@ -94,13 +95,13 @@ public class DatabaseInitialization
         }
     }
 
-    private IServiceProvider CreateServices()
+    private IServiceProvider CreateServices(string connectionString)
     {
         return new ServiceCollection()
             .AddFluentMigratorCore()
             .ConfigureRunner(rb => rb
                 .AddMySql5()
-                .WithGlobalConnectionString(ConnectionString)
+                .WithGlobalConnectionString(connectionString)
                 .ScanIn(Assembly.GetExecutingAssembly())
                 .For.Migrations())
             .AddLogging(lb => lb.AddFluentMigratorConsole())
@@ -116,5 +117,10 @@ public class DatabaseInitialization
     private void LogMessage(object obj)
     {
         Logger.Debug($"[MIGRATIONS] {obj}");
+    }
+
+    public void Dispose()
+    {
+        _distributedLockFactory = null;
     }
 }

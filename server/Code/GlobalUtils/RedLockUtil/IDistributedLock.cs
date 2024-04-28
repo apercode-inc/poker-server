@@ -3,45 +3,44 @@ using System.Threading.Tasks;
 
 namespace Server.GlobalUtils
 {
-    [Obsolete]
     public interface IDistributedLock
     {
         /// <summary>
         /// Determines if lock is acquired or not
         /// </summary>
-        [Obsolete] public bool IsAcquired { get; }
+        public bool IsAcquired { get; }
         
         // Async API
         /// <summary>
         /// Tries to acquire the lock. If the lock is already acquired by something else, the method will early-return
         /// </summary>
         /// <returns></returns>
-        [Obsolete] public Task TryAcquireAsync();
+        public Task TryAcquireAsync();
         
         /// <summary>
         /// Tries to release the lock. Will do nothing if lock is not acquired
         /// </summary>
         /// <returns></returns>
-        [Obsolete] public Task TryReleaseAsync();
+        public Task TryReleaseAsync();
         
         /// <summary>
         /// Waits for already acquired-by-something-else lock to be released
         /// </summary>
         /// <param name="retryInterval">Retry duration to check for lock</param>
         /// <returns></returns>
-        [Obsolete] public Task WaitUntilReleased(TimeSpan retryInterval);
+        public Task WaitUntilReleased(TimeSpan retryInterval);
         
         // Callback API
         /// <summary>
         /// Tries to acquire the lock
         /// </summary>
         /// <param name="callback">Callback to call no matter if lock is acquired or not</param>
-        [Obsolete] public void TryAcquire(Action<IDistributedLock> callback);
+        public void TryAcquire(Action<IDistributedLock> callback);
         
         /// <summary>
         /// Tries to release the lock
         /// </summary>
         /// <param name="callback">Callback to call no matter if lock is released or not</param>
-        [Obsolete] public void TryRelease(Action<IDistributedLock> callback = null);
+        public void TryRelease(Action<IDistributedLock> callback = null);
     }
 }

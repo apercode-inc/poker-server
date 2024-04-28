@@ -2,6 +2,7 @@ using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.DataBaseFeature.Interfaces;
 using server.Code.MorpehFeatures.DataBaseFeature.Systems;
+using server.Code.MorpehFeatures.DataBaseFeature.Utils;
 
 namespace server.Code.MorpehFeatures.DataBaseFeature;
 
@@ -11,6 +12,7 @@ public static class DataBaseFeature
     {
         var systemsGroup = world.CreateSystemsGroup();
         
+        systemsGroup.AddInitializer(container.NewAndRegister<DatabaseInitialization>());
         systemsGroup.AddInitializer(container.NewAndRegister<DataBaseConnector, IDbConnector>());
         
         world.AddSystemsGroup(index++, systemsGroup);

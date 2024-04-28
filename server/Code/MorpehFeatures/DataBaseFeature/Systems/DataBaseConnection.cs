@@ -33,10 +33,8 @@ public class DataBaseConnector : IInitializer, IDbConnector
             MaximumPoolSize = 32,
         };
         ConnectionString = connectionString.ToString();
-        
-        _databaseInitialization.ConnectionString = ConnectionString;
-        
-        _databaseInitialization.StartProcessTables();
+
+        _databaseInitialization.StartProcessTables(ConnectionString);
     }
 
     public DbConnection GetConnection()

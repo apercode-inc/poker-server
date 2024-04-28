@@ -16,15 +16,6 @@ namespace Server.GlobalUtils
             _keysToLockIdStorage = new ConcurrentDictionary<string, string>();
         }
         
-        /// <summary>
-        /// Create distributed lock
-        /// </summary>
-        /// <param name="resource">String name of lock (must be unique to resource)</param>
-        /// <param name="spinDuration">Obsolete. Not used any more.</param>
-        /// <param name="spinCount">Obsolete. Not used any more.</param>
-        /// <param name="keyTimeout">Timeout of lock if it wasn't released properly</param>
-        /// <returns></returns>
-        [Obsolete]
         public IDistributedLock Create(string resource, TimeSpan spinDuration, int spinCount, TimeSpan keyTimeout)
         {
             ThrowIfInvalidSettings(keyTimeout);
