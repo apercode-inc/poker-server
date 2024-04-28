@@ -1,7 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using server.Code.MorpehFeatures.DataBaseFeature.Utils;
+using Server.GlobalUtils;
 
-namespace Server.GlobalUtils
+namespace server.Code.GlobalUtils.RedLockUtil
 {
     public class InMemoryLock : IDistributedLock
     {
@@ -64,17 +65,17 @@ namespace Server.GlobalUtils
             {
                 await TryAcquireAsync();
                 
-                // MainThread.Run(() => //todo thread
-                // {
-                //     try
-                //     {
-                //         callback?.Invoke(this);
-                //     }
-                //     catch (Exception e)
-                //     {
-                //         Log.Error(e, "LockAcquire | System error: {message}");
-                //     }
-                // });
+                MainThread.Run(() =>
+                {
+                    try
+                    {
+                        callback?.Invoke(this);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error($"LockAcquire | System error: {e}", true);
+                    }
+                });
             }).Forget();
         }
         
@@ -83,17 +84,17 @@ namespace Server.GlobalUtils
             Task.Run(async () =>
             {
                 await TryReleaseAsync();
-                // MainThread.Run(() => //todo main thread 
-                // {
-                //     try
-                //     {
-                //         callback?.Invoke(this);
-                //     }
-                //     catch (Exception e)
-                //     {
-                //         Log.Error(e, "LockRelease | System error: {message}");
-                //     }
-                // });
+                MainThread.Run(() =>
+                {
+                    try
+                    {
+                        callback?.Invoke(this);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error($"LockRelease | System error: {e}", true);
+                    }
+                });
             }).Forget();
         }
 

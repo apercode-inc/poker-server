@@ -66,9 +66,9 @@ public static class IDbConnectorExtensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ThrowIfMainThread()
         {
-            // if (MainThread.IsMainThread) //todo MainThread стоит добавить проверку что мы в главном потоке и кидать экс
-            // {
-            //     throw new Exception("IDbConnectorExtensions.ExecuteAsync not allowed in main thread");
-            // }
+            if (MainThread.IsMainThread)
+            {
+                throw new Exception("IDbConnectorExtensions.ExecuteAsync not allowed in main thread");
+            }
         }
     }

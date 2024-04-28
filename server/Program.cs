@@ -5,8 +5,6 @@ using server;
 using server.Code;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.DataBaseFeature.Utils;
-using Server.GlobalUtils;
 
 //Injection
 var container = new SimpleDImple();
@@ -58,11 +56,13 @@ using (SentrySdk.Init(options =>
            options.Environment = serverParameters.IsProduction ? "prod" : "dev";
        }))
     
+MainThread.Assert();
+    
 while (true)
 {
     stopWatch.Reset();
     stopWatch.Start();
-    
+
     //Console.WriteLine(Time.deltaTime);
     
     framesPerSecond++;
@@ -70,6 +70,8 @@ while (true)
     
     //netFrameServer.Run(); //todo 
     systemExecutor.Execute();
+    
+    MainThread.Pulse();
     
     frameRateTimer += Time.deltaTime;
     
@@ -79,7 +81,7 @@ while (true)
         framesPerSecond = 0;
         frameRateTimer = 0f;
     }
-
+    
     stopWatch.Stop();
 
     var timeLeft = (int) (targetMilliseconds - stopWatch.Elapsed.TotalMilliseconds);
