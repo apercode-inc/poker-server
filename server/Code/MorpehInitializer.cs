@@ -27,6 +27,7 @@ public static class MorpehInitializer
         RoomPokerFeature.AddStorage(world, ref groupIndex, container);
         CurrencyFeature.AddStorage(world, ref groupIndex, container);
         NotificationFeature.AddStorage(world, ref groupIndex, container);
+        TestFeature.AddStorage(world, ref groupIndex, container);
 
         //Systems
         ConfigsFeature.Add(world, ref groupIndex, container);
