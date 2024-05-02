@@ -9,7 +9,6 @@ namespace server.Code.MorpehFeatures.PlayersFeature.Systems;
 public class PlayerNicknameSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerNickname> _playerNickname;
-    [Injectable] private Stash<PlayerNicknameSetDatabaseTest> _playerNicknameSetDatabaseTest;
     
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
@@ -26,10 +25,6 @@ public class PlayerNicknameSyncSystem : IInitializer
         if (_playerStorage.TryGetPlayerById(id, out var playerEntity))
         {
             _playerNickname.Set(playerEntity, new PlayerNickname
-            {
-                Value = dataframe.Nickname,
-            });
-            _playerNicknameSetDatabaseTest.Set(playerEntity, new PlayerNicknameSetDatabaseTest
             {
                 Value = dataframe.Nickname,
             });

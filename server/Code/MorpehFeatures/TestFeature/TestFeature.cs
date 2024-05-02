@@ -23,12 +23,6 @@ public static class TestFeature
 
         //systemsGroup.AddSystem(container.New<RoomPokerCheckCardDeskTestSystem>());
 
-        using (container.Scoped(new ThreadSafeFilter<TestSafeContainer>()))
-        {
-            systemsGroup.AddSystem(container.New<TestConnectionPlayerAndWriteSafeContainerSystem>());
-            systemsGroup.AddSystem(container.New<TestCreateRecordInPlayersTable>());
-        }
-        
         using (container.Scoped(new ThreadSafeFilter<PlayerSafeContainer>()))
         {
             systemsGroup.AddSystem(container.New<PlayerReadDataSystem>());

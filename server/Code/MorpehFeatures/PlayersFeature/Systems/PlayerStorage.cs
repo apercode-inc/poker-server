@@ -13,6 +13,7 @@ public class PlayerStorage : IInitializer
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<Destroy> _destroy;
     [Injectable] private Stash<PlayerDbModelRequest> _playerDbModelRequest;
+    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
 
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerRoomCreateSend> _playerRoomCreateSend;
@@ -23,13 +24,15 @@ public class PlayerStorage : IInitializer
 
     private Filter _filter;
 
-    private Dictionary<int, Entity> _players;
+    private Dictionary<int, Entity> _playersByIds;
+    private Dictionary<string, Entity> _playerByGuids;
 
     public World World { get; set; }
 
     public void OnAwake()
     {
-        _players = new Dictionary<int, Entity>();
+        _playersByIds = new Dictionary<int, Entity>();
+        _playerByGuids = new Dictionary<string, Entity>();
         
         _filter = World.Filter
             .With<PlayerId>()
@@ -43,10 +46,24 @@ public class PlayerStorage : IInitializer
         {
             Id = id,
         });
+        
         _playerDbModelRequest.Set(newEntity);
-        _players.Add(id, newEntity);
+        _playersByIds.Add(id, newEntity);
 
         //Подгрузка из бд и навешивание PlayerAuthData и PlayerBalance, отправка баланса на клиент
+    }
+
+    public void AddAuth(int id, string guid)
+    {
+        if (!TryGetPlayerById(id, out var player))
+        {
+            return;
+        }
+        _playerAuthData.Set(player, new PlayerAuthData
+        {
+            Guid = guid,
+        });
+        _playerByGuids.Add(guid, player);
     }
     
     public void CreateForRoomAndSync(Entity createdPlayer, CurrencyType currencyType, long contribution,
@@ -76,11 +93,17 @@ public class PlayerStorage : IInitializer
 
     public void Remove(int id)
     {
-        _players.Remove(id);
+        _playersByIds.Remove(id);
         
         foreach (var entity in _filter)
         {
             ref var playerId = ref _playerId.Get(entity);
+            ref var playerAuthData = ref _playerAuthData.Get(entity, out var exist);
+
+            if (exist)
+            {
+                _playerByGuids.Remove(playerAuthData.Guid);
+            }
 
             if (playerId.Id == id)
             {
@@ -92,7 +115,7 @@ public class PlayerStorage : IInitializer
 
     public bool TryGetPlayerById(int id, out Entity player)
     {
-        if (_players.TryGetValue(id, out var value))
+        if (_playersByIds.TryGetValue(id, out var value))
         {
             player = value;
             return true;

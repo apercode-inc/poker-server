@@ -16,6 +16,8 @@ public class PlayersCreateTableMigration : Migration
             .WithColumn("chips").AsInt64()
             .WithColumn("gold").AsInt64()
             .WithColumn("stars").AsInt64()
+            .WithColumn("avatar_id").AsInt32()
+            .WithColumn("avatar_url").AsString().Nullable()
             .WithColumn("registration_date").AsDateTime();
     }
 
