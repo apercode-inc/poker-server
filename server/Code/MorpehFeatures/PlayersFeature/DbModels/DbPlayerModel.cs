@@ -9,5 +9,7 @@ public class DbPlayerModel
     public long chips { get; set; }
     public long gold { get; set; }
     public long stars { get; set; }
+    public int avatar_id { get; set; }
+    public string avart_url { get; set; }
     public DateTime registration_date { get; set; }
 }

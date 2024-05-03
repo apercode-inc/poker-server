@@ -1,0 +1,86 @@
+using NetFrame.Server;
+using Scellecs.Morpeh;
+using server.Code.Injection;
+using server.Code.MorpehFeatures.CurrencyFeature.Dataframe;
+using server.Code.MorpehFeatures.CurrencyFeature.Enums;
+using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.PlayersFeature.Dataframes;
+
+namespace server.Code.MorpehFeatures.PlayersFeature.Systems;
+
+public class PlayerInitializeSystem : ISystem
+{
+    [Injectable] private Stash<PlayerDbEntry> _playerDbEntry;
+    [Injectable] private Stash<PlayerCurrency> _playerCurrency;
+    [Injectable] private Stash<PlayerNickname> _playerNickname;
+    [Injectable] private Stash<PlayerInitialize> _playerInitialize;
+
+    [Injectable] private NetFrameServer _server;
+    
+    private Filter _filter;
+    
+    public World World { get; set; }
+
+    public void OnAwake()
+    {
+        _filter = World.Filter
+            .With<PlayerId>()
+            .With<PlayerInitialize>()
+            .Build();
+    }
+
+    public void OnUpdate(float deltaTime)
+    {
+        foreach (var playerEntity in _filter)
+        {
+            ref var playerInitialize = ref _playerInitialize.Get(playerEntity);
+
+            var model = playerInitialize.DbPlayerModel;
+            
+            _playerDbEntry.Set(playerEntity, new PlayerDbEntry
+            {
+                Model = model,
+            });
+
+            var currencyByType = new Dictionary<CurrencyType, long>
+            {
+                [CurrencyType.Chips] = model.chips,
+                [CurrencyType.Gold] = model.gold,
+                [CurrencyType.Stars] = model.stars,
+            };
+            
+            _playerCurrency.Set(playerEntity, new PlayerCurrency
+            {
+                CurrencyByType = currencyByType,
+            });
+            
+            var currencyDataframe = new CurrencyInitDataframe
+            {
+                CurrencyByType = currencyByType,
+            };
+            _server.Send(ref currencyDataframe, playerEntity);
+            
+            _playerNickname.Set(playerEntity, new PlayerNickname
+            {
+                Value = model.nickname,
+            });
+
+            var playerInitializeDataframe = new PlayerInitializeDataframe
+            {
+                Nickname = model.nickname,
+                AvatarUrl = model.avart_url,
+                AvatarIndex = model.avatar_id,
+                Level = model.level,
+                Experience = model.experience,
+            };
+            _server.Send(ref playerInitializeDataframe, playerEntity);
+
+            _playerInitialize.Remove(playerEntity);
+        }
+    }
+
+    public void Dispose()
+    {
+        _filter = null;
+    }
+}

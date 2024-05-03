@@ -6,9 +6,9 @@ using server.Code.MorpehFeatures.DataBaseFeature.Utils;
 using server.Code.MorpehFeatures.PlayersFeature.DbModels;
 using Server.Database;
 
-namespace server.Code.MorpehFeatures.TestFeature.Systems;
+namespace server.Code.MorpehFeatures.PlayersFeature.Systems;
 
-public class TestPlayerDbService : IInitializer
+public class PlayerDbService : IInitializer
 {
     [Injectable] private IDbConnector _dbConnector;
     
@@ -28,8 +28,8 @@ public class TestPlayerDbService : IInitializer
         return await _dbConnector.ExecuteAsync(session =>
         {
             return session.UnitOfWork.Connection.ExecuteAsync(@"INSERT INTO players (unique_id, nickname, level, 
-                     experience, chips, gold, stars, registration_date) 
-                VALUES (@unique_id, @nickname, @level, @experience, @chips, @gold, @stars, @registration_date)", playerModel);
+                     experience, chips, gold, stars, avatar_id, avatar_url, registration_date) 
+                VALUES (@unique_id, @nickname, @level, @experience, @chips, @gold, @stars, @avatar_id, @avart_url, @registration_date)", playerModel);
         });
     }
     

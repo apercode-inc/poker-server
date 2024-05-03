@@ -1,5 +1,6 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.PlayersFeature.Systems;
 
 namespace server.Code.MorpehFeatures.TestFeature.Systems;
 
@@ -7,7 +8,7 @@ public class TestCreateRecordInPlayersTable : ISystem
 {
     //[Injectable] private ThreadSafeFilter<TestSafeContainer> _safeFilter;
 
-    [Injectable] private TestPlayerDbService _testPlayerDbService;
+    [Injectable] private PlayerDbService _playerDbService;
     
     private Random _random;
     

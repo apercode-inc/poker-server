@@ -47,18 +47,11 @@ public class PlayerStorage : IInitializer
             Id = id,
         });
         
-        _playerDbModelRequest.Set(newEntity);
         _playersByIds.Add(id, newEntity);
-
-        //Подгрузка из бд и навешивание PlayerAuthData и PlayerBalance, отправка баланса на клиент
     }
 
-    public void AddAuth(int id, string guid)
+    public void AddAuth(Entity player, string guid)
     {
-        if (!TryGetPlayerById(id, out var player))
-        {
-            return;
-        }
         _playerAuthData.Set(player, new PlayerAuthData
         {
             Guid = guid,

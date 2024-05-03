@@ -1,6 +1,7 @@
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using Server.GlobalUtils;
 using server.Code.MorpehFeatures.TestFeature.Systems;
 using server.Code.MorpehFeatures.TestFeature.SafeContainers;
@@ -12,8 +13,6 @@ public static class TestFeature
     public static void AddStorage(World world, ref int index, SimpleDImple container)
     {
         var systemsGroup = world.CreateSystemsGroup();
-        
-        systemsGroup.AddInitializer(container.NewAndRegister<TestPlayerDbService>());
 
         world.AddSystemsGroup(index++, systemsGroup);
     }

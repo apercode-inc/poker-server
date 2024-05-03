@@ -30,7 +30,14 @@ public static class AuthenticationFeature
             systemsGroup.AddSystem(container.New<AuthenticationPlayerCreateSendSystem>());
         }
         
-        
+        systemsGroup.AddInitializer(container.New<AuthenticationPlayerCreateSyncSystem>());
+
+        using (container.Scoped(new ThreadSafeFilter<PlayerCreatedSafeContainer>()))
+        {
+            systemsGroup.AddSystem(container.New<AuthenticationPlayerCreateSystem>());
+            systemsGroup.AddSystem(container.New<AuthenticationUserCreateSystem>());
+        }
+
         world.AddSystemsGroup(index++, systemsGroup);
     }
 }

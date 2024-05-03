@@ -5,7 +5,7 @@ namespace server.Code.GlobalUtils;
 
 public static class Logger
 {
-    public static void Debug(string text, ConsoleColor color = ConsoleColor.White, bool isSend = false)
+    public static void Debug(string text, ConsoleColor color = ConsoleColor.Cyan, bool isSend = false)
     {
         Console.ForegroundColor = color;
         Console.WriteLine(text);

@@ -34,6 +34,20 @@ public class AuthenticationDbService : IInitializer
                 });
         });
     }
+    
+    public async Task<int> InsertUserThreadPool(DbUserModel userModel)
+    {
+        return await Task.Run(async () => await InsertUserAsync(userModel));
+    }
+
+    public async Task<int> InsertUserAsync(DbUserModel userModel)
+    {
+        return await _dbConnector.ExecuteAsync(session =>
+        {
+            return session.UnitOfWork.Connection.ExecuteAsync(@"INSERT INTO users (unique_id, player_id) 
+                VALUES (@unique_id, @player_id)", userModel);
+        });
+    }
 
     public void Dispose()
     {
