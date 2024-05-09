@@ -3,7 +3,9 @@ using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CurrencyFeature.Dataframe;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
+using server.Code.MorpehFeatures.DataBaseFeature.Utils;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
@@ -13,6 +15,7 @@ public class CurrencyPlayerService : IInitializer
 {
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerCurrency> _playerCurrency;
+    [Injectable] private Stash<PlayerDbEntry> _playerDbEntry;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerId> _playerId;
 
@@ -20,6 +23,7 @@ public class CurrencyPlayerService : IInitializer
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
 
     [Injectable] private NetFrameServer _server;
+    [Injectable] private PlayerDbService _playerDbService;
     
     public World World { get; set; }
 
@@ -39,11 +43,13 @@ public class CurrencyPlayerService : IInitializer
         ref var playerCurrency = ref _playerCurrency.Get(player);
         ref var playerId = ref _playerId.Get(player);
         ref var playerPokerContribution = ref _playerPokerContribution.Get(player);
-        
+
         var currencyType = playerPokerContribution.CurrencyType;
 
         playerPokerContribution.Value += cost;
-        playerCurrency.CurrencyByType[currencyType] += cost;
+        var newBalance = playerCurrency.CurrencyByType[currencyType] += cost;
+
+        SetInDatabase(player, currencyType, newBalance);
 
         var dataframe = new RoomPokerPlayerGiveBankDataframe
         {
@@ -80,7 +86,9 @@ public class CurrencyPlayerService : IInitializer
         var currencyType = playerPokerContribution.CurrencyType;
 
         playerPokerContribution.Value -= cost;
-        playerCurrency.CurrencyByType[currencyType] -= cost;
+        var newBalance = playerCurrency.CurrencyByType[currencyType] -= cost;
+        
+        SetInDatabase(player, currencyType, newBalance);
 
         playerPokerCurrentBet.Value += cost;
         
@@ -115,8 +123,9 @@ public class CurrencyPlayerService : IInitializer
         {
             return false;
         }
-        playerCurrency.CurrencyByType[type] -= cost;
+        var newBalance = playerCurrency.CurrencyByType[type] -= cost;
         
+        SetInDatabase(player, type, newBalance);
         Send(player, type, playerCurrency.CurrencyByType[type]);
         
         return true;
@@ -125,9 +134,28 @@ public class CurrencyPlayerService : IInitializer
     public void Give(Entity player, CurrencyType type, long cost)
     {
         ref var playerCurrency = ref _playerCurrency.Get(player);
-        playerCurrency.CurrencyByType[type] += cost;
+        var newBalance = playerCurrency.CurrencyByType[type] += cost;
 
+        SetInDatabase(player, type, newBalance);
         Send(player, type, playerCurrency.CurrencyByType[type]);
+    }
+    
+    private void SetInDatabase(Entity player, CurrencyType currencyType, long newBalance)
+    {
+        ref var playerDbEntry = ref _playerDbEntry.Get(player);
+        switch (currencyType)
+        {
+            case CurrencyType.Chips:
+                playerDbEntry.Model.chips = newBalance;
+                _playerDbService.UpdateChipsPlayerThreadPool(playerDbEntry.Model.unique_id, newBalance).Forget();
+                break;
+            case CurrencyType.Gold:
+                playerDbEntry.Model.gold = newBalance;
+                break;
+            case CurrencyType.Stars:
+                playerDbEntry.Model.stars = newBalance;
+                break;
+        }
     }
 
     private void Send(Entity player, CurrencyType type, long value)

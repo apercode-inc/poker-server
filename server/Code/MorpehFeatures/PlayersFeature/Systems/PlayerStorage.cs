@@ -1,4 +1,6 @@
+using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
@@ -21,6 +23,8 @@ public class PlayerStorage : IInitializer
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
+    
+    [Injectable] private NetFrameServer _server;
 
     private Filter _filter;
 
@@ -50,8 +54,20 @@ public class PlayerStorage : IInitializer
         _playersByIds.Add(id, newEntity);
     }
 
-    public void AddAuth(Entity player, string guid)
+    public void AddAuth(Entity player, string guid, int playerId)
     {
+        //
+        Logger.Debug($"guid = {guid} playerId = {playerId}", ConsoleColor.Red);
+        
+        if (_playerByGuids.TryGetValue(guid, out var existingPlayer))
+        {
+            Logger.Debug("Предыдущего игрока отключаем", ConsoleColor.Red);
+            ref var existingPlayerId = ref _playerId.Get(existingPlayer);
+            _server.Disconnect(existingPlayerId.Id);
+            //Remove(existingPlayerId.Id);
+        }
+        
+        Logger.Debug("Новый Игрок записан", ConsoleColor.Red);
         _playerAuthData.Set(player, new PlayerAuthData
         {
             Guid = guid,

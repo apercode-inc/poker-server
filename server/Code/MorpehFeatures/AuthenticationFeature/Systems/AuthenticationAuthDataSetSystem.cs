@@ -27,7 +27,7 @@ public class AuthenticationAuthDataSetSystem : ISystem
         {
             if (_playerStorage.TryGetPlayerById(safeContainer.PlayerId, out var player))
             {
-                _playerStorage.AddAuth(player, safeContainer.PlayerGuid);
+                _playerStorage.AddAuth(player, safeContainer.PlayerGuid, safeContainer.PlayerId);
                 _playerDbModelRequest.Set(player);
             }
         }

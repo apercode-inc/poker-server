@@ -20,6 +20,7 @@ public class AuthenticationPlayerCreateSystem : ISystem
     [Injectable] private Stash<AuthenticationPlayerCreate> _authenticationPlayerCreate;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerInitialize> _playerInitialize;
+    [Injectable] private Stash<PlayerId> _playerId;
     
     [Injectable] private ThreadSafeFilter<PlayerCreatedSafeContainer> _playerCreatedSafeFilter;
     
@@ -35,6 +36,7 @@ public class AuthenticationPlayerCreateSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
+            .With<PlayerId>()
             .With<AuthenticationPlayerCreate>()
             .Build();
     }
@@ -84,8 +86,10 @@ public class AuthenticationPlayerCreateSystem : ISystem
                     UserModel = userModel,
                 });
             });
+
+            ref var playerId = ref _playerId.Get(playerEntity);
             
-            _playerStorage.AddAuth(playerEntity, newPlayerGuid);
+            _playerStorage.AddAuth(playerEntity, newPlayerGuid, playerId.Id);
 
             var dataframe = new AuthenticationPlayerCreateCompleteDataframe();
             _server.Send(ref dataframe, playerEntity);
