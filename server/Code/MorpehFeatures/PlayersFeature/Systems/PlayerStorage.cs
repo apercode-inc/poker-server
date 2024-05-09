@@ -56,7 +56,10 @@ public class PlayerStorage : IInitializer
 
     public void AddAuth(Entity player, string guid, int playerId)
     {
-        //
+        //TODO Какое то говно это все сейчаc, все ровно метод Remove срабатывает как то ещё
+        //Нужно нормально сделать так чтобы не было заходов с разных подключений за одного и того же игрока
+        //Сейчас происходит дисконнент -> удаление -> запись -> после того как отработало событие дисконнента ещё раз удаление.
+        
         Logger.Debug($"guid = {guid} playerId = {playerId}", ConsoleColor.Red);
         
         if (_playerByGuids.TryGetValue(guid, out var existingPlayer))
@@ -64,7 +67,7 @@ public class PlayerStorage : IInitializer
             Logger.Debug("Предыдущего игрока отключаем", ConsoleColor.Red);
             ref var existingPlayerId = ref _playerId.Get(existingPlayer);
             _server.Disconnect(existingPlayerId.Id);
-            //Remove(existingPlayerId.Id);
+            Remove(existingPlayerId.Id);
         }
         
         Logger.Debug("Новый Игрок записан", ConsoleColor.Red);
