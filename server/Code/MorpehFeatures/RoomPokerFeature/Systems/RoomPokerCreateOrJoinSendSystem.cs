@@ -15,6 +15,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerNickname> _playerNickname;
+    [Injectable] private Stash<PlayerAvatar> _playerAvatar;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
@@ -67,6 +68,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
 
                 ref var playerId = ref _playerId.Get(playerEntityFromRoom);
                 ref var playerNickname = ref _playerNickname.Get(playerEntityFromRoom);
+                ref var playerAvatar = ref _playerAvatar.Get(playerEntityFromRoom);
                 var isDealer = _playerDealer.Has(playerEntityFromRoom);
                 ref var playerPokerContribution = ref _playerPokerContribution.Get(playerEntityFromRoom);
                 ref var playerCurrency = ref _playerCurrency.Get(playerEntityFromRoom);
@@ -107,6 +109,8 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                 {
                     Id = playerId.Id,
                     Nickname = playerNickname.Value,
+                    AvatarIndex = playerAvatar.AvatarIndex,
+                    AvatarUrl = playerAvatar.AvatarUrl,
                     Seat = (byte) playersBySeat.Key,
                     IsDealer = isDealer,
                     ContributionBalance = playerPokerContribution.Value,

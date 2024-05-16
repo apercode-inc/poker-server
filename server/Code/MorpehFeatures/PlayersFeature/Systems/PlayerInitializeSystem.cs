@@ -13,6 +13,7 @@ public class PlayerInitializeSystem : ISystem
     [Injectable] private Stash<PlayerDbEntry> _playerDbEntry;
     [Injectable] private Stash<PlayerCurrency> _playerCurrency;
     [Injectable] private Stash<PlayerNickname> _playerNickname;
+    [Injectable] private Stash<PlayerAvatar> _playerAvatar;
     [Injectable] private Stash<PlayerInitialize> _playerInitialize;
 
     [Injectable] private NetFrameServer _server;
@@ -63,6 +64,11 @@ public class PlayerInitializeSystem : ISystem
             _playerNickname.Set(playerEntity, new PlayerNickname
             {
                 Value = model.nickname,
+            });
+            _playerAvatar.Set(playerEntity, new PlayerAvatar
+            {
+                AvatarUrl = model.avart_url,
+                AvatarIndex = model.avatar_id,
             });
 
             var playerInitializeDataframe = new PlayerInitializeDataframe
