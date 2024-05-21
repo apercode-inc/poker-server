@@ -2,7 +2,7 @@ using server.Code.GlobalUtils;
 
 namespace server.Code.MorpehFeatures.DataBaseFeature.Utils;
 
-public static class FluentAsync
+public static class FluentAsyncExtensions
 {
     public static void Forget(this Task task)
     {
