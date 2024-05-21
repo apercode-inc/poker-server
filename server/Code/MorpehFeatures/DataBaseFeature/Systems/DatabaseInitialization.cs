@@ -63,6 +63,14 @@ public class DatabaseInitialization : IInitializer
                 keyTimeout: TimeSpan.FromSeconds(30));
 
             await opLock.TryAcquireAsync();
+            
+            while (!opLock.IsAcquired)
+            {
+                LogMessage($"Not starting database operations - operation {AsyncOperationLockId} is locked by something else, waiting");
+
+                await opLock.WaitUntilReleased(TimeSpan.FromMilliseconds(500));
+                await opLock.TryAcquireAsync();
+            }
 
             LogMessage("Start");
 
@@ -74,15 +82,6 @@ public class DatabaseInitialization : IInitializer
                 UpdateDatabase(scope.ServiceProvider);
 
                 await opLock.TryReleaseAsync();
-            }
-            else
-            {
-                LogMessage(
-                    $"Not starting database operations - operation {AsyncOperationLockId} is locked by something else, waiting");
-
-                await opLock.WaitUntilReleased(TimeSpan.FromMilliseconds(500));
-
-                LogMessage($"{AsyncOperationLockId} released, finished all operations");
             }
 
             LogMessage("Finish");
