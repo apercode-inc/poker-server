@@ -8,4 +8,9 @@ public class ServerParameters
     public int MaxPlayers;
     public string ConfigPath;
     public string SentryDsn;
+    public string SqlHost;
+    public int SqlPort;
+    public string SqlUser;
+    public string SqlPassword;
+    public string SqlDatabase;
 }

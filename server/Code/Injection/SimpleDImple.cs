@@ -42,6 +42,13 @@ public class SimpleDImple : IInjectionContainer
         }
         throw new InvalidOperationException($"SimpleDi: No known dependency of type = {type}");
     }
+    
+    public void UnRegister<T>(T instance) where T : class
+    {
+        var type = typeof(T);
+        _registrations.Remove(type);
+    }
+
 
     public void Register<T>(T instance) where T : class
     {
@@ -52,12 +59,22 @@ public class SimpleDImple : IInjectionContainer
         _registrations.Add(type, instance);
     }
     
+    public void UnRegister<T>(T instance, Type type) where T : class
+    {
+        _registrations.Remove(type);
+    }
+    
     public void Register<T>(T instance, Type type) where T : class
     {
         if (_registrations.ContainsKey(type))
             throw new InvalidOperationException($"SimpleDi: Dependency of type = {type} already exists");
         
         _registrations.Add(type, instance);
+    }
+    
+    public ScopedRegistration<T> Scoped<T>(T instance) where T : class
+    {
+        return new ScopedRegistration<T>(this, instance);
     }
     
     public void AddResolver(Func<Type, object> resolver, Type baseType)

@@ -56,12 +56,6 @@ public class RoomPokerDetectCombinationSystem : ISystem
                 var combination = GetPokerCombination(playerCards.Cards, roomPokerCardsToTable.Cards, 
                     out var combinationOrderedCards);
 
-                //todo debug
-                ref var playerNickname = ref player.GetComponent<PlayerNickname>();
-                
-                 Logger.Debug($"player: {playerNickname.Value} | combination: {combination} | cards: " +
-                              $"{Logger.GetCardsLog(combinationOrderedCards, "^")}", ConsoleColor.Blue);
-                
                 _playerPokerCombination.Set(player, new PlayerPokerCombination
                 {
                     CombinationType = combination,
@@ -74,8 +68,6 @@ public class RoomPokerDetectCombinationSystem : ISystem
                 }
             }
             
-            //todo debug
-            Logger.Debug($"combination max: {combinationMax}");
             _roomPokerCombinationMax.Set(roomEntity, new RoomPokerCombinationMax
             {
                 CombinationMax = combinationMax,
@@ -115,7 +107,7 @@ public class RoomPokerDetectCombinationSystem : ISystem
         return combinationTypeMax;
     }
 
-    public CombinationType DetectPokerCombination(List<CardModel> cards)
+    private CombinationType DetectPokerCombination(List<CardModel> cards)
     {
         ulong handValue = 0;
 

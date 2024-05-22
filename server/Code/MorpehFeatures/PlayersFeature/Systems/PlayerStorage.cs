@@ -1,4 +1,6 @@
+using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
@@ -13,6 +15,7 @@ public class PlayerStorage : IInitializer
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<Destroy> _destroy;
     [Injectable] private Stash<PlayerDbModelRequest> _playerDbModelRequest;
+    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
 
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerRoomCreateSend> _playerRoomCreateSend;
@@ -20,16 +23,20 @@ public class PlayerStorage : IInitializer
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
+    
+    [Injectable] private NetFrameServer _server;
 
     private Filter _filter;
 
-    private Dictionary<int, Entity> _players;
+    private Dictionary<int, Entity> _playersByIds;
+    private Dictionary<string, Entity> _playerByGuids;
 
     public World World { get; set; }
 
     public void OnAwake()
     {
-        _players = new Dictionary<int, Entity>();
+        _playersByIds = new Dictionary<int, Entity>();
+        _playerByGuids = new Dictionary<string, Entity>();
         
         _filter = World.Filter
             .With<PlayerId>()
@@ -43,10 +50,24 @@ public class PlayerStorage : IInitializer
         {
             Id = id,
         });
-        _playerDbModelRequest.Set(newEntity);
-        _players.Add(id, newEntity);
+        
+        _playersByIds.Add(id, newEntity);
+    }
 
-        //Подгрузка из бд и навешивание PlayerAuthData и PlayerBalance, отправка баланса на клиент
+    public void AddAuth(Entity player, string guid, int playerId)
+    {
+        if (_playerByGuids.ContainsKey(guid))
+        {
+            _server.Disconnect(playerId);
+            Remove(playerId);
+            return;
+        }
+        
+        _playerAuthData.Set(player, new PlayerAuthData
+        {
+            Guid = guid,
+        });
+        _playerByGuids.Add(guid, player);
     }
     
     public void CreateForRoomAndSync(Entity createdPlayer, CurrencyType currencyType, long contribution,
@@ -76,7 +97,7 @@ public class PlayerStorage : IInitializer
 
     public void Remove(int id)
     {
-        _players.Remove(id);
+        _playersByIds.Remove(id);
         
         foreach (var entity in _filter)
         {
@@ -84,6 +105,13 @@ public class PlayerStorage : IInitializer
 
             if (playerId.Id == id)
             {
+                ref var playerAuthData = ref _playerAuthData.Get(entity, out var exist);
+
+                if (exist)
+                {
+                    _playerByGuids.Remove(playerAuthData.Guid);
+                }
+                
                 _destroy.Set(entity);
                 break;
             }
@@ -92,7 +120,7 @@ public class PlayerStorage : IInitializer
 
     public bool TryGetPlayerById(int id, out Entity player)
     {
-        if (_players.TryGetValue(id, out var value))
+        if (_playersByIds.TryGetValue(id, out var value))
         {
             player = value;
             return true;

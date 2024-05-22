@@ -22,6 +22,11 @@ var serverParameters = new ServerParameters
     MaxPlayers = ServerEnvsUtil.ReadInt("MAX_PLAYERS"),
     ConfigPath = ServerEnvsUtil.Read("CONFIG_PATH"),
     SentryDsn = ServerEnvsUtil.Read("SENTRY_DSN"),
+    SqlHost = ServerEnvsUtil.Read("MYSQL_HOST"),
+    SqlPort = int.Parse(ServerEnvsUtil.Read("MYSQL_PORT", "3306")),
+    SqlUser = ServerEnvsUtil.Read("MYSQL_USER"),
+    SqlPassword = ServerEnvsUtil.Read("MYSQL_PASSWORD"),
+    SqlDatabase = ServerEnvsUtil.Read("MYSQL_DATABASE")
 };
 container.Register(serverParameters);
 
@@ -51,11 +56,13 @@ using (SentrySdk.Init(options =>
            options.Environment = serverParameters.IsProduction ? "prod" : "dev";
        }))
     
+MainThread.Assert();
+    
 while (true)
 {
     stopWatch.Reset();
     stopWatch.Start();
-    
+
     //Console.WriteLine(Time.deltaTime);
     
     framesPerSecond++;
@@ -63,6 +70,8 @@ while (true)
     
     //netFrameServer.Run(); //todo 
     systemExecutor.Execute();
+    
+    MainThread.Pulse();
     
     frameRateTimer += Time.deltaTime;
     
@@ -72,7 +81,7 @@ while (true)
         framesPerSecond = 0;
         frameRateTimer = 0f;
     }
-
+    
     stopWatch.Stop();
 
     var timeLeft = (int) (targetMilliseconds - stopWatch.Elapsed.TotalMilliseconds);

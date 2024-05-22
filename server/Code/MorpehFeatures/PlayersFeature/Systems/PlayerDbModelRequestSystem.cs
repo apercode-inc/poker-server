@@ -1,23 +1,22 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.CurrencyFeature.Dataframe;
-using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
-using server.Code.MorpehFeatures.PlayersFeature.Dataframes;
+using server.Code.MorpehFeatures.PlayersFeature.ThreadSafeContainers;
 
 namespace server.Code.MorpehFeatures.PlayersFeature.Systems;
 
 public class PlayerDbModelRequestSystem : ISystem
 {
     [Injectable] private Stash<PlayerDbModelRequest> _playerDbModelRequest;
-    [Injectable] private Stash<PlayerCurrency> _playerCurrency;
-
-    [Injectable] private NetFrameServer _server;
+    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     
-    private Filter _filter;
+    [Injectable] private ThreadSafeFilter<PlayerDbModelThreadSafe> _threadSafeFilter;
 
-    //private ThreadSafeContainer<PlayerDbModelThreadSafe> _threadSafeContainer;
+    [Injectable] private PlayerDbService _playerDbService;
+
+    private Filter _filter;
 
     public World World { get; set; }
 
@@ -25,37 +24,32 @@ public class PlayerDbModelRequestSystem : ISystem
     {
         _filter = World.Filter
             .With<PlayerDbModelRequest>()
+            .With<PlayerAuthData>()
             .Build();
     }
 
     public void OnUpdate(float deltaTime)
     {
-        foreach (var entity in _filter)
+        foreach (var playerEntity in _filter)
         {
-            //надо создать PlayerDbModelResponseSystem и вытащить запись из таблицы с игроками,
-            //а пока что временно повесим баланс какой нибудь
+            ref var playerAuthData = ref _playerAuthData.Get(playerEntity);
+            var playerGuid = playerAuthData.Guid;
 
-            long chips = 10000;
-            long gold = 150;
-
-            var currencyByType = new Dictionary<CurrencyType, long>
+            Task.Run(async () =>
             {
-                [CurrencyType.Chips] = chips,
-                [CurrencyType.Gold] = gold,
-            };
-            
-            _playerCurrency.Set(entity, new PlayerCurrency
-            {
-                CurrencyByType = currencyByType,
+                var model = await _playerDbService.GetPlayerAsync(playerGuid);
+                
+                if (model.Any())
+                {
+                    _threadSafeFilter.Add(new PlayerDbModelThreadSafe
+                    {
+                        Player = playerEntity,
+                        Model = model.First(),
+                    });
+                }
             });
-
-            var dataframe = new CurrencyInitDataframe
-            {
-                CurrencyByType = currencyByType,
-            };
-            _server.Send(ref dataframe, entity);
-
-            _playerDbModelRequest.Remove(entity);
+            
+            _playerDbModelRequest.Remove(playerEntity);
         }
     }
 

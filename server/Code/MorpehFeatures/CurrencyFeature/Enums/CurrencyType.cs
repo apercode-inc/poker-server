@@ -4,4 +4,5 @@ public enum CurrencyType
 {
     Chips = 0,
     Gold = 1,
+    Stars = 2,
 }

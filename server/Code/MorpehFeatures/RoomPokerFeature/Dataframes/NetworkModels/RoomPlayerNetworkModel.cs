@@ -8,6 +8,8 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
 {
     public int Id;
     public string Nickname;
+    public int AvatarIndex;
+    public string AvatarUrl;
     public byte Seat;
     public bool IsDealer;
     public long ContributionBalance;
@@ -22,6 +24,8 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
     {
         writer.WriteInt(Id);
         writer.WriteString(Nickname);
+        writer.WriteInt(AvatarIndex);
+        writer.WriteString(AvatarUrl);
         writer.WriteByte(Seat);
         writer.WriteBool(IsDealer);
         writer.WriteLong(ContributionBalance);
@@ -46,6 +50,8 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
     {
         Id = reader.ReadInt();
         Nickname = reader.ReadString();
+        AvatarIndex = reader.ReadInt();
+        AvatarUrl = reader.ReadString();
         Seat = reader.ReadByte();
         IsDealer = reader.ReadBool();
         ContributionBalance = reader.ReadLong();
