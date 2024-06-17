@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.NotificationFeature.Enums;
 using server.Code.MorpehFeatures.NotificationFeature.Systems;
@@ -45,7 +44,7 @@ public class RoomPokerCreateRequestSyncSystem : IInitializer
 
         if (playerCurrency.CurrencyByType[dataframe.CurrencyType] < dataframe.Contribution)
         {
-            _notificationService.Show(player, LocalizationKeys.RoomPokerJoinNotEnoughMoney, NotificationType.Error);
+            _notificationService.Show(player, "не достаточно средств для взноса", NotificationType.Error);
             return;
         }
 
