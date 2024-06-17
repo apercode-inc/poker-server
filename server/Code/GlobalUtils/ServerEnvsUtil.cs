@@ -1,4 +1,3 @@
-#define _WINDOWS
 using System.Text;
 
 namespace server.Code.GlobalUtils
