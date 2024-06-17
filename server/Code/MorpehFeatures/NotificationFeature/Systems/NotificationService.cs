@@ -1,8 +1,6 @@
 ﻿using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.LocalizationFeature;
-using server.Code.MorpehFeatures.LocalizationFeature.Dataframes;
 using server.Code.MorpehFeatures.NotificationFeature.Dataframes;
 using server.Code.MorpehFeatures.NotificationFeature.Enums;
 
@@ -18,16 +16,12 @@ namespace server.Code.MorpehFeatures.NotificationFeature.Systems
         {
         }
 
-        public void Show(Entity playerEntity, string messageKey, NotificationType type, List<LocalizationParameter> parameters = null)
+        public void Show(Entity playerEntity, string messageText, NotificationType type)
         {
             var dataframe = new NotificationDataframe
             {
-                MessageText = messageKey,
-                Type = type,
-                LocalizationParameters = new LocalizationParametersListDataframe
-                {
-                    Parameters = parameters
-                }
+                MessageText = messageText,
+                Type = type
             };
 
             _server.Send(ref dataframe, playerEntity);

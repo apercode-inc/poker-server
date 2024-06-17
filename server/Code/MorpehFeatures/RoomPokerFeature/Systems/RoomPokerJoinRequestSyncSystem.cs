@@ -1,7 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
@@ -55,7 +54,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         if (roomPokerPlayers.MarkedPlayersBySeat.Count >= roomPokerStats.MaxPlayers)
         {
-            _notificationService.Show(player, LocalizationKeys.RoomPokerJoinNoFreeSpace, NotificationType.Error);
+            _notificationService.Show(player, "нет свободного места", NotificationType.Error);
             return;
         }
         
@@ -68,7 +67,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         if (playerCurrency.CurrencyByType[roomPokerStats.CurrencyType] < roomPokerStats.Contribution)
         {
-            _notificationService.Show(player, LocalizationKeys.RoomPokerJoinNotEnoughMoney, NotificationType.Error);
+            _notificationService.Show(player, "не достаточно средств для взноса", NotificationType.Error);
             return;
         }
 
