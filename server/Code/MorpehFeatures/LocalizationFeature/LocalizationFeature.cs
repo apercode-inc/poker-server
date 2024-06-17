@@ -10,6 +10,8 @@ public static class LocalizationFeature
     {
         var systemsGroup = world.CreateSystemsGroup();
         
+        
+        // test
         systemsGroup.AddInitializer(container.New<LocalizationApiKeysRequestsInitializer>());
         
         world.AddSystemsGroup(index++, systemsGroup);
