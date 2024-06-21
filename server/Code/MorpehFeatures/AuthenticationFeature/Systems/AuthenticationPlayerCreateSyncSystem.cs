@@ -6,6 +6,7 @@ using server.Code.MorpehFeatures.AuthenticationFeature.Components;
 using server.Code.MorpehFeatures.AuthenticationFeature.Dataframes;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
+using server.Code.MorpehFeatures.LocalizationFeature;
 using server.Code.MorpehFeatures.NotificationFeature.Enums;
 using server.Code.MorpehFeatures.NotificationFeature.Systems;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -24,11 +25,22 @@ public class AuthenticationPlayerCreateSyncSystem : IInitializer
     [Injectable] private NotificationService _notificationService;
     [Injectable] private PlayerStorage _playerStorage;
 
+    private List<LocalizationParameter> _nicknameLengthParameters;
+
     public World World { get; set; }
 
     public void OnAwake()
     {
         _server.Subscribe<AuthenticationPlayerCreateResponseDataframe>(Handler);
+
+        _nicknameLengthParameters = new List<LocalizationParameter>
+        {
+            new LocalizationParameter
+            {
+                key = "length",
+                value = null,
+            }
+        };
     }
 
     private void Handler(AuthenticationPlayerCreateResponseDataframe dataframe, int playerId)
@@ -42,25 +54,30 @@ public class AuthenticationPlayerCreateSyncSystem : IInitializer
         
         if (_playerAuthData.Has(playerEntity))
         {
-            _notificationService.Show(playerEntity, "Игрок уже зарегистиророван", NotificationType.Error);
+            _notificationService.Show(playerEntity, AuthenticationLocalizationKeys.AuthPlayerCreateAlreadyExists, NotificationType.Error);
             return;
         }
         
         if (string.IsNullOrWhiteSpace(dataframe.UserId))
         {
-            _notificationService.Show(playerEntity, "Ошибка аутентификации", NotificationType.Error);
+            _notificationService.Show(playerEntity, AuthenticationLocalizationKeys.AuthPlayerCreateError, NotificationType.Error);
             return;
         }
         
         if (dataframe.AvatarIndex < 0)
         {
-            _notificationService.Show(playerEntity, "Не корректный аватар", NotificationType.Error);
+            _notificationService.Show(playerEntity, AuthenticationLocalizationKeys.AuthPlayerCreateIncorrectAvatar, NotificationType.Error);
             return;
         }
 
         if (dataframe.Nickname.Length < config.NicknameLength)
         {
-            _notificationService.Show(playerEntity, $"Никнейм должен содержать {config.NicknameLength} или более символов", NotificationType.Error);
+            _nicknameLengthParameters[0].value = config.NicknameLength.ToString();
+            _notificationService.Show(playerEntity,
+                AuthenticationLocalizationKeys.AuthPlayerCreateNicknameTooShort,
+                NotificationType.Error,
+                _nicknameLengthParameters);
+            
             return;
         }
         
