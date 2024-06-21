@@ -55,7 +55,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         if (roomPokerPlayers.MarkedPlayersBySeat.Count >= roomPokerStats.MaxPlayers)
         {
-            _notificationService.Show(player, LocalizationKeys.RoomPokerJoinNoFreeSpace, NotificationType.Error);
+            _notificationService.Show(player, RoomPokerLocalizationKeys.RoomPokerJoinNoFreeSpace, NotificationType.Error);
             return;
         }
         
@@ -68,7 +68,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         if (playerCurrency.CurrencyByType[roomPokerStats.CurrencyType] < roomPokerStats.Contribution)
         {
-            _notificationService.Show(player, LocalizationKeys.RoomPokerJoinNotEnoughMoney, NotificationType.Error);
+            _notificationService.Show(player, RoomPokerLocalizationKeys.RoomPokerJoinNotEnoughMoney, NotificationType.Error);
             return;
         }
 

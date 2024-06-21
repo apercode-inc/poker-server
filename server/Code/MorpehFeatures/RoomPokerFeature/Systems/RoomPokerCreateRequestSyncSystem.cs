@@ -45,7 +45,7 @@ public class RoomPokerCreateRequestSyncSystem : IInitializer
 
         if (playerCurrency.CurrencyByType[dataframe.CurrencyType] < dataframe.Contribution)
         {
-            _notificationService.Show(player, LocalizationKeys.RoomPokerJoinNotEnoughMoney, NotificationType.Error);
+            _notificationService.Show(player, RoomPokerLocalizationKeys.RoomPokerJoinNotEnoughMoney, NotificationType.Error);
             return;
         }
 

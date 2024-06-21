@@ -54,19 +54,19 @@ public class AuthenticationPlayerCreateSyncSystem : IInitializer
         
         if (_playerAuthData.Has(playerEntity))
         {
-            _notificationService.Show(playerEntity, LocalizationKeys.AuthPlayerCreateAlreadyExists, NotificationType.Error);
+            _notificationService.Show(playerEntity, AuthenticationLocalizationKeys.AuthPlayerCreateAlreadyExists, NotificationType.Error);
             return;
         }
         
         if (string.IsNullOrWhiteSpace(dataframe.UserId))
         {
-            _notificationService.Show(playerEntity, LocalizationKeys.AuthPlayerCreateError, NotificationType.Error);
+            _notificationService.Show(playerEntity, AuthenticationLocalizationKeys.AuthPlayerCreateError, NotificationType.Error);
             return;
         }
         
         if (dataframe.AvatarIndex < 0)
         {
-            _notificationService.Show(playerEntity, LocalizationKeys.AuthPlayerCreateIncorrectAvatar, NotificationType.Error);
+            _notificationService.Show(playerEntity, AuthenticationLocalizationKeys.AuthPlayerCreateIncorrectAvatar, NotificationType.Error);
             return;
         }
 
@@ -74,7 +74,7 @@ public class AuthenticationPlayerCreateSyncSystem : IInitializer
         {
             _nicknameLengthParameters[0].value = config.NicknameLength.ToString();
             _notificationService.Show(playerEntity,
-                LocalizationKeys.AuthPlayerCreateNicknameTooShort,
+                AuthenticationLocalizationKeys.AuthPlayerCreateNicknameTooShort,
                 NotificationType.Error,
                 _nicknameLengthParameters);
             
