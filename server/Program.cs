@@ -26,7 +26,9 @@ var serverParameters = new ServerParameters
     SqlPort = int.Parse(ServerEnvsUtil.Read("MYSQL_PORT", "3306")),
     SqlUser = ServerEnvsUtil.Read("MYSQL_USER"),
     SqlPassword = ServerEnvsUtil.Read("MYSQL_PASSWORD"),
-    SqlDatabase = ServerEnvsUtil.Read("MYSQL_DATABASE")
+    SqlDatabase = ServerEnvsUtil.Read("MYSQL_DATABASE"),
+    PrivateKeyPath = ServerEnvsUtil.Read("PRIVATE_KEY_PATH"),
+    SecretToken = ServerEnvsUtil.Read("SECRET_TOKEN")
 };
 container.Register(serverParameters);
 
