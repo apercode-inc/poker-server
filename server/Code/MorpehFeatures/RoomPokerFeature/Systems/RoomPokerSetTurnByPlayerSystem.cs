@@ -90,16 +90,19 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             }
 
             var raiseBets = new List<long>();
-            
-            var raiseBet = requiredBet + roomPokerStats.BigBet;
-            raiseBets.Add(raiseBet);
-            while (playerPokerContribution.Value > raiseBet)
-            {
-                raiseBet += roomPokerStats.BigBet;
-                raiseBets.Add(raiseBet);
-            }
-            raiseBets.Add(playerPokerContribution.Value);
 
+            if (playerPokerContribution.Value > requiredBet)
+            {
+                var raiseBet = requiredBet + roomPokerStats.BigBet;
+                raiseBets.Add(raiseBet);
+                while (playerPokerContribution.Value > raiseBet)
+                {
+                    raiseBet += roomPokerStats.BigBet;
+                    raiseBets.Add(raiseBet);
+                }
+                raiseBets.Add(playerPokerContribution.Value);
+            }
+           
             var dataframe = new RoomPokerPlayerTurnRequestDataframe
             {
                 TurnType = turnType,
