@@ -12,7 +12,7 @@
       <PackageReference Include="FluentMigrator" Version="5.2.0" />
       <PackageReference Include="FluentMigrator.Runner" Version="5.2.0" />
       <PackageReference Include="MySqlConnector" Version="2.3.7" />
-      <PackageReference Include="NetFrame" Version="1.1.7" />
+      <PackageReference Include="NetFrame" Version="1.1.8" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="Scellecs.Morpeh" Version="2023.1.0" />
       <PackageReference Include="Sentry.AspNetCore" Version="4.2.1" />

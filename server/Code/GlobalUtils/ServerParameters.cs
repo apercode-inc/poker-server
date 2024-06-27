@@ -13,4 +13,6 @@ public class ServerParameters
     public string SqlUser;
     public string SqlPassword;
     public string SqlDatabase;
+    public string PrivateKeyPath;
+    public string SecretToken;
 }
