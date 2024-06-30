@@ -21,8 +21,8 @@ public class StartServerSystem : ISystem
     {
         NetFrameDataframeCollection.Initialize(Assembly.GetExecutingAssembly());
         
-        _server.Start(_serverParameters.Port, _serverParameters.MaxPlayers, 
-            _serverParameters.PrivateKeyPath, _serverParameters.SecretToken);
+        _server.SetProtectionWithFilePath(_serverParameters.PrivateKeyPath, _serverParameters.SecretToken);
+        _server.Start(_serverParameters.Port, _serverParameters.MaxPlayers);
         
         Logger.Debug("Server started...", ConsoleColor.Green);
 
