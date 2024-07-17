@@ -12,16 +12,19 @@ public struct RoomPokerPlayerTurnRequestDataframe : INetworkDataframe
 
     public void Write(NetFrameWriter writer)
     {
-        writer.WriteInt((int) TurnType);
+        writer.WriteInt((int)TurnType);
         writer.WriteLong(RequiredBet);
-        
-        writer.WriteInt(RaiseBets?.Count ?? 0);
 
-        if (RaiseBets != null)
+        var hasBets = RaiseBets != null;
+        writer.WriteBool(hasBets);
+
+        if (hasBets)
         {
-            foreach (var item in RaiseBets)
+            writer.WriteInt(RaiseBets.Count);
+
+            foreach (var bet in RaiseBets)
             {
-                writer.WriteLong(item);
+                writer.WriteLong(bet);
             }
         }
     }
@@ -30,12 +33,12 @@ public struct RoomPokerPlayerTurnRequestDataframe : INetworkDataframe
     {
         TurnType = (PokerPlayerTurnType)reader.ReadInt();
         RequiredBet = reader.ReadLong();
-        
-        var count = reader.ReadInt();
 
-        if (count > 0)
+        if (reader.ReadBool())
         {
+            var count = reader.ReadInt();
             RaiseBets = new List<long>();
+
             for (var i = 0; i < count; i++)
             {
                 RaiseBets.Add(reader.ReadLong());
