@@ -21,6 +21,15 @@ public class StartServerSystem : ISystem
     {
         NetFrameDataframeCollection.Initialize(Assembly.GetExecutingAssembly());
         
+        if (File.Exists(_serverParameters.PrivateKeyPath))
+        {
+            Logger.Debug("Есть RSA ключ по указанному пути", ConsoleColor.Green);
+        }
+        else
+        {
+            Logger.Debug("Нет RSA ключа по указанному пути", ConsoleColor.Red);
+        }
+        
         _server.SetProtectionWithFilePath(_serverParameters.PrivateKeyPath, _serverParameters.SecretToken);
         _server.Start(_serverParameters.Port, _serverParameters.MaxPlayers);
         
