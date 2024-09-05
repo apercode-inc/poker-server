@@ -11,8 +11,6 @@ public class LocalizationApiKeysRequestsInitializer : IInitializer
     private const string SpreadSheetId = "1YWco69Y6i192jLeZ38WTR5uMOhS5-ZpGnMbrJ8FmTu4";
     
     [Injectable] private NetFrameServer _server;
-    
-    private Filter _filter;
 
     public World World { get; set; }
 
@@ -33,6 +31,6 @@ public class LocalizationApiKeysRequestsInitializer : IInitializer
 
     public void Dispose()
     {
-        _filter = null;
+        
     }
 }
