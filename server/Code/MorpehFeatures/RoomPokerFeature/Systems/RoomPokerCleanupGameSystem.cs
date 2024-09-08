@@ -20,7 +20,6 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
-    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
     
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;

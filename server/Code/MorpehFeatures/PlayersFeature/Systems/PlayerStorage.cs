@@ -130,6 +130,18 @@ public class PlayerStorage : IInitializer
         return false;
     }
 
+    public bool TryGetPlayerByGuid(string guid, out Entity player)
+    {
+        if (_playerByGuids.TryGetValue(guid, out var value))
+        {
+            player = value;
+            return true;
+        }
+
+        player = null;
+        return false;
+    }
+
     public void Dispose()
     {
         _filter = null;

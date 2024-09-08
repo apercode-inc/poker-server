@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.CurrencyFeature.Dataframe;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
@@ -18,9 +19,11 @@ public class CurrencyPlayerService : IInitializer
     [Injectable] private Stash<PlayerDbEntry> _playerDbEntry;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerId> _playerId;
+    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
 
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerDbService _playerDbService;
@@ -101,8 +104,24 @@ public class CurrencyPlayerService : IInitializer
         };
         _server.SendInRoom(ref dataframe, room);
 
-        ref var roomPokerBank = ref _roomPokerBank.Get(room);
+        ref var playerAuthData = ref _playerAuthData.Get(player);
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(room);
 
+        if (!roomPokerPlayers.PlayerPotModels.TryGetValue(playerAuthData.Guid, out var playerPotModel))
+        {
+            Logger.Error($"[CurrencyPlayerService.TrySetBet] player pot model not exist collection, guid: {playerAuthData.Guid}");
+            return false;
+        }
+        
+        playerPotModel.SetBet(cost);
+            
+        if (playerPokerContribution.Value == 0)
+        {
+            playerPotModel.SetFold();
+        }
+
+        ref var roomPokerBank = ref _roomPokerBank.Get(room);
+        
         roomPokerBank.Total += cost;
 
         if (roomPokerMaxBet.Value < playerPokerCurrentBet.Value)

@@ -8,13 +8,14 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
+[Obsolete("Выпилить после реализации RoomPokerSetStrengthHandSystem")]
 public class RoomPokerCombinationCompareSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
     [Injectable] private Stash<RoomPokerShowdown> _roomPokerShowdown;
     
-    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
+    //[Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
     
     private Filter _filter;
@@ -29,18 +30,20 @@ public class RoomPokerCombinationCompareSystem : ISystem
         _filter = World.Filter
             .With<RoomPokerCardsToTable>()
             .With<RoomPokerPlayers>()
-            .With<RoomPokerCombinationMax>()
+            //.With<RoomPokerCombinationMax>()
             .Build();
     }
 
     public void OnUpdate(float deltaTime)
     {
+        return;
+        
         foreach (var roomEntity in _filter)
         {
-            ref var roomPokerCombinationMax = ref _roomPokerCombinationMax.Get(roomEntity);
-            var combinationMax = roomPokerCombinationMax.CombinationMax;
+            //ref var roomPokerCombinationMax = ref _roomPokerCombinationMax.Get(roomEntity);
+            var combinationMax = CombinationType.Flush;// roomPokerCombinationMax.CombinationMax;
 
-            _roomPokerCombinationMax.Remove(roomEntity);
+            //_roomPokerCombinationMax.Remove(roomEntity);
             
             _playersByCards.Clear();
 

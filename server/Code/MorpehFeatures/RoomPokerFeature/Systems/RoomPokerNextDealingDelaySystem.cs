@@ -9,7 +9,6 @@ public class RoomPokerNextDealingDelaySystem : ISystem
     [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
     [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
-    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
     
     private Filter _filter;
     
