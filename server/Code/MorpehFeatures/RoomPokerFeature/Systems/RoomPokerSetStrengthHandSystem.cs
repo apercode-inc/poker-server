@@ -63,7 +63,7 @@ public class RoomPokerSetStrengthHandSystem : ISystem
                 
                 //todo test
                 ref var playerNickname = ref player.GetComponent<PlayerNickname>();
-                Logger.LogWarning($"Player:{playerNickname.Value}, StrengthHand:{playerPokerCombination.StrengthHand}");
+                Logger.LogWarning($"Player:{playerNickname.Value}, combination: {playerPokerCombination.CombinationType}, StrengthHand:{playerPokerCombination.StrengthHand}");
             }
         }
     }
