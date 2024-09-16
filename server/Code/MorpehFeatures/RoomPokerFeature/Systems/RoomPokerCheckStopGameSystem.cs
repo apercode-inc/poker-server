@@ -3,6 +3,7 @@ using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.StartTimer;
 
@@ -15,6 +16,8 @@ public class RoomPokerCheckStopGameSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
     [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
     [Injectable] private Stash<RoomPokerShowOrHideCards> _roomPokerShowOrHideCards;
+
+    [Injectable] private Stash<PlayerAllin> _playerAllin;
     
     [Injectable] private NetFrameServer _server;
     
@@ -49,6 +52,7 @@ public class RoomPokerCheckStopGameSystem : ISystem
             foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var player = playerBySeat.Value;
+                _playerAllin.Remove(player);
 
                 playerGivenBank.Add(player);
             }

@@ -119,7 +119,6 @@ public class CurrencyPlayerService : IInitializer
         if (playerPokerContribution.Value == 0)
         {
             _playerAllin.Set(player);
-            playerPotModel.SetNonTurn();
         }
 
         ref var roomPokerBank = ref _roomPokerBank.Get(room);

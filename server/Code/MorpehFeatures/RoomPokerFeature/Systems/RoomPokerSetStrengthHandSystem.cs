@@ -16,6 +16,7 @@ public class RoomPokerSetStrengthHandSystem : ISystem
 
     [Injectable] private Stash<RoomPokerSetStrengthHand> _roomPokerSetStrengthHand;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
     
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
@@ -85,6 +86,8 @@ public class RoomPokerSetStrengthHandSystem : ISystem
                                   $"StrengthHand:{playerPotModel.Value.HandStrength}");
             }
             //todo end
+            
+            _roomPokerPayoutWinnings.Set(roomEntity);
         }
     }
 

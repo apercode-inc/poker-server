@@ -6,7 +6,7 @@ public class PlayerPotModel
     public long PotCommitment;
     public int HandStrength;
     public long ChipsRemaining;
-    public bool IsNonTurn;
+    public bool IsFold;
 
     public PlayerPotModel(string guid)
     {
@@ -18,9 +18,9 @@ public class PlayerPotModel
         PotCommitment += chips;
     }
 
-    public void SetNonTurn()
+    public void SetFold()
     {
-        IsNonTurn = true;
+        IsFold = true;
     }
 
     public void SetHandStrength(int handStrength)
