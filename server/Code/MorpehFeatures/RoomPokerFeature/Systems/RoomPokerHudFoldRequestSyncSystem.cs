@@ -60,7 +60,7 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
         
         if (roomPokerPlayers.PlayerPotModels.TryGetValue(playerAuthData.Guid, out var playerPotModel))
         {
-            playerPotModel.SetFold();
+            playerPotModel.SetNonTurn();
         }
 
         if (playerByMarker.Value != player)

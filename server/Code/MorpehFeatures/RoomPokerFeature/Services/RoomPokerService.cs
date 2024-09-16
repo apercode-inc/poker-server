@@ -58,7 +58,7 @@ public class RoomPokerService : IInitializer
 
         if (roomPokerPlayers.PlayerPotModels.TryGetValue(playerAuthData.Guid, out var playerPotModel))
         {
-            playerPotModel.SetFold();
+            playerPotModel.SetNonTurn();
         }
         
         var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);

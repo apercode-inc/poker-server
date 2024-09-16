@@ -20,6 +20,7 @@ public class CurrencyPlayerService : IInitializer
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
+    [Injectable] private Stash<PlayerAllin> _playerAllin;
 
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
@@ -117,7 +118,8 @@ public class CurrencyPlayerService : IInitializer
             
         if (playerPokerContribution.Value == 0)
         {
-            playerPotModel.SetFold();
+            _playerAllin.Set(player);
+            playerPotModel.SetNonTurn();
         }
 
         ref var roomPokerBank = ref _roomPokerBank.Get(room);

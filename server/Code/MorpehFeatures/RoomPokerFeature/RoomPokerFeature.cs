@@ -35,6 +35,7 @@ public static class RoomPokerFeature
         
         //Player turn
         systemsGroup.AddInitializer(container.New<RoomPokerHudSetBetRequestSyncSystem>());
+        systemsGroup.AddInitializer(container.New<RoomPokerHudAllInRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerHudFoldRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerHudCheckRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerHudHideCardsSyncSystem>());
@@ -67,12 +68,12 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerDetectCombinationSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerSetStrengthHandSystem>()); //todo это новое реализовать
         systemsGroup.AddSystem(container.New<RoomPokerCombinationCompareSystem>()); //todo это старое выпилить
-        systemsGroup.AddSystem(container.New<RoomPokerShowdownSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownSystem>()); //todo 
 
         systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
 
         //End game logic
-        systemsGroup.AddSystem(container.New<RoomPokerPlayersGivenBankSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerPlayersGivenBankSystem>()); //todo
         systemsGroup.AddSystem(container.New<RoomPokerShowdownTickTimerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerShowOrHideCardsActivateSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerTickTimerShowOrHideByPlayerSystem>());
