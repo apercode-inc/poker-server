@@ -18,6 +18,7 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
 
     [Injectable] private Stash<PlayerDropCards> _playerDropCards;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
+    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
@@ -54,6 +55,13 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
 
         roomPokerPlayers.MarkedPlayersBySeat.TryGetValueByMarked(PokerPlayerMarkerType.ActivePlayer,
             out var playerByMarker);
+        
+        ref var playerAuthData = ref _playerAuthData.Get(player);
+        
+        if (roomPokerPlayers.PlayerPotModels.TryGetValue(playerAuthData.Guid, out var playerPotModel))
+        {
+            playerPotModel.SetFold();
+        }
 
         if (playerByMarker.Value != player)
         {

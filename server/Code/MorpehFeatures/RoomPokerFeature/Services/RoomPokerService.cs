@@ -30,6 +30,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
     [Injectable] private Stash<PlayerShowOrHideTimer> _playerShowOrHideTimer;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
+    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
@@ -52,6 +53,13 @@ public class RoomPokerService : IInitializer
 
         _markersByPlayer.Clear();
         _roomPokerCardDeskService.ReturnCardsInDeskToPlayer(roomEntity, playerLeft);
+
+        ref var playerAuthData = ref _playerAuthData.Get(playerLeft);
+
+        if (roomPokerPlayers.PlayerPotModels.TryGetValue(playerAuthData.Guid, out var playerPotModel))
+        {
+            playerPotModel.SetFold();
+        }
         
         var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);
         var overOnePlayerToTable = markedPlayersBySeat.Count > 1;
