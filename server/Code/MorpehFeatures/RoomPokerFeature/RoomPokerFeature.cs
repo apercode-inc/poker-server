@@ -1,5 +1,6 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
@@ -66,10 +67,11 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerSetCardsToTableSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerSetCardsTickTimerAndNextStateTableSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerDetectCombinationSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerSetStrengthHandSystem>()); //todo это новое реализовать
-        systemsGroup.AddSystem(container.New<RoomPokerPayoutWinningsSystem>()); //todo новый пиздатый алгоритм выдачи выигрышей
-        systemsGroup.AddSystem(container.New<RoomPokerCombinationCompareSystem>()); //todo это старое выпилить
-        systemsGroup.AddSystem(container.New<RoomPokerShowdownSystem>()); //todo 
+        systemsGroup.AddSystem(container.New<RoomPokerSetStrengthHandSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerCalculatePayoutWinningsSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerPayOutPodsSystem>());
+        
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownSystem>()); //todo полностью переделать
 
         systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
 

@@ -9,6 +9,7 @@ using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
+using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 
 namespace server.Code.MorpehFeatures.CurrencyFeature.Services;
 
@@ -108,13 +109,24 @@ public class CurrencyPlayerService : IInitializer
         ref var playerAuthData = ref _playerAuthData.Get(player);
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(room);
 
-        if (!roomPokerPlayers.PlayerPotModels.TryGetValue(playerAuthData.Guid, out var playerPotModel))
+        PlayerPotModel targetPlayerPotModel = null;
+        foreach (var playerPotModel in roomPokerPlayers.PlayerPotModels)
+        {
+            if (playerPotModel.Guid != playerAuthData.Guid)
+            {
+                continue;
+            }
+
+            targetPlayerPotModel = playerPotModel;
+        }
+
+        if (targetPlayerPotModel == null)
         {
             Logger.Error($"[CurrencyPlayerService.TrySetBet] player pot model not exist collection, guid: {playerAuthData.Guid}");
             return false;
         }
         
-        playerPotModel.SetBet(cost);
+        targetPlayerPotModel.SetBet(cost);
             
         if (playerPokerContribution.Value == 0)
         {

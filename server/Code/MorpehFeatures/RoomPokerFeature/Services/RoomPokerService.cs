@@ -57,11 +57,16 @@ public class RoomPokerService : IInitializer
 
         ref var playerAuthData = ref _playerAuthData.Get(playerLeft);
 
-        if (roomPokerPlayers.PlayerPotModels.TryGetValue(playerAuthData.Guid, out var playerPotModel))
+        foreach (var playerPotModel in roomPokerPlayers.PlayerPotModels)
         {
+            if (playerPotModel.Guid != playerAuthData.Guid)
+            {
+                continue;
+            }
             playerPotModel.SetFold();
+            break;
         }
-        
+
         var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);
         var overOnePlayerToTable = markedPlayersBySeat.Count > 1;
 

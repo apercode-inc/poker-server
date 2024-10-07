@@ -7,6 +7,6 @@ namespace server.Code.MorpehFeatures.PlayersFeature.Components;
 public struct PlayerPokerCombination : IComponent
 {
     public CombinationType CombinationType;
-    public int StrengthHand;
+    public int HandStrength;
     public List<CardModel> CombinationCards;
 }

@@ -1,15 +1,21 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.ConfigsFeature.Constants;
+using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerPayoutWinningsSystem : ISystem
+public class RoomPokerCalculatePayoutWinningsSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<RoomPokerPaidOutToPlayers> _roomPokerPaidOutToPlayers;
 
+    [Injectable] private ConfigsService _configsService;
+    
     private List<PlayerPotModel> _playerPotModelWinners;
 
     private Filter _filter;
@@ -26,47 +32,34 @@ public class RoomPokerPayoutWinningsSystem : ISystem
             .Build();
     }
 
-    public void Dispose()
-    {
-        _playerPotModelWinners = null;
-        _filter = null;
-    }
-
     public void OnUpdate(float deltaTime)
     {
         foreach (var roomEntity in _filter)
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+            var players = roomPokerPlayers.PlayerPotModels;
 
-            var players = roomPokerPlayers.PlayerPotModels.Values.ToList();
+            var paidOutToPlayers = new List<List<PlayerPotModel>>();
             
             while (PotChipsRemaining(players) > 0)
             {
-                PayOutWinners(CalculateAndSortWinners(players), players);
+                var payOutWinners = GetPayOutWinners(CalculateAndSortWinners(players), players);
+                paidOutToPlayers.Add(payOutWinners);
             }
 
             // Refund players if remaining chips in pot (bigger/folded stacks)
-            foreach (var player in players)
-            {
-                if (!player.IsFold || player.PotCommitment == 0)
-                {
-                    continue;
-                }
-
-                player.ChipsRemaining += player.PotCommitment;
-                player.PotCommitment = 0;
-
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"REFUND ---> Player: {player.Guid} chips: {player.ChipsRemaining} paid out.");
-                Console.ResetColor();
-            }
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"*********************** Final results:");
-            Console.ResetColor();
-
-            PotChipsRemaining(players);
+            paidOutToPlayers.Add(GetPayOutRefund(players));
             
+            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
+            var delayPayOut = config.DelayPayOut;
+            
+            _roomPokerPaidOutToPlayers.Set(roomEntity, new RoomPokerPaidOutToPlayers
+            {
+                PaidDelay = delayPayOut,
+                PaidCooldown = delayPayOut,
+                PaidOutToPlayers = paidOutToPlayers,
+            });
+
             _roomPokerPayoutWinnings.Remove(roomEntity);
         }
     }
@@ -74,6 +67,7 @@ public class RoomPokerPayoutWinningsSystem : ISystem
     private List<PlayerPotModel> CalculateAndSortWinners(List<PlayerPotModel> playersInHand)
     {
         var highHand = 0;
+        
         // Get highHand, skipping folded and empty pots
         foreach (var player in playersInHand)
         {
@@ -96,7 +90,7 @@ public class RoomPokerPayoutWinningsSystem : ISystem
         return _playerPotModelWinners;
     }
 
-    private void PayOutWinners(List<PlayerPotModel> winners, List<PlayerPotModel> playersInHand)
+    private List<PlayerPotModel> GetPayOutWinners(List<PlayerPotModel> winners, List<PlayerPotModel> playersInHand)
     {
         long collectedSidePot;
         long currentCommitment, collectionAmount;
@@ -118,8 +112,7 @@ public class RoomPokerPayoutWinningsSystem : ISystem
                 }
             }
 
-            int winnersToPay = 0;
-            Console.WriteLine($"winners.count {winners.Count}");
+            var winnersToPay = 0;
 
             foreach (var player in winners)
             {
@@ -128,10 +121,6 @@ public class RoomPokerPayoutWinningsSystem : ISystem
                     winnersToPay++;
                 }
             }
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"collectedSidePot: {collectedSidePot}  winnersToPay: {winnersToPay}");
-            Console.ResetColor();
 
             // Pay unpaid winners, tip dealer with remainders...
             foreach (var player in winners)
@@ -143,44 +132,54 @@ public class RoomPokerPayoutWinningsSystem : ISystem
                     if (player.PotCommitment <= 0)
                     {
                         paidWinners.Add(player);
-
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"WIN ----> Player: {player.Guid} chips: {player.ChipsRemaining} paid out.");
-                        Console.ResetColor();
                     }
                 }
             }
         }
 
         winners.Clear();
+        return paidWinners;
+    }
+    
+    private List<PlayerPotModel> GetPayOutRefund(List<PlayerPotModel> players)
+    {
+        var paidRefund = new List<PlayerPotModel>();
+        
+        foreach (var player in players)
+        {
+            if (!player.IsFold || player.PotCommitment == 0)
+            {
+                continue;
+            }
+
+            player.ChipsRemaining += player.PotCommitment;
+            player.PotCommitment = 0;
+            
+            paidRefund.Add(player);
+        }
+        
+        return paidRefund;
     }
 
-    // Only count potchips for unfolded players. Also prints status to Console.
+    // Only count potchips for unfolded players.
     private long PotChipsRemaining(List<PlayerPotModel> playersInHand)
     {
         long tally = 0;
 
         foreach (var player in playersInHand)
         {
-            if (player.IsFold)
+            if (!player.IsFold)
             {
-                ShowInfo(player, ConsoleColor.Cyan);
-            }
-            else
-            {
-                ShowInfo(player, ConsoleColor.Blue);
                 tally += player.PotCommitment;
             }
         }
 
         return tally;
     }
-
-    private static void ShowInfo(PlayerPotModel playerPot, ConsoleColor color)
+    
+    public void Dispose()
     {
-        Console.ForegroundColor = color;
-        Console.WriteLine(
-            $"Player: {playerPot.Guid}   \tchips: {playerPot.ChipsRemaining}    \tCommitment: {playerPot.PotCommitment}   \tHandStrength: {playerPot.HandStrength}  \tIsNonTurn: {playerPot.IsFold}");
-        Console.ResetColor();
+        _playerPotModelWinners = null;
+        _filter = null;
     }
 }

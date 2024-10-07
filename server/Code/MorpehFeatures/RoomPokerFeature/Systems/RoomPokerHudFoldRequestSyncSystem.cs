@@ -57,10 +57,15 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
             out var playerByMarker);
         
         ref var playerAuthData = ref _playerAuthData.Get(player);
-        
-        if (roomPokerPlayers.PlayerPotModels.TryGetValue(playerAuthData.Guid, out var playerPotModel))
+
+        foreach (var playerPotModel in roomPokerPlayers.PlayerPotModels)
         {
+            if (playerPotModel.Guid != playerAuthData.Guid)
+            {
+                continue;
+            }
             playerPotModel.SetFold();
+            break;
         }
 
         if (playerByMarker.Value != player)

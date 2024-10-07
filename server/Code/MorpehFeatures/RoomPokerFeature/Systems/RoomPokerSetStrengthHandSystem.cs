@@ -36,11 +36,6 @@ public class RoomPokerSetStrengthHandSystem : ISystem
             .Build();
     }
 
-    public void Dispose()
-    {
-        _filter = null;
-    }
-
     public void OnUpdate(float deltaTime)
     {
         foreach (var roomEntity in _filter)
@@ -60,33 +55,23 @@ public class RoomPokerSetStrengthHandSystem : ISystem
                     continue;
                 }
 
-                playerPokerCombination.StrengthHand = GetStrengthCombination(playerPokerCombination.CombinationType,
+                playerPokerCombination.HandStrength = GetStrengthCombination(playerPokerCombination.CombinationType,
                     playerPokerCombination.CombinationCards);
 
                 ref var playerAuthData = ref _playerAuthData.Get(player);
 
-                if (roomPokerPlayers.PlayerPotModels.TryGetValue(playerAuthData.Guid, out var playerPotModel))
+                foreach (var playerPotModel in roomPokerPlayers.PlayerPotModels)
                 {
-                    playerPotModel.SetHandStrength(playerPokerCombination.StrengthHand);
+                    if (playerAuthData.Guid != playerPotModel.Guid)
+                    {
+                        continue;
+                    }
+                    
+                    playerPotModel.SetHandStrength(playerPokerCombination.HandStrength);
+                    break;
                 }
             }
 
-            //todo test
-            foreach (var playerPotModel in roomPokerPlayers.PlayerPotModels)
-            {
-                if (!_playerStorage.TryGetPlayerByGuid(playerPotModel.Key, out var player))
-                {
-                    continue;
-                }
-                
-                ref var playerNickname = ref player.GetComponent<PlayerNickname>();
-                ref var playerPokerCombination = ref _playerPokerCombination.Get(player);
-                
-                Logger.LogWarning($"Player:{playerNickname.Value}, combination: {playerPokerCombination.CombinationType}, " +
-                                  $"StrengthHand:{playerPotModel.Value.HandStrength}");
-            }
-            //todo end
-            
             _roomPokerPayoutWinnings.Set(roomEntity);
         }
     }
@@ -152,5 +137,10 @@ public class RoomPokerSetStrengthHandSystem : ISystem
         }
         
         return strength;
+    }
+    
+    public void Dispose()
+    {
+        _filter = null;
     }
 }

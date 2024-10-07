@@ -66,7 +66,7 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
                 ref var playerId = ref _playerId.Get(playerEntity);
                 ref var playerAuthData = ref _playerAuthData.Get(playerEntity);
                 
-                roomPokerPlayers.PlayerPotModels.Add(playerAuthData.Guid, new PlayerPotModel(playerAuthData.Guid));
+                roomPokerPlayers.PlayerPotModels.Add(new PlayerPotModel(playerAuthData.Guid));
 
                 _networkCardsModel.Clear();
 
