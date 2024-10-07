@@ -3,7 +3,7 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Models;
 public class PlayerPotModel
 {
     public string Guid;
-    public long PotCommitment;
+    public long PotCommitment;  
     public int HandStrength;
     public long ChipsRemaining;
     public bool IsFold;

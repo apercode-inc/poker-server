@@ -28,6 +28,7 @@ public class RoomPokerPayoutWinningsSystem : ISystem
 
     public void Dispose()
     {
+        _playerPotModelWinners = null;
         _filter = null;
     }
 
@@ -37,11 +38,11 @@ public class RoomPokerPayoutWinningsSystem : ISystem
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            var players = roomPokerPlayers.PlayerPotModels.Values;
+            var players = roomPokerPlayers.PlayerPotModels.Values.ToList();
             
-            while (PotChipsRemaining(players.ToList()) > 0)
+            while (PotChipsRemaining(players) > 0)
             {
-                PayOutWinners(CalculateAndSortWinners(players.ToList()), players.ToList());
+                PayOutWinners(CalculateAndSortWinners(players), players);
             }
 
             // Refund players if remaining chips in pot (bigger/folded stacks)
@@ -56,7 +57,7 @@ public class RoomPokerPayoutWinningsSystem : ISystem
                 player.PotCommitment = 0;
 
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Refund ---> Player: {player.Guid} chips: {player.ChipsRemaining} paid out.");
+                Console.WriteLine($"REFUND ---> Player: {player.Guid} chips: {player.ChipsRemaining} paid out.");
                 Console.ResetColor();
             }
 
@@ -64,7 +65,7 @@ public class RoomPokerPayoutWinningsSystem : ISystem
             Console.WriteLine($"*********************** Final results:");
             Console.ResetColor();
 
-            PotChipsRemaining(players.ToList());
+            PotChipsRemaining(players);
             
             _roomPokerPayoutWinnings.Remove(roomEntity);
         }
@@ -72,7 +73,7 @@ public class RoomPokerPayoutWinningsSystem : ISystem
 
     private List<PlayerPotModel> CalculateAndSortWinners(List<PlayerPotModel> playersInHand)
     {
-        int highHand = 0;
+        var highHand = 0;
         // Get highHand, skipping folded and empty pots
         foreach (var player in playersInHand)
         {
@@ -144,7 +145,7 @@ public class RoomPokerPayoutWinningsSystem : ISystem
                         paidWinners.Add(player);
 
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine($"Win ----> Player: {player.Guid} chips: {player.ChipsRemaining} paid out.");
+                        Console.WriteLine($"WIN ----> Player: {player.Guid} chips: {player.ChipsRemaining} paid out.");
                         Console.ResetColor();
                     }
                 }
