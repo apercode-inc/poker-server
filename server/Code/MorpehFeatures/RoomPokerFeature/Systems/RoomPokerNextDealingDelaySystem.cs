@@ -19,7 +19,6 @@ public class RoomPokerNextDealingDelaySystem : ISystem
         _filter = World.Filter
             .With<RoomPokerNextDealingTimer>()
             .With<RoomPokerPlayers>()
-            .Without<RoomPokerShowOrHideCards>()
             .Build();
     }
 

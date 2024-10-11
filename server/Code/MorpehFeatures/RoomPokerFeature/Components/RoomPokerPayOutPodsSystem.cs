@@ -1,3 +1,4 @@
+using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
@@ -14,6 +15,9 @@ public class RoomPokerPayOutPodsSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPaidOutToPlayers> _roomPokerPaidOutToPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
+    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
 
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
@@ -23,6 +27,8 @@ public class RoomPokerPayOutPodsSystem : ISystem
     [Injectable] private PlayerStorage _playerStorage;
     [Injectable] private CurrencyPlayerService _currencyPlayerService;
     [Injectable] private PlayerDbService _playerDbService;
+
+    [Injectable] private NetFrameServer _server;
 
     private Filter _filter;
 
@@ -69,6 +75,7 @@ public class RoomPokerPayOutPodsSystem : ISystem
                             ref var playerPokerCombination = ref _playerPokerCombination.Get(player);
                                 
                             Logger.Debug($"player:{playerNickname.Value} | combination: {playerPokerCombination.CombinationType} | handStrength:{playerPokerCombination.HandStrength} | win:{playerPotModel.ChipsRemaining}", ConsoleColor.Blue);
+                            //todo end
                         }
                         else
                         {
@@ -98,8 +105,18 @@ public class RoomPokerPayOutPodsSystem : ISystem
             else
             {
                 _roomPokerPaidOutToPlayers.Remove(roomEntity);
-                Logger.Debug($"можно переходить с следующей раздачи", ConsoleColor.Green);
-                //todo тут НАВЕРНОЕ можно переходить с следующей раздачи
+
+                ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+
+                if (roomPokerPlayers.MarkedPlayersBySeat.Count == 1)
+                {
+                    _roomPokerActive.Remove(roomEntity);
+                }
+
+                _roomPokerCleanupTimer.Set(roomEntity, new RoomPokerCleanupTimer
+                {
+                    Value = 0,
+                });
             }
         }
     }

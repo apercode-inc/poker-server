@@ -13,7 +13,6 @@ public class RoomPokerCheckStopGameSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
-    [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
     [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
     [Injectable] private Stash<RoomPokerShowOrHideCards> _roomPokerShowOrHideCards;
 
@@ -56,11 +55,6 @@ public class RoomPokerCheckStopGameSystem : ISystem
 
                 playerGivenBank.Add(player);
             }
-            
-            _roomPokerPlayersGivenBank.Set(roomEntity, new RoomPokerPlayersGivenBank
-            {
-                Players = playerGivenBank
-            });
 
             var dataframe = new RoomPokerStopGameResetTimerDataframe();
             _server.SendInRoom(ref dataframe, roomEntity);

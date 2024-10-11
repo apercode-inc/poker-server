@@ -8,6 +8,7 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.StartTimer;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 
@@ -24,6 +25,7 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
+    [Injectable] private Stash<PlayerAllin> _playerAllin;
 
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -74,6 +76,7 @@ public class RoomPokerCleanupGameSystem : ISystem
 
                 _playerTurnCompleteFlag.Remove(player);
                 _playerPokerCombination.Remove(player);
+                _playerAllin.Remove(player);
                 
                 var cardsDataframe = new RoomPokerSetCardsByPlayerDataframe
                 {
@@ -97,6 +100,8 @@ public class RoomPokerCleanupGameSystem : ISystem
             
             if (!_roomPokerActive.Has(roomEntity))
             {
+                var dataframe = new RoomPokerStopGameResetTimerDataframe();
+                _server.SendInRoom(ref dataframe, roomEntity);
                 continue;
             }
             

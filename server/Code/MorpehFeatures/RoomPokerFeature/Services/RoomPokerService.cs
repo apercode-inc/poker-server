@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -16,7 +17,6 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
     [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
-    [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
     [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
 
     [Injectable] private Stash<PlayerId> _playerId;
@@ -68,9 +68,8 @@ public class RoomPokerService : IInitializer
         }
 
         var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);
-        var overOnePlayerToTable = markedPlayersBySeat.Count > 1;
 
-        if (isRemove && overOnePlayerToTable)
+        if (isRemove)
         {
             foreach (var markerByPlayer in _markersByPlayer)
             {
@@ -210,19 +209,10 @@ public class RoomPokerService : IInitializer
             withCardsPlayers.Add(player);
         }
         
-        if (withCardsPlayers.length == 1)
+        Logger.Debug("call from [RoomPokerService.SetActivePlayerMarkerOrGivenBank]");
+        if (markedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out var nextPlayerActive))
         {
-            _roomPokerPlayersGivenBank.Set(roomEntity, new RoomPokerPlayersGivenBank
-            {
-                Players = withCardsPlayers,
-            });
-        }
-        else
-        {
-            if (markedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out var nextPlayerActive))
-            {
-                _playerSetPokerTurn.Set(nextPlayerActive.Value);
-            }
+            _playerSetPokerTurn.Set(nextPlayerActive.Value);
         }
     }
 
