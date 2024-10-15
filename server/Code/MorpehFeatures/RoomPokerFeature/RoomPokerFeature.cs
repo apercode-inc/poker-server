@@ -68,9 +68,9 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerSetStrengthHandSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerCalculatePayoutWinningsSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPayOutPodsSystem>());
-
-        //systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
-
+        
+        
+        
         //End game logic
         systemsGroup.AddSystem(container.New<RoomPokerCleanupGameSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerNextDealingDelaySystem>());

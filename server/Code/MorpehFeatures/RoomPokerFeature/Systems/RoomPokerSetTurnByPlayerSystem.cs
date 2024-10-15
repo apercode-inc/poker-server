@@ -66,18 +66,16 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                 
                 continue;
             }
-
-            //todo тут игра была оборвана намеренно, можно сделать запрос игроку на показ/скрытие карт (внутри метода!!!!)
+            
             if (_roomPokerService.TryStopRoundGame(roomEntity))
             {
+                //todo тут игра была оборвана намеренно, можно сделать запрос игроку на показ/скрытие карт (внутри метода!!!!)
                 continue;
             }
 
             if (AllInExceptOne(playerEntity, roomEntity))
             {
-                //todo все игроки должны показать обязательно свои карты 
-                _playerPokerCheck.Set(playerEntity);
-                _playerTurnTimerReset.Set(playerEntity);
+                //todo все игроки должны показать обязательно свои карты (внутри метода!!!!)
                 continue;
             }
             
@@ -174,7 +172,16 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             count++;
         }
 
-        return count > 0;
+        if (count <= 0)
+        {
+            return false;
+        }
+        
+        _playerPokerCheck.Set(playerEntity);
+        _playerTurnTimerReset.Set(playerEntity);
+            
+        return true;
+
     }
 
     public void Dispose()
