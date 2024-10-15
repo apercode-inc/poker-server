@@ -63,8 +63,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                 {
                     _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
                 }
-
-                //todo все игроки должны показать обязательно свои карты 
+                
                 continue;
             }
 
