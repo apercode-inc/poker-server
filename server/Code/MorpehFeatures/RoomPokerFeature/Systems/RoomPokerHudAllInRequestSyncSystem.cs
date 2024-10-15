@@ -55,7 +55,7 @@ public class RoomPokerHudAllInRequestSyncSystem : IInitializer
         }
 
         ref var playerPokerContribution = ref _playerPokerContribution.Get(player);
-
+        
         _playerSetBet.Set(player, new PlayerSetBet
         {
             Bet = playerPokerContribution.Value,

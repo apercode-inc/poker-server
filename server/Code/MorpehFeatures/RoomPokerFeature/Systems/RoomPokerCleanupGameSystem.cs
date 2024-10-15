@@ -65,7 +65,8 @@ public class RoomPokerCleanupGameSystem : ISystem
             _roomPokerCardDeskService.ReturnCardsInDeskToTable(roomEntity);
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
+            roomPokerPlayers.PlayerPotModels.Clear();
+            
             foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var player = markedPlayer.Value;

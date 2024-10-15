@@ -39,7 +39,7 @@ public class RoomPokerSetBetByPlayerSystem : ISystem
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
 
             var roomEntity = playerRoomPoker.RoomEntity;
-            
+
             if (_currencyPlayerService.TrySetBet(roomEntity, playerEntity, roomPokerSetBet.Bet))
             {
                 ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
@@ -50,7 +50,11 @@ public class RoomPokerSetBetByPlayerSystem : ISystem
                     _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
                 }
             }
-
+            else
+            {
+                Logger.Error($"[RoomPokerSetBetByPlayerSystem.OnUpdate] error set bet");
+            }
+            
             _playerTurnCompleteFlag.Set(playerEntity);
             _playerSetBet.Remove(playerEntity);
         }

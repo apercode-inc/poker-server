@@ -18,6 +18,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
     [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
     [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
+    [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
 
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
@@ -175,6 +176,32 @@ public class RoomPokerService : IInitializer
         }
     }
 
+    public bool TryStopRoundGame(Entity roomEntity)
+    {
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+        var playersWithCardsPlayersCount = 0;
+        
+        foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
+        {
+            var player = markedPlayer.Value;
+            ref var playerCards = ref _playerCards.Get(player);
+            
+            if (playerCards.CardsState != CardsState.Empty)
+            {
+                playersWithCardsPlayersCount++;
+            }
+        }
+
+        if (playersWithCardsPlayersCount > 1)
+        {
+            return false;
+        }
+
+        _roomPokerPayoutWinnings.Set(roomEntity);
+
+        return true;
+    }
+
     private void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
     {
         _playerDealer.Set(nextMarkedPlayer);
@@ -209,10 +236,14 @@ public class RoomPokerService : IInitializer
             withCardsPlayers.Add(player);
         }
         
-        Logger.Debug("call from [RoomPokerService.SetActivePlayerMarkerOrGivenBank]");
         if (markedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out var nextPlayerActive))
         {
-            _playerSetPokerTurn.Set(nextPlayerActive.Value);
+            var player = nextPlayerActive.Value;
+
+            if (!player.IsNullOrDisposed())
+            {
+                _playerSetPokerTurn.Set(player);
+            }
         }
     }
 
