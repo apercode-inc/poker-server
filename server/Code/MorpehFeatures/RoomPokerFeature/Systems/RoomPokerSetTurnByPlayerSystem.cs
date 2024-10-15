@@ -64,9 +64,11 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                     _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
                 }
 
+                //todo все игроки должны показать обязательно свои карты 
                 continue;
             }
 
+            //todo тут игра была оборвана намеренно, можно сделать запрос игроку на показ/скрытие карт (внутри метода!!!!)
             if (_roomPokerService.TryStopRoundGame(roomEntity))
             {
                 continue;
@@ -74,6 +76,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
 
             if (AllInExceptOne(playerEntity, roomEntity))
             {
+                //todo все игроки должны показать обязательно свои карты 
                 _playerPokerCheck.Set(playerEntity);
                 _playerTurnTimerReset.Set(playerEntity);
                 continue;

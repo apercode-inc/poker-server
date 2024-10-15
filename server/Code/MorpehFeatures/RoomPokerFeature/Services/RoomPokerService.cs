@@ -196,7 +196,7 @@ public class RoomPokerService : IInitializer
         {
             return false;
         }
-
+        
         _roomPokerPayoutWinnings.Set(roomEntity);
 
         return true;
