@@ -5,7 +5,15 @@ namespace server.Code.GlobalUtils;
 
 public static class Logger
 {
-    public static void Debug(string text, ConsoleColor color = ConsoleColor.Cyan, bool isSend = false)
+    public static void Debug(string text, bool isSend = false)
+    {
+        if (isSend)
+        {
+            SentrySdk.CaptureMessage(text, SentryLevel.Debug);
+        }
+    }
+    
+    public static void DebugColor(string text, ConsoleColor color = ConsoleColor.Cyan, bool isSend = false)
     {
         Console.ForegroundColor = color;
         Console.WriteLine(text);

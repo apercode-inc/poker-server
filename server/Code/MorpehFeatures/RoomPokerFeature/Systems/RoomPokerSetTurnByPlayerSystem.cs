@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -22,6 +21,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerAllin> _playerAllin;
     [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
+    [Injectable] private Stash<PlayerShowdownForced> _playerShowdownForced;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
@@ -66,7 +66,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                 
                 continue;
             }
-            
+
             if (_roomPokerService.TryStopRoundGame(roomEntity))
             {
                 //todo тут игра была оборвана намеренно, можно сделать запрос игроку на показ/скрытие карт (внутри метода!!!!)
@@ -75,7 +75,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
 
             if (AllInExceptOne(playerEntity, roomEntity))
             {
-                //todo все игроки должны показать обязательно свои карты (внутри метода!!!!)
+                //todo отправляет showdown по несколько раз одним и тем же игрокам!!!!!!!
                 continue;
             }
             
@@ -150,7 +150,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
         ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
 
         var isCalled = playerPokerCurrentBet.Value >= roomPokerMaxBet.Value;
-
+    
         if (!isCalled)
         {
             return false;
@@ -168,6 +168,8 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             {
                 continue;
             }
+            
+            _playerShowdownForced.Set(otherPlayerEntity);
 
             count++;
         }
@@ -176,6 +178,8 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
         {
             return false;
         }
+        
+        _playerShowdownForced.Set(playerEntity);
         
         _playerPokerCheck.Set(playerEntity);
         _playerTurnTimerReset.Set(playerEntity);

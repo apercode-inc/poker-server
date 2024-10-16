@@ -39,10 +39,10 @@ public static class MovingMarkersDictionaryTest
         var removePlayer = megPlayer;
         if (playersBySeat.Remove(removePlayer, _movedPlayersByMarker))
         {
-            Logger.Debug($"remove player: {removePlayer.Nickname}", ConsoleColor.Magenta);
+            Logger.DebugColor($"remove player: {removePlayer.Nickname}", ConsoleColor.Magenta);
             foreach (var playerNewMarked in _movedPlayersByMarker)
             {
-                Logger.Debug($"next marked {playerNewMarked.Key}: {playerNewMarked.Value.Nickname}" , ConsoleColor.Magenta);
+                Logger.DebugColor($"next marked {playerNewMarked.Key}: {playerNewMarked.Value.Nickname}" , ConsoleColor.Magenta);
             }
         }
         
@@ -52,7 +52,7 @@ public static class MovingMarkersDictionaryTest
         var moveMarker = PokerPlayerMarkerType.ActivePlayer;
         if (playersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out var nextMarkedPlayer))
         {
-            Logger.Debug($"Move Marker {moveMarker}, next marked player: {nextMarkedPlayer.Value.Nickname}" , ConsoleColor.Magenta);
+            Logger.DebugColor($"Move Marker {moveMarker}, next marked player: {nextMarkedPlayer.Value.Nickname}" , ConsoleColor.Magenta);
         }
         
         ShowAllPlayers(playersBySeat);
@@ -60,7 +60,7 @@ public static class MovingMarkersDictionaryTest
         
         playersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer, PokerPlayerMarkerType.DealerPlayer);
         
-        Logger.Debug($"Reset all markers", ConsoleColor.Magenta);
+        Logger.DebugColor($"Reset all markers", ConsoleColor.Magenta);
         
         ShowAllPlayers(playersBySeat);
         ShowNextActivePlayer(playersBySeat);
@@ -75,7 +75,7 @@ public static class MovingMarkersDictionaryTest
     {
         if (playersBySeat.TryGetNext(PokerPlayerMarkerType.ActivePlayer, out var nextActive))
         {
-            Logger.Debug($"next player after active: {nextActive.Value.Nickname}", ConsoleColor.Yellow);
+            Logger.DebugColor($"next player after active: {nextActive.Value.Nickname}", ConsoleColor.Yellow);
         }
         else
         {
@@ -87,7 +87,7 @@ public static class MovingMarkersDictionaryTest
     {
         foreach (var playerBySeat in playersBySeat)
         {
-            Logger.Debug(
+            Logger.DebugColor(
                 $"seat: {playerBySeat.Key} | player: {playerBySeat.Value.Nickname} | isDealer: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.DealerPlayer])} | isActive: {GetFormat(playerBySeat.Markers[PokerPlayerMarkerType.ActivePlayer])}",
                 ConsoleColor.Green);
         }

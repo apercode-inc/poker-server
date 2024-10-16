@@ -15,13 +15,17 @@ public struct RoomPokerSetCardsByPlayerDataframe : INetworkDataframe
     {
         writer.WriteInt(PlayerId);
         writer.WriteInt((int) CardsState);
-        writer.WriteInt(Cards?.Count ?? 0);
+        
+        var hasCards = Cards != null;
+        writer.WriteBool(hasCards);
 
-        if (Cards != null)
+        if (hasCards)
         {
-            foreach (var user in Cards)
+            writer.WriteInt(Cards.Count);
+            
+            foreach (var card in Cards)
             {
-                writer.Write(user);
+                writer.Write(card);
             }
         }
     }
@@ -31,11 +35,11 @@ public struct RoomPokerSetCardsByPlayerDataframe : INetworkDataframe
         PlayerId = reader.ReadInt();
         CardsState = (CardsState) reader.ReadInt();    
         
-        var count = reader.ReadInt();
-
-        if (count > 0)
+        if (reader.ReadBool())
         {
+            var count = reader.ReadInt();
             Cards = new List<RoomPokerCardNetworkModel>();
+
             for (var i = 0; i < count; i++)
             {
                 Cards.Add(reader.Read<RoomPokerCardNetworkModel>());

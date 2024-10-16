@@ -74,7 +74,7 @@ public class RoomPokerPayOutPodsSystem : ISystem
                             ref var playerNickname = ref _playerNickname.Get(player);
                             ref var playerPokerCombination = ref _playerPokerCombination.Get(player);
                                 
-                            Logger.Debug($"player:{playerNickname.Value} | combination: {playerPokerCombination.CombinationType} | handStrength:{playerPokerCombination.HandStrength} | win:{playerPotModel.ChipsRemaining}", ConsoleColor.Blue);
+                            Logger.DebugColor($"player:{playerNickname.Value} | combination: {playerPokerCombination.CombinationType} | handStrength:{playerPokerCombination.HandStrength} | win:{playerPotModel.ChipsRemaining}", ConsoleColor.Blue);
                             //todo end
                         }
                         else
@@ -88,7 +88,7 @@ public class RoomPokerPayOutPodsSystem : ISystem
                         switch (roomPokerStats.CurrencyType)
                         {
                             case CurrencyType.Chips:
-                                _playerDbService.IncreaseChipsPlayerAsync(playerPotModel.Guid, playerPotModel.ChipsRemaining)
+                                _playerDbService.IncreaseChipsPlayerThreadPool(playerPotModel.Guid, playerPotModel.ChipsRemaining)
                                     .Forget();
                                 break;
                             case CurrencyType.Gold:

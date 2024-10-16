@@ -53,7 +53,7 @@ public class PlayerDbService : IInitializer
     
     public async Task<DbPlayerModel> IncreaseChipsPlayerThreadPool(string uniqueId, long chips)
     {
-        return await Task.Run(async () => await UpdateChipsPlayerAsync(uniqueId, chips));
+        return await Task.Run(async () => await IncreaseChipsPlayerAsync(uniqueId, chips));
     }
     
     public async Task<DbPlayerModel> IncreaseChipsPlayerAsync(string uniqueId, long chips)
