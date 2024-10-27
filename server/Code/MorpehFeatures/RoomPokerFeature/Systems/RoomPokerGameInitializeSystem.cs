@@ -7,6 +7,7 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
+using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -18,13 +19,14 @@ public class RoomPokerGameInitializeSystem : ISystem
     [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
-
     [Injectable] private Stash<PlayerDealer> _playerDealer;
+
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
 
     [Injectable] private RoomPokerCardDeskService _cardDeskService;
-
+    [Injectable] private RoomPokerService _roomPokerService;
+    
     [Injectable] private NetFrameServer _server;
 
     private Filter _filter;
@@ -59,25 +61,17 @@ public class RoomPokerGameInitializeSystem : ISystem
             roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer, 
                 PokerPlayerMarkerType.NextRoundActivePlayer);
 
-            int dealerPlayerId;
+            Entity dealerPlayer;
 
             if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.DealerPlayer, 
                     out var markedPlayer))
             {
-                var playerEntity = markedPlayer.Value;
-                
-                ref var playerId = ref _playerId.Get(playerEntity);
-                dealerPlayerId = playerId.Id;
+                dealerPlayer = markedPlayer.Value;
             }
             else
             {
                 markedPlayer = roomPokerPlayers.MarkedPlayersBySeat.GetFirst();
-                    
-                var playerEntity = markedPlayer.Value;
-                roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.DealerPlayer);
-                    
-                ref var playerId = ref _playerId.Get(playerEntity);
-                dealerPlayerId = playerId.Id;
+                dealerPlayer = markedPlayer.Value;
             }
 
             if (roomPokerPlayers.MarkedPlayersBySeat.TryGetNext(PokerPlayerMarkerType.DealerPlayer, out markedPlayer))
@@ -88,11 +82,7 @@ public class RoomPokerGameInitializeSystem : ISystem
                 roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.NextRoundActivePlayer);
             }
             
-            var dataframe = new RoomPokerSetDealerDataframe
-            {
-                PlayerId = dealerPlayerId
-            };
-            _server.SendInRoom(ref dataframe, roomEntity);
+            _roomPokerService.SetDealerPlayerMarker(roomEntity, dealerPlayer);
             
             _roomPokerDealingCardsToPlayer.Set(roomEntity);
             _roomPokerGameInitialize.Remove(roomEntity);
