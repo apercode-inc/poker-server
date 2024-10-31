@@ -39,6 +39,8 @@ public static class RoomPokerFeature
         systemsGroup.AddInitializer(container.New<RoomPokerHudAllInRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerHudFoldRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerHudCheckRequestSyncSystem>());
+        systemsGroup.AddInitializer(container.New<RoomPokerHudShowCardsRequestSyncSystem>());
+        systemsGroup.AddInitializer(container.New<RoomPokerHudHideCardsRequestSyncSystem>());
 
         systemsGroup.AddSystem(container.New<RoomPokerCreateOrJoinSendSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerLeftSystem>());
@@ -69,7 +71,12 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerSetStrengthHandSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerCalculatePayoutWinningsSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPayOutPodsSystem>());
-
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownTurnCheckSystem>());
+        
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownTurnRequestByPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerTickTimerTurnShowdownByPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerResetTimerTurnShowdownByPlayerSystem>());
+        
         systemsGroup.AddSystem(container.New<RoomPokerShowdownForcedByPlayerSystem>());
         
         //End game logic

@@ -20,6 +20,7 @@ public class RoomPokerPayOutPodsSystem : ISystem
     [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
+    [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
 
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
@@ -115,13 +116,8 @@ public class RoomPokerPayOutPodsSystem : ISystem
                 {
                     _roomPokerActive.Remove(roomEntity);
                 }
-                
-                var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
 
-                _roomPokerCleanupTimer.Set(roomEntity, new RoomPokerCleanupTimer
-                {
-                    Value = config.DelayCleanup,
-                });
+                _roomPokerShowdownChoiceCheck.Set(roomEntity);
             }
         }
     }
