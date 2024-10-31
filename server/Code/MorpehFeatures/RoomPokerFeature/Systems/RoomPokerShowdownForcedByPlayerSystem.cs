@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
@@ -39,7 +40,15 @@ public class RoomPokerShowdownForcedByPlayerSystem : ISystem
     {
         foreach (var playerEntity in _filter)
         {
+            _playerShowdownForced.Remove(playerEntity);
+            
             ref var playerCards = ref _playerCards.Get(playerEntity);
+
+            if (playerCards.CardsState != CardsState.Close)
+            {
+                continue;
+            }
+            
             playerCards.CardsState = CardsState.Open;
 
             ref var playerId = ref _playerId.Get(playerEntity);
@@ -56,15 +65,16 @@ public class RoomPokerShowdownForcedByPlayerSystem : ISystem
                 });
             }
 
+            ref var playerNickname = ref playerEntity.GetComponent<PlayerNickname>();
+            
+            Logger.Debug($"force showdown player: {playerNickname.Value}");
             var dataframe = new RoomPokerSetCardsByPlayerDataframe
             {
                 PlayerId = playerId.Id,
                 CardsState = CardsState.Open,
                 Cards = _networkCardsModel,
             };
-            _server.Send(ref dataframe, playerRoomPoker.RoomEntity);
-
-            _playerShowdownForced.Remove(playerEntity);
+            _server.SendInRoom(ref dataframe, playerRoomPoker.RoomEntity);
         }
     }
     

@@ -29,6 +29,8 @@ public class RoomPokerSetCardsToTableSystem : ISystem
     [Injectable] private Stash<RoomPokerSetCardsTickTimer> _roomPokerSetCardsTickTimer;
     [Injectable] private Stash<RoomPokerDetectCombination> _roomPokerDetectCombination;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<RoomPokerAllShowdown> _roomPokerAllShowdown;
+    [Injectable] private Stash<RoomPokerAllShowdownSet> _roomPokerAllShowdownSet;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
 
@@ -56,17 +58,21 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         foreach (var roomEntity in _filter)
         {
             _roomPokerSetCardsToTable.Remove(roomEntity);
-            
+
             if (_roomPokerService.TryStopRoundGame(roomEntity))
             {
                 continue;
+            }
+            
+            if (!_roomPokerAllShowdown.Has(roomEntity) && _roomPokerService.AllShowdownPlayers(roomEntity))
+            {
+                _roomPokerAllShowdownSet.Set(roomEntity);
             }
             
             ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
 
             var cards = roomPokerCardsToTable.Cards;
             roomPokerCardsToTable.State++;
-            
 
             switch (roomPokerCardsToTable.State)
             {

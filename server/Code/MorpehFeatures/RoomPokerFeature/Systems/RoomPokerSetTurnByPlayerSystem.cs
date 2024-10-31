@@ -21,7 +21,6 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerAllin> _playerAllin;
     [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
-    [Injectable] private Stash<PlayerShowdownForced> _playerShowdownForced;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
@@ -55,7 +54,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             var roomEntity = playerRoomPoker.RoomEntity;
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-            
+
             if (playerCards.CardsState == CardsState.Empty || _playerAllin.Has(playerEntity))
             {
                 if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer,
@@ -69,16 +68,14 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
 
             if (_roomPokerService.TryStopRoundGame(roomEntity))
             {
-                //todo тут игра была оборвана намеренно, можно сделать запрос игроку на показ/скрытие карт (внутри метода!!!!)
                 continue;
             }
 
             if (AllInExceptOne(playerEntity, roomEntity))
             {
-                //todo отправляет showdown по несколько раз одним и тем же игрокам!!!!!!!
                 continue;
             }
-            
+
             ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
             
             ref var playerPokerContribution = ref _playerPokerContribution.Get(playerEntity);
@@ -142,7 +139,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             });
         }
     }
-    
+
     private bool AllInExceptOne(Entity playerEntity, Entity roomEntity)
     {
         ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
@@ -168,8 +165,6 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             {
                 continue;
             }
-            
-            _playerShowdownForced.Set(otherPlayerEntity);
 
             count++;
         }
@@ -178,8 +173,6 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
         {
             return false;
         }
-        
-        _playerShowdownForced.Set(playerEntity);
         
         _playerPokerCheck.Set(playerEntity);
         _playerTurnTimerReset.Set(playerEntity);

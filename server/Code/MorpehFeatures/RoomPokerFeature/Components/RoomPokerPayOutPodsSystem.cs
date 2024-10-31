@@ -2,12 +2,14 @@ using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.CurrencyFeature.Services;
 using server.Code.MorpehFeatures.DataBaseFeature.Utils;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
+using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
@@ -22,6 +24,7 @@ public class RoomPokerPayOutPodsSystem : ISystem
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
+    [Injectable] private Stash<PlayerShowdownForced> _playerShowdownForced;
 
     [Injectable] private ConfigsService _configsService;
     [Injectable] private PlayerStorage _playerStorage;
@@ -69,11 +72,11 @@ public class RoomPokerPayOutPodsSystem : ISystem
                         if (playerRoomExist && playerRoomPoker.RoomEntity == roomEntity)
                         {
                             _currencyPlayerService.TryGiveBank(roomEntity, player, playerPotModel.ChipsRemaining);
-                            
+                            _playerShowdownForced.Set(player);
+
                             //todo debug!!!
                             ref var playerNickname = ref _playerNickname.Get(player);
                             ref var playerPokerCombination = ref _playerPokerCombination.Get(player);
-                                
                             Logger.DebugColor($"player:{playerNickname.Value} | combination: {playerPokerCombination.CombinationType} | handStrength:{playerPokerCombination.HandStrength} | win:{playerPotModel.ChipsRemaining}", ConsoleColor.Blue);
                             //todo end
                         }
@@ -112,10 +115,12 @@ public class RoomPokerPayOutPodsSystem : ISystem
                 {
                     _roomPokerActive.Remove(roomEntity);
                 }
+                
+                var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
 
                 _roomPokerCleanupTimer.Set(roomEntity, new RoomPokerCleanupTimer
                 {
-                    Value = 0,
+                    Value = config.DelayCleanup,
                 });
             }
         }

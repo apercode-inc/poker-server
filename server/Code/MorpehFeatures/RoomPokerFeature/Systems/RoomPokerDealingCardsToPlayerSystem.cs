@@ -104,11 +104,12 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
                     Cards = _networkCardsModel,
                 };
                 _server.Send(ref dataframe, playerId.Id);
-                
+
                 var dataframeOtherPlayers = new RoomPokerSetCardsByPlayerDataframe
                 {
                     PlayerId = playerId.Id,
                     CardsState = CardsState.Close,
+                    Cards = new List<RoomPokerCardNetworkModel>(),
                 };
                 _server.SendInRoomExcept(ref dataframeOtherPlayers, roomEntity, playerEntity);
             }

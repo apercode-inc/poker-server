@@ -201,6 +201,33 @@ public class RoomPokerService : IInitializer
 
         return true;
     }
+    
+    public bool AllShowdownPlayers(Entity roomEntity)
+    {
+        var allInCount = 0;
+        var inGameCount = 0;
+
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+
+        foreach (var markedPlayers in roomPokerPlayers.MarkedPlayersBySeat)
+        {
+            var otherPlayerEntity = markedPlayers.Value;
+
+            if (_playerAllin.Has(otherPlayerEntity))
+            {
+                allInCount++;
+            }
+
+            ref var playerCards = ref _playerCards.Get(otherPlayerEntity);
+
+            if (playerCards.CardsState != CardsState.Empty)
+            {
+                inGameCount++;
+            }
+        }
+        
+        return inGameCount - allInCount <= 1;
+    }
 
     private void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
     {
