@@ -1,5 +1,6 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AdsFeature;
 using server.Code.MorpehFeatures.CleanupDestroyFeature;
 using server.Code.MorpehFeatures.ConfigsFeature;
 using server.Code.MorpehFeatures.ConnectionFeature;
@@ -36,6 +37,7 @@ public static class MorpehInitializer
 
         // Systems
         AuthenticationFeature.Add(world, ref groupIndex, container);
+        AdsFeature.Add(world, ref groupIndex, container);
         ConfigsFeature.Add(world, ref groupIndex, container);
         ConnectionFeature.Add(world, ref groupIndex, container);
         PlayersFeature.Add(world, ref groupIndex, container);
