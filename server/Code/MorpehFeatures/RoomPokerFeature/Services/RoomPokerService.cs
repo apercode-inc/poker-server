@@ -19,6 +19,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
     [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
+    [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
 
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
@@ -176,7 +177,7 @@ public class RoomPokerService : IInitializer
         }
     }
 
-    public bool TryStopRoundGame(Entity roomEntity)
+    public bool TryOnePlayerRoundGame(Entity roomEntity)
     {
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         var playersWithCardsPlayersCount = 0;
@@ -197,6 +198,7 @@ public class RoomPokerService : IInitializer
             return false;
         }
         
+        _roomPokerOnePlayerRoundGame.Set(roomEntity);
         _roomPokerPayoutWinnings.Set(roomEntity);
 
         return true;

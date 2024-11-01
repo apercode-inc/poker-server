@@ -71,8 +71,8 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerSetStrengthHandSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerCalculatePayoutWinningsSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPayOutPodsSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerShowdownTurnCheckSystem>());
         
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownTurnCheckSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerShowdownTurnRequestByPlayerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerTickTimerTurnShowdownByPlayerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerResetTimerTurnShowdownByPlayerSystem>());

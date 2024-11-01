@@ -59,7 +59,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         {
             _roomPokerSetCardsToTable.Remove(roomEntity);
 
-            if (_roomPokerService.TryStopRoundGame(roomEntity))
+            if (_roomPokerService.TryOnePlayerRoundGame(roomEntity))
             {
                 continue;
             }

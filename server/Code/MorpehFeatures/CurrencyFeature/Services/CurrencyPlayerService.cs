@@ -40,7 +40,7 @@ public class CurrencyPlayerService : IInitializer
     {
         ref var roomPokerBank = ref _roomPokerBank.Get(room);
 
-        if (roomPokerBank.OnTable <= 0)
+        if (roomPokerBank.Total <= 0)
         {
             return false;
         }

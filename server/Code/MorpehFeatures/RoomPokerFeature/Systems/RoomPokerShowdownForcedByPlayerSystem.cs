@@ -65,9 +65,6 @@ public class RoomPokerShowdownForcedByPlayerSystem : ISystem
                 });
             }
 
-            ref var playerNickname = ref playerEntity.GetComponent<PlayerNickname>();
-            
-            Logger.Debug($"force showdown player: {playerNickname.Value}");
             var dataframe = new RoomPokerSetCardsByPlayerDataframe
             {
                 PlayerId = playerId.Id,

@@ -66,7 +66,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                 continue;
             }
 
-            if (_roomPokerService.TryStopRoundGame(roomEntity))
+            if (_roomPokerService.TryOnePlayerRoundGame(roomEntity))
             {
                 continue;
             }

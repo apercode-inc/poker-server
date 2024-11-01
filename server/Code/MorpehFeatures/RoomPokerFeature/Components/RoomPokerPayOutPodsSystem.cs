@@ -2,14 +2,12 @@ using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.CurrencyFeature.Services;
 using server.Code.MorpehFeatures.DataBaseFeature.Utils;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
-using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
@@ -21,6 +19,7 @@ public class RoomPokerPayOutPodsSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
+    [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
 
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
@@ -73,7 +72,11 @@ public class RoomPokerPayOutPodsSystem : ISystem
                         if (playerRoomExist && playerRoomPoker.RoomEntity == roomEntity)
                         {
                             _currencyPlayerService.TryGiveBank(roomEntity, player, playerPotModel.ChipsRemaining);
-                            _playerShowdownForced.Set(player);
+
+                            if (!_roomPokerOnePlayerRoundGame.Has(roomEntity))
+                            {
+                                _playerShowdownForced.Set(player);
+                            }
 
                             //todo debug!!!
                             ref var playerNickname = ref _playerNickname.Get(player);

@@ -22,6 +22,7 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
     [Injectable] private Stash<RoomPokerAllShowdown> _roomPokerAllShowdown;
+    [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
     
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
@@ -66,6 +67,7 @@ public class RoomPokerCleanupGameSystem : ISystem
 
             _roomPokerCardDeskService.ReturnCardsInDeskToTable(roomEntity);
             _roomPokerAllShowdown.Remove(roomEntity);
+            _roomPokerOnePlayerRoundGame.Remove(roomEntity);
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             roomPokerPlayers.PlayerPotModels.Clear();
