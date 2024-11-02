@@ -39,7 +39,7 @@ public class AdsRewardedVideoCheckCooldownSystem : ISystem
             {
                 continue;
             }
-
+            
             _playerAdsRewardedVideoCooldown.Remove(entity);
             _playerAdsRewardedVideoState.Set(entity, new PlayerAdsRewardedVideoState
             {
@@ -47,7 +47,10 @@ public class AdsRewardedVideoCheckCooldownSystem : ISystem
             });
 
             ref var playerId = ref _playerId.Get(entity);
-            var dataframe = new AdsSetShowRewardedVideoDataframe();
+            var dataframe = new AdsSetShowRewardedVideoDataframe
+            {
+                CanShow = true,
+            };
             _server.Send(ref dataframe, playerId.Id);
         }
     }

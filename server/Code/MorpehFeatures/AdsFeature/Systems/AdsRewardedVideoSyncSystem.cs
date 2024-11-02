@@ -73,6 +73,12 @@ public class AdsRewardedVideoSyncSystem : IInitializer
         {
             Timer = config.RewardedAdsShowCooldown,
         });
+
+        var setShowDataframe = new AdsSetShowRewardedVideoDataframe
+        {
+            CanShow = false
+        };
+        _server.Send(ref setShowDataframe, sender);
     }
 
     public void Dispose() { }

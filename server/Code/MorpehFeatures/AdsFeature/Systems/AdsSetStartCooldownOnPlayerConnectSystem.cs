@@ -11,7 +11,8 @@ public class AdsSetStartCooldownOnPlayerConnectSystem : ISystem
 {
     [Injectable] private Stash<PlayerAdsRewardedVideoCooldown> _playerAdsRewardedVideoCooldown;
     [Injectable] private Stash<PlayerAdsRewardedVideoState> _playerAdsRewardedVideoState;
-
+    [Injectable] private Stash<PlayerInitializeAds> _playerInitializeAds;
+    
     [Injectable] private ConfigsService _configsService;
     
     private Filter _filter;
@@ -22,7 +23,7 @@ public class AdsSetStartCooldownOnPlayerConnectSystem : ISystem
     {
         _filter = World.Filter
             .With<PlayerId>()
-            .With<PlayerInitialize>()
+            .With<PlayerInitializeAds>()
             .Build();
     }
 
@@ -44,6 +45,8 @@ public class AdsSetStartCooldownOnPlayerConnectSystem : ISystem
             {
                 Value = AdsPlayerState.Cooldown,
             });
+
+            _playerInitializeAds.Remove(entity);
         }
     }
 
