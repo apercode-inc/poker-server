@@ -16,7 +16,6 @@ public class RoomPokerListRequestSyncSystem : IInitializer
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private Stash<PlayerNickname> _playerNickname;
-    [Injectable] private Stash<PlayerDealer> _playerDealer;
     [Injectable] private Stash<PlayerCards> _playerCards;
 
     [Injectable] private NetFrameServer _server;

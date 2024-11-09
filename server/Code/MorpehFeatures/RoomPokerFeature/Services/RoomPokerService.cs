@@ -161,7 +161,7 @@ public class RoomPokerService : IInitializer
         }
     }
 
-    private void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
+    public void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
     {
         _playerDealer.Set(nextMarkedPlayer);
         
