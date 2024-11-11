@@ -77,12 +77,6 @@ public class RoomPokerPayOutPodsSystem : ISystem
                             {
                                 _playerShowdownForced.Set(player);
                             }
-
-                            //todo debug!!!
-                            ref var playerNickname = ref _playerNickname.Get(player);
-                            ref var playerPokerCombination = ref _playerPokerCombination.Get(player);
-                            Logger.DebugColor($"player:{playerNickname.Value} | combination: {playerPokerCombination.CombinationType} | handStrength:{playerPokerCombination.HandStrength} | win:{playerPotModel.ChipsRemaining}", ConsoleColor.Blue);
-                            //todo end
                         }
                         else
                         {
