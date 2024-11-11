@@ -176,7 +176,7 @@ public class RoomPokerService : IInitializer
             }
         }
     }
-
+    
     public bool TryOnePlayerRoundGame(Entity roomEntity)
     {
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
@@ -230,8 +230,8 @@ public class RoomPokerService : IInitializer
         
         return inGameCount - allInCount <= 1;
     }
-
-    private void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
+    
+    public void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
     {
         _playerDealer.Set(nextMarkedPlayer);
         
