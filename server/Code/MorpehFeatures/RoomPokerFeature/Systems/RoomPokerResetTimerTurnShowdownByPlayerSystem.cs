@@ -52,12 +52,7 @@ public class RoomPokerResetTimerTurnShowdownByPlayerSystem : ISystem
             _playerTurnShowdownResetTimer.Remove(playerEntity);
         }
     }
-    
-    private void ClearTimer(Entity roomEntity, Entity playerEntity)
-    {
-       
-    }
-    
+
     public void Dispose()
     {
         _filter = null;

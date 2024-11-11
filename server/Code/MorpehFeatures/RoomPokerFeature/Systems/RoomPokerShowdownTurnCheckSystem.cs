@@ -28,6 +28,7 @@ public class RoomPokerShowdownTurnCheckSystem : ISystem
     {
         _filter = World.Filter
             .With<RoomPokerShowdownChoiceCheck>()
+            .With<RoomPokerActive>()
             .With<RoomPokerPlayers>()
             .Build();
     }
