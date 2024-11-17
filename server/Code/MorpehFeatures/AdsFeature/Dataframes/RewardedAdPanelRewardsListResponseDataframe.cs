@@ -26,7 +26,8 @@ public struct RewardedAdPanelRewardsListResponseDataframe : INetworkDataframe
     public void Read(NetFrameReader reader)
     {
         PanelId = reader.ReadString();
-            
+
+        Rewards = null;
         int count = reader.ReadInt();
         if (count == 0) return;
 
