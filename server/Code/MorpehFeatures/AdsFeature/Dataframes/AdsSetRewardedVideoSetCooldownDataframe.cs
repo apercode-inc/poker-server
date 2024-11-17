@@ -3,20 +3,20 @@ using NetFrame.WriteAndRead;
 
 namespace server.Code.MorpehFeatures.AdsFeature.Dataframes;
 
-public struct AdsRewardedVideoResultDataframe : INetworkDataframe
+public struct AdsSetRewardedVideoSetCooldownDataframe : INetworkDataframe
 {
     public string PanelId;
-    public bool IsCompleted;
+    public bool OnCooldown;
         
     public void Write(NetFrameWriter writer)
     {
         writer.WriteString(PanelId);
-        writer.WriteBool(IsCompleted);
+        writer.WriteBool(OnCooldown);
     }
 
     public void Read(NetFrameReader reader)
     {
         PanelId = reader.ReadString();
-        IsCompleted = reader.ReadBool();
+        OnCooldown = reader.ReadBool();
     }
 }

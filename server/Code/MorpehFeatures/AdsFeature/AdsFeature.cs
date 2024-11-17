@@ -11,6 +11,7 @@ public static class AdsFeature
         var systemsGroup = world.CreateSystemsGroup();
         
         systemsGroup.AddInitializer(container.New<AdsRewardedVideoSyncSystem>());
+        systemsGroup.AddInitializer(container.New<AdsRewardedVideoRewardsSyncSystem>());
 
         systemsGroup.AddSystem(container.New<AdsSetStartCooldownOnPlayerConnectSystem>());
         systemsGroup.AddSystem(container.New<AdsRewardedVideoCheckCooldownSystem>());

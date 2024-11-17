@@ -4,5 +4,5 @@ namespace server.Code.MorpehFeatures.AdsFeature.Components;
 
 public struct PlayerAdsRewardedVideoCooldown : IComponent
 {
-    public float Timer;
+    public List<(string, float)> TimersByPanelId;
 }

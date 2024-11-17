@@ -1,6 +1,5 @@
 ﻿using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AdsFeature.Components;
 using server.Code.MorpehFeatures.AdsFeature.Dataframes;
@@ -11,7 +10,6 @@ namespace server.Code.MorpehFeatures.AdsFeature.Systems;
 public class AdsRewardedVideoCheckCooldownSystem : ISystem
 {
     [Injectable] private Stash<PlayerAdsRewardedVideoCooldown> _playerAdsRewardedVideoCooldown;
-    [Injectable] private Stash<PlayerAdsRewardedVideoState> _playerAdsRewardedVideoState;
     [Injectable] private Stash<PlayerId> _playerId;
 
     [Injectable] private NetFrameServer _server;
@@ -24,7 +22,6 @@ public class AdsRewardedVideoCheckCooldownSystem : ISystem
     {
         _filter = World.Filter
             .With<PlayerAdsRewardedVideoCooldown>()
-            .With<PlayerAdsRewardedVideoState>()
             .With<PlayerId>()
             .Build();
     }
@@ -34,24 +31,23 @@ public class AdsRewardedVideoCheckCooldownSystem : ISystem
         foreach (var entity in _filter)
         {
             ref var cooldown = ref _playerAdsRewardedVideoCooldown.Get(entity);
-            cooldown.Timer -= deltaTime;
-            if (cooldown.Timer > 0f)
+            for (int i = cooldown.TimersByPanelId.Count - 1; i >= 0; i--)
             {
-                continue;
+                var timer = cooldown.TimersByPanelId[i];
+                timer.Item2 -= deltaTime;
+                cooldown.TimersByPanelId[i] = timer;
+                
+                if (timer.Item2 > 0f) continue;
+                
+                ref var playerId = ref _playerId.Get(entity);
+                var dataframe = new AdsSetRewardedVideoSetCooldownDataframe
+                {
+                    PanelId = timer.Item1,
+                    OnCooldown = false
+                };
+                _server.Send(ref dataframe, playerId.Id);
+                cooldown.TimersByPanelId.RemoveAt(i);
             }
-            
-            _playerAdsRewardedVideoCooldown.Remove(entity);
-            _playerAdsRewardedVideoState.Set(entity, new PlayerAdsRewardedVideoState
-            {
-                Value = AdsPlayerState.Wait
-            });
-
-            ref var playerId = ref _playerId.Get(entity);
-            var dataframe = new AdsSetShowRewardedVideoDataframe
-            {
-                CanShow = true,
-            };
-            _server.Send(ref dataframe, playerId.Id);
         }
     }
 

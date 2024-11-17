@@ -2,6 +2,7 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AdsFeature.Components;
+using server.Code.MorpehFeatures.AdsFeature.Configs;
 using server.Code.MorpehFeatures.AdsFeature.Dataframes;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
@@ -12,7 +13,6 @@ namespace server.Code.MorpehFeatures.AdsFeature.Systems;
 
 public class AdsRewardedVideoSyncSystem : IInitializer
 {
-    [Injectable] private Stash<PlayerAdsRewardedVideoState> _playerAdsRewardedVideoState;
     [Injectable] private Stash<PlayerAdsRewardedVideoCooldown> _playerAdsRewardedVideoCooldown;
     
     [Injectable] private NetFrameServer _server;
@@ -24,25 +24,7 @@ public class AdsRewardedVideoSyncSystem : IInitializer
     
     public void OnAwake()
     {
-        _server.Subscribe<AdsRewardedVideoStartShowDataframe>(OnStartShowRewardedVideo);
         _server.Subscribe<AdsRewardedVideoResultDataframe>(OnRewardedVideoResult);
-    }
-
-    private void OnStartShowRewardedVideo(AdsRewardedVideoStartShowDataframe dataframe, int sender)
-    {
-        if (!_playerStorage.TryGetPlayerById(sender, out var playerEntity))
-        {
-            return;
-        }
-
-        ref var state = ref _playerAdsRewardedVideoState.Get(playerEntity, out bool exist);
-        if (!exist || state.Value == AdsPlayerState.Wait)
-        {
-            _playerAdsRewardedVideoState.Set(playerEntity, new PlayerAdsRewardedVideoState
-            {
-                Value = AdsPlayerState.Show,
-            });
-        }
     }
 
     private void OnRewardedVideoResult(AdsRewardedVideoResultDataframe dataframe, int sender)
@@ -53,32 +35,75 @@ public class AdsRewardedVideoSyncSystem : IInitializer
         }
         
         var config = _configsService.GetConfig<AdsConfig>(ConfigsPath.Ads);
-        ref var state = ref _playerAdsRewardedVideoState.Get(playerEntity, out bool exist);
-        if (exist && state.Value == AdsPlayerState.Show && dataframe.IsComplete)
+        bool onCooldown = IsAdPanelOnCooldown(dataframe.PanelId, playerEntity);
+        
+        if (dataframe.IsCompleted && !onCooldown)
         {
-            foreach (var rewardConfig in config.AdsShowRewards)
+            GivePlayerRewardByPanelId(dataframe.PanelId, playerEntity, config);
+            SetAdPanelCooldown(dataframe.PanelId, playerEntity, config.RewardedAdsShowCooldown);
+        }
+        
+        var setCooldownDataframe = new AdsSetRewardedVideoSetCooldownDataframe
+        {
+            PanelId = dataframe.PanelId,
+            OnCooldown = true,
+        };
+        _server.Send(ref setCooldownDataframe, sender);
+    }
+
+    private void GivePlayerRewardByPanelId(string panelId, Entity playerEntity, AdsConfig config)
+    {
+        foreach (var rewardsForPanel in config.RewardsForPanels)
+        {
+            if (rewardsForPanel.PanelId != panelId)
+            {
+                continue;
+            }
+                    
+            foreach (var rewardConfig in rewardsForPanel.AdsShowRewards)
             {
                 if (rewardConfig.Amount > 0)
                 {
                     _currencyPlayerService.Give(playerEntity, rewardConfig.CurrencyType, rewardConfig.Amount);
                 }
             }
+            break;
         }
-        
-        _playerAdsRewardedVideoState.Set(playerEntity, new PlayerAdsRewardedVideoState
-        {
-            Value = AdsPlayerState.Cooldown,
-        });
-        _playerAdsRewardedVideoCooldown.Set(playerEntity, new PlayerAdsRewardedVideoCooldown
-        {
-            Timer = config.RewardedAdsShowCooldown,
-        });
+    }
 
-        var setShowDataframe = new AdsSetShowRewardedVideoDataframe
+    private bool IsAdPanelOnCooldown(string panelId, Entity playerEntity)
+    {
+        ref var cooldownPanels = ref _playerAdsRewardedVideoCooldown.Get(playerEntity);
+        foreach (var timer in cooldownPanels.TimersByPanelId)
         {
-            CanShow = false
-        };
-        _server.Send(ref setShowDataframe, sender);
+            if (timer.Item1 == panelId)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void SetAdPanelCooldown(string panelId, Entity playerEntity, float cooldown)
+    {
+        ref var cooldownPanels = ref _playerAdsRewardedVideoCooldown.Get(playerEntity);
+        bool foundPanel = false;
+        for (int i = 0; i < cooldownPanels.TimersByPanelId.Count; i++)
+        {
+            var timer = cooldownPanels.TimersByPanelId[i];
+            if (timer.Item1 == panelId)
+            {
+                foundPanel = true;
+                timer.Item2 = cooldown;
+                cooldownPanels.TimersByPanelId[i] = timer;
+            }
+        }
+
+        if (!foundPanel)
+        {
+            cooldownPanels.TimersByPanelId.Add((panelId, cooldown));
+        }
     }
 
     public void Dispose() { }
