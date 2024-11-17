@@ -6,6 +6,7 @@ using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Turn;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
+using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -22,6 +23,7 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
     
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
+    [Injectable] private RoomPokerService _roomPokerService;
     
     public World World { get; set; }
 
@@ -56,17 +58,7 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
         roomPokerPlayers.MarkedPlayersBySeat.TryGetValueByMarked(PokerPlayerMarkerType.ActivePlayer,
             out var playerByMarker);
         
-        ref var playerAuthData = ref _playerAuthData.Get(player);
-
-        foreach (var playerPotModel in roomPokerPlayers.PlayerPotModels)
-        {
-            if (playerPotModel.Guid != playerAuthData.Guid)
-            {
-                continue;
-            }
-            playerPotModel.SetFold();
-            break;
-        }
+        _roomPokerService.SetPlayerFoldForPotModels(player, roomPokerPlayers.PlayerPotModels);
 
         if (playerByMarker.Value != player)
         {

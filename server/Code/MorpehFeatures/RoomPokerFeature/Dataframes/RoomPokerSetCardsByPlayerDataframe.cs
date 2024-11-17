@@ -15,14 +15,12 @@ public struct RoomPokerSetCardsByPlayerDataframe : INetworkDataframe
     {
         writer.WriteInt(PlayerId);
         writer.WriteInt((int) CardsState);
-        
-        var hasCards = Cards != null;
-        writer.WriteBool(hasCards);
 
-        if (hasCards)
+        var count = Cards?.Count ?? 0;
+        writer.WriteInt(count);
+
+        if (count != 0)
         {
-            writer.WriteInt(Cards.Count);
-            
             foreach (var card in Cards)
             {
                 writer.Write(card);
@@ -34,10 +32,12 @@ public struct RoomPokerSetCardsByPlayerDataframe : INetworkDataframe
     {
         PlayerId = reader.ReadInt();
         CardsState = (CardsState) reader.ReadInt();    
+            
+        Cards = null; //todo временный костыль, нужно исправлять в NetFrame.  Переиспользуется коллекция с прошлой отправки
+        var count = reader.ReadInt(); 
         
-        if (reader.ReadBool())
+        if (count != 0)
         {
-            var count = reader.ReadInt();
             Cards = new List<RoomPokerCardNetworkModel>();
 
             for (var i = 0; i < count; i++)

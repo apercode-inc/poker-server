@@ -92,21 +92,18 @@ public class RoomPokerCalculatePayoutWinningsSystem : ISystem
 
     private List<PlayerPotModel> GetPayOutWinners(List<PlayerPotModel> winners, List<PlayerPotModel> playersInHand)
     {
-        long collectedSidePot;
-        long currentCommitment, collectionAmount;
-
         var paidWinners = new List<PlayerPotModel>();
 
         foreach (var playerPot in winners)
         {
-            collectedSidePot = 0;
-            currentCommitment = playerPot.PotCommitment;
+            long collectedSidePot = 0;
+            var currentCommitment = playerPot.PotCommitment;
             // Collect from all players who have money in pot
             foreach (var player in playersInHand)
             {
                 if (player.PotCommitment > 0)
                 {
-                    collectionAmount = Math.Min(currentCommitment, player.PotCommitment);
+                    var collectionAmount = Math.Min(currentCommitment, player.PotCommitment);
                     player.PotCommitment -= collectionAmount;
                     collectedSidePot += collectionAmount;
                 }
@@ -164,17 +161,17 @@ public class RoomPokerCalculatePayoutWinningsSystem : ISystem
     // Only count potchips for unfolded players.
     private long PotChipsRemaining(List<PlayerPotModel> playersInHand)
     {
-        long tally = 0;
+        long total = 0;
 
         foreach (var player in playersInHand)
         {
             if (!player.IsFold)
             {
-                tally += player.PotCommitment;
+                total += player.PotCommitment;
             }
         }
 
-        return tally;
+        return total;
     }
     
     public void Dispose()

@@ -71,26 +71,32 @@ public class CurrencyPlayerService : IInitializer
 
     public bool TrySetBet(Entity room, Entity player, long cost)
     {
-        ref var playerCurrency = ref _playerCurrency.Get(player);
-        ref var playerId = ref _playerId.Get(player);
+        ref var playerAuthData = ref _playerAuthData.Get(player);
         ref var playerPokerContribution = ref _playerPokerContribution.Get(player);
-
+        var currencyType = playerPokerContribution.CurrencyType;
+        
         if (playerPokerContribution.Value < cost)
         {
+            Logger.Error($"[CurrencyPlayerService.TrySetBet] contribution value is less than the bet, guid: " +
+                         $"{playerAuthData.Guid}, currencyType: {currencyType}");
             return false;
         }
         
-        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
-        ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(room);
-
-        var currencyType = playerPokerContribution.CurrencyType;
+        if (!TryTake(player, currencyType, cost))
+        {
+            Logger.Error($"[CurrencyPlayerService.TrySetBet] balance value is less than the bet, guid: " +
+                         $"{playerAuthData.Guid}, currencyType: {currencyType}");
+            return false;
+        }
 
         playerPokerContribution.Value -= cost;
-        var newBalance = playerCurrency.CurrencyByType[currencyType] -= cost;
-        
-        SetInDatabase(player, currencyType, newBalance);
 
+        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
+        
         playerPokerCurrentBet.Value += cost;
+        
+        ref var playerCurrency = ref _playerCurrency.Get(player);
+        ref var playerId = ref _playerId.Get(player);
         
         var dataframe = new RoomPokerPlayerSetBetDataframe
         {
@@ -100,22 +106,10 @@ public class CurrencyPlayerService : IInitializer
             PlayerId = playerId.Id,
         };
         _server.SendInRoom(ref dataframe, room);
-
-        ref var playerAuthData = ref _playerAuthData.Get(player);
+        
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(room);
 
-        PlayerPotModel targetPlayerPotModel = null;
-        foreach (var playerPotModel in roomPokerPlayers.PlayerPotModels)
-        {
-            if (playerPotModel.Guid != playerAuthData.Guid)
-            {
-                continue;
-            }
-
-            targetPlayerPotModel = playerPotModel;
-        }
-
-        if (targetPlayerPotModel == null)
+        if (!TryGetPlayerPotModelByGuid(roomPokerPlayers, playerAuthData.Guid, out var targetPlayerPotModel))
         {
             Logger.Error($"[CurrencyPlayerService.TrySetBet] player pot model not exist collection, guid: {playerAuthData.Guid}");
             return false;
@@ -131,29 +125,29 @@ public class CurrencyPlayerService : IInitializer
         ref var roomPokerBank = ref _roomPokerBank.Get(room);
         
         roomPokerBank.Total += cost;
+        
+        ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(room);
 
         if (roomPokerMaxBet.Value < playerPokerCurrentBet.Value)
         {
             roomPokerMaxBet.Value = playerPokerCurrentBet.Value;
         }
-        
-        Send(player, currencyType, playerCurrency.CurrencyByType[currencyType]);
 
         return true;
     }
 
-    public bool TryTake(Entity player, CurrencyType type, long cost)
+    public bool TryTake(Entity player, CurrencyType currencyType, long cost)
     {
         ref var playerCurrency = ref _playerCurrency.Get(player);
 
-        if (playerCurrency.CurrencyByType[type] < cost)
+        if (playerCurrency.CurrencyByType[currencyType] < cost)
         {
             return false;
         }
-        var newBalance = playerCurrency.CurrencyByType[type] -= cost;
+        var newBalance = playerCurrency.CurrencyByType[currencyType] -= cost;
         
-        SetInDatabase(player, type, newBalance);
-        Send(player, type, playerCurrency.CurrencyByType[type]);
+        SetInDatabase(player, currencyType, newBalance);
+        Send(player, currencyType, playerCurrency.CurrencyByType[currencyType]);
         
         return true;
     }
@@ -165,6 +159,24 @@ public class CurrencyPlayerService : IInitializer
 
         SetInDatabase(player, type, newBalance);
         Send(player, type, playerCurrency.CurrencyByType[type]);
+    }
+    
+    private bool TryGetPlayerPotModelByGuid(RoomPokerPlayers roomPokerPlayers, string guid,
+        out PlayerPotModel targetPlayerPotModel)
+    {
+        targetPlayerPotModel = null;
+        foreach (var playerPotModel in roomPokerPlayers.PlayerPotModels)
+        {
+            if (playerPotModel.Guid != guid)
+            {
+                continue;
+            }
+
+            targetPlayerPotModel = playerPotModel;
+            return true;
+        }
+        
+        return false;
     }
     
     private void SetInDatabase(Entity player, CurrencyType currencyType, long newBalance)

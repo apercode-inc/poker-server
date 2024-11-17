@@ -50,11 +50,7 @@ public class RoomPokerSetBetByPlayerSystem : ISystem
                     _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
                 }
             }
-            else
-            {
-                Logger.Error($"[RoomPokerSetBetByPlayerSystem.OnUpdate] error set bet");
-            }
-            
+
             _playerTurnCompleteFlag.Set(playerEntity);
             _playerSetBet.Remove(playerEntity);
         }
