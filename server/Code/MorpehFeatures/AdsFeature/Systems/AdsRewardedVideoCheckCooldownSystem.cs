@@ -10,7 +10,6 @@ namespace server.Code.MorpehFeatures.AdsFeature.Systems;
 public class AdsRewardedVideoCheckCooldownSystem : ISystem
 {
     [Injectable] private Stash<PlayerAdsRewardedVideoCooldown> _playerAdsRewardedVideoCooldown;
-    [Injectable] private Stash<PlayerId> _playerId;
 
     [Injectable] private NetFrameServer _server;
 
@@ -37,15 +36,17 @@ public class AdsRewardedVideoCheckCooldownSystem : ISystem
                 timer.Item2 -= deltaTime;
                 cooldown.TimersByPanelId[i] = timer;
                 
-                if (timer.Item2 > 0f) continue;
+                if (timer.Item2 > 0f)
+                {
+                    continue;
+                }
                 
-                ref var playerId = ref _playerId.Get(entity);
                 var dataframe = new AdsSetRewardedVideoSetCooldownDataframe
                 {
                     PanelId = timer.Item1,
                     OnCooldown = false
                 };
-                _server.Send(ref dataframe, playerId.Id);
+                _server.Send(ref dataframe, entity);
                 cooldown.TimersByPanelId.RemoveAt(i);
             }
         }

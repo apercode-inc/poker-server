@@ -40,7 +40,7 @@ public class AdsRewardedVideoSyncSystem : IInitializer
         if (dataframe.IsCompleted && !onCooldown)
         {
             GivePlayerRewardByPanelId(dataframe.PanelId, playerEntity, config);
-            SetAdPanelCooldown(dataframe.PanelId, playerEntity, config.RewardedAdsShowCooldown);
+            SetAdPanelCooldown(dataframe.PanelId, playerEntity, config);
         }
         
         var setCooldownDataframe = new AdsSetRewardedVideoSetCooldownDataframe
@@ -85,8 +85,18 @@ public class AdsRewardedVideoSyncSystem : IInitializer
         return false;
     }
 
-    private void SetAdPanelCooldown(string panelId, Entity playerEntity, float cooldown)
+    private void SetAdPanelCooldown(string panelId, Entity playerEntity, AdsConfig config)
     {
+        float cooldown = 0f;
+        foreach (var adsPanelConfig in config.RewardsForPanels)
+        {
+            if (adsPanelConfig.PanelId == panelId)
+            {
+                cooldown = adsPanelConfig.RewardedAdsShowCooldown;
+                break;
+            }
+        }
+        
         ref var cooldownPanels = ref _playerAdsRewardedVideoCooldown.Get(playerEntity);
         bool foundPanel = false;
         for (int i = 0; i < cooldownPanels.TimersByPanelId.Count; i++)
