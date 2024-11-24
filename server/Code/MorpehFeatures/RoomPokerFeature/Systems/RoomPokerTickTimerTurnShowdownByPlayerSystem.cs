@@ -9,24 +9,21 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
+public class RoomPokerTickTimerTurnShowdownByPlayerSystem : ISystem
 {
-    [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
+    [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
-    [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
-    [Injectable] private Stash<PlayerCards> _playerCards;
-    [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
-    [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
+    [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<Destroy> _destroy;
+    [Injectable] private Stash<PlayerTurnShowdownResetTimer> _playerTurnShowdownResetTimer;
     
-    [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
+    [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
-
-    [Injectable] private NetFrameServer _server;
-    [Injectable] private RoomPokerService _roomPokerService;
     
+    [Injectable] private RoomPokerService _roomPokerService;
+    [Injectable] private NetFrameServer _server;
+
     private Filter _filter;
     
     public World World { get; set; }
@@ -34,20 +31,20 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
-            .With<PlayerId>()
+            .With<PlayerTurnShowdownTimer>()
             .With<PlayerRoomPoker>()
-            .With<PlayerTurnTimer>()
+            .With<PlayerId>()
             .Build();
     }
 
     public void OnUpdate(float deltaTime)
     {
-        foreach (var playerEntity in _filter)
+        foreach (var playerEntity in  _filter)
         {
-            ref var playerTurnTimer = ref _playerTurnTimer.Get(playerEntity);
+            ref var playerTurnShowdownTimer = ref _playerTurnShowdownTimer.Get(playerEntity);
 
-            playerTurnTimer.TimeCurrent += deltaTime;
-
+            playerTurnShowdownTimer.TimeCurrent += deltaTime;
+            
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
             var roomEntity = playerRoomPoker.RoomEntity;
 
@@ -59,35 +56,24 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
                 ResetTimer(playerEntity);
                 continue;
             }
-            
-            if (playerTurnTimer.TimeCurrent < playerTurnTimer.TimeMax)
+
+            if (playerTurnShowdownTimer.TimeCurrent < playerTurnShowdownTimer.TimeMax)
             {
                 continue;
             }
+
+            _roomPokerService.DropCards(roomEntity, playerEntity);
             
-            ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
-
-            ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
-
-            if (roomPokerMaxBet.Value - playerPokerCurrentBet.Value > 0)
-            {
-                _roomPokerService.DropCards(roomEntity, playerEntity);
-            }
-            else
-            {
-                _playerPokerCheck.Set(playerEntity);
-            }
-
             ResetTimer(playerEntity);
         }
     }
 
     private void ResetTimer(Entity playerEntity)
     {
-        var dataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();
-        _server.Send(ref dataframe, playerEntity);
+        var closeActivePanelDataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();
+        _server.Send(ref closeActivePanelDataframe, playerEntity);
 
-        _playerTurnTimerReset.Set(playerEntity);
+        _playerTurnShowdownResetTimer.Set(playerEntity);
     }
 
     public void Dispose()

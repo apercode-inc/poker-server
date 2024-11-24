@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using Scellecs.Morpeh.Collections;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
@@ -26,6 +27,7 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
 
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
+    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private ConfigsService _configsService;
@@ -54,12 +56,17 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             ref var pokerCardDesk = ref _pokerCardDesk.Get(roomEntity);
+            
+            roomPokerPlayers.PlayerPotModels.Clear();
 
             foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var playerEntity = playerBySeat.Value;
 
                 ref var playerId = ref _playerId.Get(playerEntity);
+                ref var playerAuthData = ref _playerAuthData.Get(playerEntity);
+                
+                roomPokerPlayers.PlayerPotModels.Add(new PlayerPotModel(playerAuthData.Guid));
 
                 _networkCardsModel.Clear();
 
@@ -97,7 +104,7 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
                     Cards = _networkCardsModel,
                 };
                 _server.Send(ref dataframe, playerId.Id);
-                
+
                 var dataframeOtherPlayers = new RoomPokerSetCardsByPlayerDataframe
                 {
                     PlayerId = playerId.Id,

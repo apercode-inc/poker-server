@@ -6,33 +6,29 @@ using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Turn;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
-using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerHudFoldRequestSyncSystem : IInitializer
+public class RoomPokerHudAllInRequestSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
-    [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
-
-    [Injectable] private Stash<PlayerDropCards> _playerDropCards;
+    [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
-    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
-    
-    [Injectable] private NetFrameServer _server;
+    [Injectable] private Stash<PlayerSetBet> _playerSetBet;
+
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+
     [Injectable] private PlayerStorage _playerStorage;
-    [Injectable] private RoomPokerService _roomPokerService;
+    [Injectable] private NetFrameServer _server;
     
     public World World { get; set; }
 
     public void OnAwake()
     {
-        _server.Subscribe<RoomPokerHudFoldRequestDataframe>(Handler);
+        _server.Subscribe<RoomPokerHudAllInRequestDataframe>(Handler);
     }
-    
-    private void Handler(RoomPokerHudFoldRequestDataframe dataframe, int clientId)
+
+    private void Handler(RoomPokerHudAllInRequestDataframe dataframe, int clientId)
     {
         if (!_playerStorage.TryGetPlayerById(clientId, out var player))
         {
@@ -48,29 +44,27 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
 
         var roomEntity = playerRoomPoker.RoomEntity;
 
-        if (_roomPokerCleanupTimer.Has(roomEntity) || _roomPokerNextDealingTimer.Has(roomEntity))
-        {
-            return;
-        }
-
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
         roomPokerPlayers.MarkedPlayersBySeat.TryGetValueByMarked(PokerPlayerMarkerType.ActivePlayer,
             out var playerByMarker);
-        
-        _roomPokerService.SetPlayerFoldForPotModels(player, roomPokerPlayers.PlayerPotModels);
 
         if (playerByMarker.Value != player)
         {
             return;
         }
 
-        _playerDropCards.Set(player);
+        ref var playerPokerContribution = ref _playerPokerContribution.Get(player);
+        
+        _playerSetBet.Set(player, new PlayerSetBet
+        {
+            Bet = playerPokerContribution.Value,
+        });
         _playerTurnTimerReset.Set(player);
     }
 
     public void Dispose()
     {
-        _server.Unsubscribe<RoomPokerHudFoldRequestDataframe>(Handler);
+        _server.Unsubscribe<RoomPokerHudAllInRequestDataframe>(Handler);
     }
 }

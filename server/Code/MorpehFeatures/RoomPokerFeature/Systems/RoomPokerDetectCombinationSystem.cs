@@ -1,5 +1,4 @@
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -13,12 +12,11 @@ public class RoomPokerDetectCombinationSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
-    [Injectable] private Stash<RoomPokerCombinationMax> _roomPokerCombinationMax;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
-    [Injectable] private Stash<PlayerCombination> _playerCombination;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
     [Injectable] private Stash<RoomPokerDetectCombination> _roomPokerDetectCombination;
+    [Injectable] private Stash<RoomPokerSetStrengthHand> _roomPokerSetStrengthHand;
 
     private Filter _filter;
 
@@ -61,18 +59,9 @@ public class RoomPokerDetectCombinationSystem : ISystem
                     CombinationType = combination,
                     CombinationCards = combinationOrderedCards,
                 });
-                
-                if (combinationMax < combination)
-                {
-                    combinationMax = combination;
-                }
             }
             
-            _roomPokerCombinationMax.Set(roomEntity, new RoomPokerCombinationMax
-            {
-                CombinationMax = combinationMax,
-            });
-
+            _roomPokerSetStrengthHand.Set(roomEntity);
             _roomPokerDetectCombination.Remove(roomEntity);
         }
     }

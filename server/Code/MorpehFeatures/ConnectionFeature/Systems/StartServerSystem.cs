@@ -24,7 +24,7 @@ public class StartServerSystem : ISystem
         _server.SetProtectionWithFilePath(_serverParameters.PrivateKeyPath, _serverParameters.SecretToken);
         _server.Start(_serverParameters.Port, _serverParameters.MaxPlayers);
         
-        Logger.Debug("Server started...", ConsoleColor.Green);
+        Logger.DebugColor("Server started...", ConsoleColor.Green);
 
         _server.ClientConnection += OnClientConnection;
         _server.ClientDisconnect += OnClientDisconnect;
@@ -37,13 +37,13 @@ public class StartServerSystem : ISystem
 
     private void OnClientConnection(int id)
     {
-        Logger.Debug($"connected player id = {id}", ConsoleColor.Green);
+        Logger.DebugColor($"connected player id = {id}", ConsoleColor.Green);
         _playerStorage.Add(id);
     }
     
     private void OnClientDisconnect(int id)
     {
-        Logger.Debug($"disconnected player id = {id}", ConsoleColor.Yellow);
+        Logger.DebugColor($"disconnected player id = {id}", ConsoleColor.Yellow);
         _playerStorage.Remove(id);
     }
 

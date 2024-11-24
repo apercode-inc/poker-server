@@ -50,6 +50,24 @@ public class PlayerDbService : IInitializer
             });
         });
     }
+    
+    public async Task<DbPlayerModel> IncreaseChipsPlayerThreadPool(string uniqueId, long chips)
+    {
+        return await Task.Run(async () => await IncreaseChipsPlayerAsync(uniqueId, chips));
+    }
+    
+    public async Task<DbPlayerModel> IncreaseChipsPlayerAsync(string uniqueId, long chips)
+    {
+        return await _dbConnector.ExecuteAsync(session =>
+        {
+            return session.UnitOfWork.Connection.QueryFirstOrDefaultAsync<DbPlayerModel>(@"
+                    UPDATE players SET chips = chips + @chips WHERE unique_id = @unique_id", new QueryParameters
+            {
+                { "unique_id", uniqueId },
+                { "chips", chips },
+            });
+        });
+    }
 
     public async Task<IEnumerable<DbPlayerModel>> GetPlayerThreadPool(string uniqueId)
     {
