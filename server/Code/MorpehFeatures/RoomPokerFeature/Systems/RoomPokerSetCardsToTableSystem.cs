@@ -1,7 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using Scellecs.Morpeh.Collections;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
@@ -13,6 +11,7 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
+using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -30,10 +29,10 @@ public class RoomPokerSetCardsToTableSystem : ISystem
     [Injectable] private Stash<RoomPokerSetCardsTickTimer> _roomPokerSetCardsTickTimer;
     [Injectable] private Stash<RoomPokerDetectCombination> _roomPokerDetectCombination;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    [Injectable] private Stash<RoomPokerPlayersGivenBank> _roomPokerPlayersGivenBank;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
 
+    [Injectable] private RoomPokerService _roomPokerService;
     [Injectable] private RoomPokerCardDeskService _cardDeskService;
     [Injectable] private NetFrameServer _server;
     [Injectable] private ConfigsService _configsService;
@@ -56,6 +55,13 @@ public class RoomPokerSetCardsToTableSystem : ISystem
     {
         foreach (var roomEntity in _filter)
         {
+            _roomPokerSetCardsToTable.Remove(roomEntity);
+
+            if (_roomPokerService.TryOnePlayerRoundGame(roomEntity))
+            {
+                continue;
+            }
+
             ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
 
             var cards = roomPokerCardsToTable.Cards;
@@ -80,8 +86,6 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            _roomPokerSetCardsToTable.Remove(roomEntity);
         }
     }
 

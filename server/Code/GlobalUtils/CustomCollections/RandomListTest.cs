@@ -13,7 +13,7 @@ public static class RandomListTest
         };
 
         Console.WriteLine(new string('-', 30));
-        Logger.Debug($"before Count: {cardDeck.Count}", ConsoleColor.Cyan);
+        Logger.DebugColor($"before Count: {cardDeck.Count}", ConsoleColor.Cyan);
         Console.WriteLine(new string('-', 30));
 
         cardDeck.TryRandomRemove(out var card1);
@@ -22,41 +22,41 @@ public static class RandomListTest
         cardDeck.TryRandomRemove(out var card4);
         cardDeck.TryRandomRemove(out var card5);
         
-        Logger.Debug($"TABLE: {card1} {card2} {card3} {card4} {card5}", ConsoleColor.Yellow);
+        Logger.DebugColor($"TABLE: {card1} {card2} {card3} {card4} {card5}", ConsoleColor.Yellow);
         
         Console.WriteLine(new string('-', 30));
 
         cardDeck.TryRandomRemove(out var hand1);
         cardDeck.TryRandomRemove(out var hand2);
         
-        Logger.Debug($"MEGA: {hand1} {hand2}", ConsoleColor.Yellow);
+        Logger.DebugColor($"MEGA: {hand1} {hand2}", ConsoleColor.Yellow);
         
         Console.WriteLine(new string('-', 30));
         
         cardDeck.TryRandomRemove(out var hand3);
         cardDeck.TryRandomRemove(out var hand4);
         
-        Logger.Debug($"JUMBO: {hand3} {hand4}", ConsoleColor.Yellow);
+        Logger.DebugColor($"JUMBO: {hand3} {hand4}", ConsoleColor.Yellow);
         
         Console.WriteLine(new string('-', 30));
-        Logger.Debug($"after remove Count: {cardDeck.Count}", ConsoleColor.Cyan);
+        Logger.DebugColor($"after remove Count: {cardDeck.Count}", ConsoleColor.Cyan);
         Console.WriteLine(new string('-', 30));
         
         foreach (var card in cardDeck)
         {
-            Logger.Debug($"card in deck: {card}", ConsoleColor.Green);
+            Logger.DebugColor($"card in deck: {card}", ConsoleColor.Green);
         }
         
         cardDeck.Add(card1);
         cardDeck.Add(card2);
         
         Console.WriteLine(new string('-', 30));
-        Logger.Debug($"after add Count: {cardDeck.Count}", ConsoleColor.Cyan);
+        Logger.DebugColor($"after add Count: {cardDeck.Count}", ConsoleColor.Cyan);
         Console.WriteLine(new string('-', 30));
         
         foreach (var card in cardDeck)
         {
-            Logger.Debug($"card in deck: {card}", ConsoleColor.Green);
+            Logger.DebugColor($"card in deck: {card}", ConsoleColor.Green);
         }
         Console.WriteLine(new string('-', 30));
     }

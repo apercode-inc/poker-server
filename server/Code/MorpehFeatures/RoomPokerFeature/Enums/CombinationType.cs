@@ -1,15 +1,15 @@
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
-public enum CombinationType : byte
+public enum CombinationType : short
 {
-    HighCard = 0,
-    OnePair = 1,
-    TwoPair = 2,
-    ThreeOfKind = 3,
-    Straight = 4,
-    Flush = 5,
-    FullHouse = 6,
-    FourOfKind = 7,
-    StraightFlush = 8,
-    RoyalFlush = 9,
+    HighCard = 1,
+    OnePair = 2,
+    TwoPair = 3,
+    ThreeOfKind = 4,
+    Straight = 5,
+    Flush = 6,
+    FullHouse = 7,
+    FourOfKind = 8,
+    StraightFlush = 9,
+    RoyalFlush = 10,
 }

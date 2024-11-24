@@ -35,10 +35,11 @@ public static class RoomPokerFeature
         
         //Player turn
         systemsGroup.AddInitializer(container.New<RoomPokerHudSetBetRequestSyncSystem>());
+        systemsGroup.AddInitializer(container.New<RoomPokerHudAllInRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerHudFoldRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerHudCheckRequestSyncSystem>());
-        systemsGroup.AddInitializer(container.New<RoomPokerHudHideCardsSyncSystem>());
-        systemsGroup.AddInitializer(container.New<RoomPokerHudShowCardsSyncSystem>());
+        systemsGroup.AddInitializer(container.New<RoomPokerHudShowCardsRequestSyncSystem>());
+        systemsGroup.AddInitializer(container.New<RoomPokerHudHideCardsRequestSyncSystem>());
 
         systemsGroup.AddSystem(container.New<RoomPokerCreateOrJoinSendSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPlayerLeftSystem>());
@@ -65,16 +66,19 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerSetCardsToTableSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerSetCardsTickTimerAndNextStateTableSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerDetectCombinationSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerCombinationCompareSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerShowdownSystem>());
-
-        systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
-
+        systemsGroup.AddSystem(container.New<RoomPokerSetStrengthHandSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerCalculatePayoutWinningsSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerPayOutPodsSystem>());
+        
+        //Showdown player turn
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownTurnCheckSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownTurnRequestByPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerTickTimerTurnShowdownByPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerResetTimerTurnShowdownByPlayerSystem>());
+        
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownForcedByPlayerSystem>());
+        
         //End game logic
-        systemsGroup.AddSystem(container.New<RoomPokerPlayersGivenBankSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerShowdownTickTimerSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerShowOrHideCardsActivateSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerTickTimerShowOrHideByPlayerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerCleanupGameSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerNextDealingDelaySystem>());
         

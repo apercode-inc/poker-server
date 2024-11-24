@@ -1,11 +1,11 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
+using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -18,11 +18,15 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
+    [Injectable] private Stash<PlayerAllin> _playerAllin;
+    [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
+    [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
 
+    [Injectable] private RoomPokerService _roomPokerService;
     [Injectable] private NetFrameServer _server;
     
     private Filter _filter;
@@ -49,10 +53,10 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
             var roomEntity = playerRoomPoker.RoomEntity;
 
-            if (playerCards.CardsState == CardsState.Empty)
-            {
-                ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
+            if (playerCards.CardsState == CardsState.Empty || _playerAllin.Has(playerEntity))
+            {
                 if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer,
                         out var nextPlayerByMarked))
                 {
@@ -61,7 +65,17 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                 
                 continue;
             }
-            
+
+            if (_roomPokerService.TryOnePlayerRoundGame(roomEntity))
+            {
+                continue;
+            }
+
+            if (AllInExceptOne(playerEntity, roomEntity))
+            {
+                continue;
+            }
+
             ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
             
             ref var playerPokerContribution = ref _playerPokerContribution.Get(playerEntity);
@@ -124,6 +138,47 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                 TimeMax = roomPokerStats.TurnTime,
             });
         }
+    }
+
+    private bool AllInExceptOne(Entity playerEntity, Entity roomEntity)
+    {
+        ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
+
+        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
+
+        var isCalled = playerPokerCurrentBet.Value >= roomPokerMaxBet.Value;
+    
+        if (!isCalled)
+        {
+            return false;
+        }
+        
+        var count = 0;
+        
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+        
+        foreach (var markedPlayers in roomPokerPlayers.MarkedPlayersBySeat)
+        {
+            var otherPlayerEntity = markedPlayers.Value;
+
+            if (playerEntity == otherPlayerEntity || !_playerAllin.Has(otherPlayerEntity))
+            {
+                continue;
+            }
+
+            count++;
+        }
+
+        if (count <= 0)
+        {
+            return false;
+        }
+        
+        _playerPokerCheck.Set(playerEntity);
+        _playerTurnTimerReset.Set(playerEntity);
+            
+        return true;
+
     }
 
     public void Dispose()

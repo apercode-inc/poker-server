@@ -72,6 +72,7 @@ public class RoomPokerGameInitializeSystem : ISystem
             {
                 markedPlayer = roomPokerPlayers.MarkedPlayersBySeat.GetFirst();
                 dealerPlayer = markedPlayer.Value;
+                roomPokerPlayers.MarkedPlayersBySeat.SetMarker(dealerPlayer, PokerPlayerMarkerType.DealerPlayer);
             }
 
             if (roomPokerPlayers.MarkedPlayersBySeat.TryGetNext(PokerPlayerMarkerType.DealerPlayer, out markedPlayer))

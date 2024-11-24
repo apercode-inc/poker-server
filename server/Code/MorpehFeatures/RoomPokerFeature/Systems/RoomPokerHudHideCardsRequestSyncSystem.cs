@@ -7,12 +7,11 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Turn;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerHudHideCardsSyncSystem : IInitializer
+public class RoomPokerHudHideCardsRequestSyncSystem : IInitializer
 {
-    [Injectable] private Stash<PlayerShowOrHideTimer> _playerShowOrHideTimer;
-
-    [Injectable] private NetFrameServer _server;
+    [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
     
+    [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
     
     public World World { get; set; }
@@ -22,21 +21,20 @@ public class RoomPokerHudHideCardsSyncSystem : IInitializer
         _server.Subscribe<RoomPokerHudHideCardsRequestDataframe>(Handler);
     }
 
-    private void Handler(RoomPokerHudHideCardsRequestDataframe dataframe, int clientId)
+    private void Handler(RoomPokerHudHideCardsRequestDataframe dataframe, int playerId)
     {
-        if (!_playerStorage.TryGetPlayerById(clientId, out var player))
+        if (!_playerStorage.TryGetPlayerById(playerId, out var playerEntity))
         {
             return;
         }
 
-        ref var playerShowOrHideTimer = ref _playerShowOrHideTimer.Get(player, out var showOrHideTimerExist);
+        ref var playerTurnShowdownTimer = ref _playerTurnShowdownTimer.Get(playerEntity, out var exist);
 
-        if (!showOrHideTimerExist)
+        if (!exist)
         {
             return;
         }
-
-        playerShowOrHideTimer.TimeCurrent = playerShowOrHideTimer.TimeMax;
+        playerTurnShowdownTimer.TimeCurrent = playerTurnShowdownTimer.TimeMax;
     }
 
     public void Dispose()

@@ -55,7 +55,7 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
 
         _playerSetBet.Set(player, new PlayerSetBet
         {
-            Bet =  dataframe.Bet,
+            Bet = dataframe.Bet,
         });
         _playerTurnTimerReset.Set(player);
     }
