@@ -35,39 +35,35 @@ public class AdsRewardedVideoSyncSystem : IInitializer
         }
         
         var config = _configsService.GetConfig<AdsConfig>(ConfigsPath.Ads);
-        bool onCooldown = IsAdPanelOnCooldown(dataframe.PanelId, playerEntity);
+        if (!config.RewardsForPanels.TryGetValue(dataframe.PanelId, out var panelConfig))
+        {
+            return;
+        }
         
+        bool onCooldown = IsAdPanelOnCooldown(dataframe.PanelId, playerEntity);
         if (dataframe.IsCompleted && !onCooldown)
         {
-            GivePlayerRewardByPanelId(dataframe.PanelId, playerEntity, config);
-            SetAdPanelCooldown(dataframe.PanelId, playerEntity, config);
+            GivePlayerRewardByPanelId(playerEntity, panelConfig);
         }
+        
+        SetAdPanelCooldown(dataframe.PanelId, playerEntity, panelConfig.RewardedAdsShowCooldown);
         
         var setCooldownDataframe = new AdsSetRewardedVideoSetCooldownDataframe
         {
             PanelId = dataframe.PanelId,
-            OnCooldown = true,
+            RemainingSeconds = panelConfig.RewardedAdsShowCooldown,
         };
         _server.Send(ref setCooldownDataframe, sender);
     }
 
-    private void GivePlayerRewardByPanelId(string panelId, Entity playerEntity, AdsConfig config)
+    private void GivePlayerRewardByPanelId(Entity playerEntity, AdsConfigById rewards)
     {
-        foreach (var rewardsForPanel in config.RewardsForPanels)
+        foreach (var rewardConfig in rewards.AdsShowRewards)
         {
-            if (rewardsForPanel.PanelId != panelId)
+            if (rewardConfig.Amount > 0)
             {
-                continue;
+                _currencyPlayerService.Give(playerEntity, rewardConfig.CurrencyType, rewardConfig.Amount);
             }
-                    
-            foreach (var rewardConfig in rewardsForPanel.AdsShowRewards)
-            {
-                if (rewardConfig.Amount > 0)
-                {
-                    _currencyPlayerService.Give(playerEntity, rewardConfig.CurrencyType, rewardConfig.Amount);
-                }
-            }
-            break;
         }
     }
 
@@ -85,18 +81,8 @@ public class AdsRewardedVideoSyncSystem : IInitializer
         return false;
     }
 
-    private void SetAdPanelCooldown(string panelId, Entity playerEntity, AdsConfig config)
+    private void SetAdPanelCooldown(string panelId, Entity playerEntity, float cooldown)
     {
-        float cooldown = 0f;
-        foreach (var adsPanelConfig in config.RewardsForPanels)
-        {
-            if (adsPanelConfig.PanelId == panelId)
-            {
-                cooldown = adsPanelConfig.RewardedAdsShowCooldown;
-                break;
-            }
-        }
-        
         ref var cooldownPanels = ref _playerAdsRewardedVideoCooldown.Get(playerEntity);
         bool foundPanel = false;
         for (int i = 0; i < cooldownPanels.TimersByPanelId.Count; i++)

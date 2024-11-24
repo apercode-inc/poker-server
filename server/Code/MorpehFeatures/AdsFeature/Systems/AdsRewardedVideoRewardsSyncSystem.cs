@@ -23,13 +23,13 @@ public class AdsRewardedVideoRewardsSyncSystem : IInitializer
     private void Handler(RewardedAdPanelRewardsRequestDataframe dataframe, int sender)
     {
         var config = _configsService.GetConfig<AdsConfig>(ConfigsPath.Ads);
-        if (!TryFindRewardConfigForPanelId(dataframe, config, out var rewardsForPanel))
+        if (!config.RewardsForPanels.TryGetValue(dataframe.PanelId, out var panelConfig))
         {
             return;
         }
         
         var rewardsList = new List<RewardItemDataframe>();
-        foreach (var adsShowReward in rewardsForPanel.AdsShowRewards)
+        foreach (var adsShowReward in panelConfig.AdsShowRewards)
         {
             rewardsList.Add(new RewardItemDataframe
             {
@@ -44,21 +44,6 @@ public class AdsRewardedVideoRewardsSyncSystem : IInitializer
             Rewards = rewardsList,
         };
         _server.Send(ref response, sender);
-    }
-
-    private static bool TryFindRewardConfigForPanelId(RewardedAdPanelRewardsRequestDataframe dataframe, AdsConfig config, out AdsConfigById rewardsForPanel)
-    {
-        foreach (var rewards in config.RewardsForPanels)
-        {
-            if (rewards.PanelId == dataframe.PanelId)
-            {
-                rewardsForPanel = rewards;
-                return true;
-            }
-        }
-
-        rewardsForPanel = null;
-        return false;
     }
 
     public void Dispose()

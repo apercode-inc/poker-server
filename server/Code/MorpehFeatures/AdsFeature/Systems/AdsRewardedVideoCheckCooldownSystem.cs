@@ -44,7 +44,7 @@ public class AdsRewardedVideoCheckCooldownSystem : ISystem
                 var dataframe = new AdsSetRewardedVideoSetCooldownDataframe
                 {
                     PanelId = timer.Item1,
-                    OnCooldown = false
+                    RemainingSeconds = 0f,
                 };
                 _server.Send(ref dataframe, entity);
                 cooldown.TimersByPanelId.RemoveAt(i);
