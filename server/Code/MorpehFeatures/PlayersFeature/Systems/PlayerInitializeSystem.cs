@@ -16,7 +16,7 @@ public class PlayerInitializeSystem : ISystem
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerAvatar> _playerAvatar;
     [Injectable] private Stash<PlayerInitialize> _playerInitialize;
-    [Injectable] private Stash<PlayerInitializeAds> _playerInitializeAds;
+    [Injectable] private Stash<PlayerAdsDbCooldownModelRequest> _playerAdsDbCooldownModelRequest;
 
     [Injectable] private NetFrameServer _server;
     
@@ -83,7 +83,7 @@ public class PlayerInitializeSystem : ISystem
             };
             _server.Send(ref playerInitializeDataframe, playerEntity);
 
-            _playerInitializeAds.Set(playerEntity);
+            _playerAdsDbCooldownModelRequest.Set(playerEntity);
             _playerInitialize.Remove(playerEntity);
         }
     }

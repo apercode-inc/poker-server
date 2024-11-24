@@ -7,6 +7,7 @@ using server.Code.MorpehFeatures.AdsFeature.Dataframes;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.CurrencyFeature.Services;
+using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 
 namespace server.Code.MorpehFeatures.AdsFeature.Systems;
@@ -14,6 +15,8 @@ namespace server.Code.MorpehFeatures.AdsFeature.Systems;
 public class AdsRewardedVideoSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerAdsRewardedVideoCooldown> _playerAdsRewardedVideoCooldown;
+    [Injectable] private Stash<PlayerAdsDbCooldownModels> _playerAdsDbCooldownModels;
+    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
