@@ -91,28 +91,20 @@ public class RoomPokerCardDeskService : IInitializer
         
         return newCardDesk;
     }
-    
-    public void ReturnCardsInDeskToPlayer(Entity roomEntity, Entity playerLeft)
+
+    public void FillTheDesk(RandomList<CardModel> cardDesk)
     {
-        ref var playerCards = ref _playerCards.Get(playerLeft);
-
-        if (playerCards.CardsState == CardsState.Empty)
+        while (cardDesk.Count > 0)
         {
-            return;
+            cardDesk.TryRandomRemove(out _);
         }
 
-        ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
-
-        while (playerCards.Cards.Count > 0)
+        foreach (var card in _cardDeskPokerStandard)
         {
-            var card = playerCards.Cards.Dequeue();
-            card.IsHands = false;
-            roomPokerCardDesk.CardDesk.Add(card);
+            cardDesk.Add(card);
         }
-
-        playerCards.CardsState = CardsState.Empty;
     }
-
+    
     public void ReturnCardsInDeskToTable(Entity roomEntity)
     {
         ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
