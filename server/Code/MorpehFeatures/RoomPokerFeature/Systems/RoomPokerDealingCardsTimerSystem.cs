@@ -10,6 +10,8 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerDealingCardsTimerSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerDealingTimer> _pokerDealingTimer;
+    [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
+    [Injectable] private Stash<RoomPokerDealingCardsToPlayerSet> _roomPokerDealingCardsToPlayerSet;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
 
@@ -21,6 +23,7 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
     {
         _filter = World.Filter
             .With<RoomPokerDealingTimer>()
+            .With<RoomPokerDealingCardsToPlayer>()
             .Build();
     }
 
@@ -37,12 +40,21 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
                 continue;
             }
 
-            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+            ref var roomPokerDealingCardsToPlayer = ref _roomPokerDealingCardsToPlayer.Get(roomEntity);
 
-            if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer,
-                    out var nextPlayerByMarked))
+            if (roomPokerDealingCardsToPlayer.QueuePlayers.Count > 0)
             {
-                _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
+                _roomPokerDealingCardsToPlayerSet.Set(roomEntity);
+            }
+            else
+            {
+                ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+
+                if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer,
+                        out var nextPlayerByMarked))
+                {
+                    _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
+                }
             }
 
             _pokerDealingTimer.Remove(roomEntity);

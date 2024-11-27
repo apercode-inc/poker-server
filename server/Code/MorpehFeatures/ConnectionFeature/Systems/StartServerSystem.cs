@@ -26,6 +26,7 @@ public class StartServerSystem : ISystem
         
         Logger.DebugColor("Server started...", ConsoleColor.Green);
 
+
         _server.ClientConnection += OnClientConnection;
         _server.ClientDisconnect += OnClientDisconnect;
     }
