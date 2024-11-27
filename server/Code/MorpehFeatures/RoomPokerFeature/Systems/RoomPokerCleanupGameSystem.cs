@@ -78,7 +78,7 @@ public class RoomPokerCleanupGameSystem : ISystem
         {
             var player = markedPlayer.Value;
 
-            _roomPokerCardDeskService.ReturnCardsInDeskToPlayer(roomEntity, player);
+            //_roomPokerCardDeskService.ReturnCardsInDeskToPlayer(roomEntity, player);
 
             ref var playerId = ref _playerId.Get(player);
 
