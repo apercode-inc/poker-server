@@ -33,29 +33,21 @@ public class AdsDbService : IInitializer
     {
         return await Task.Run(async () => await _dbConnector.ExecuteAsync(session
             => session.UnitOfWork.Connection.ExecuteAsync(
-                $"UPDATE {DbPlayerAdsCooldownConstants.TableName} SET {DbPlayerAdsCooldownConstants.EndTimestamp} = @timestamp" +
-                $"WHERE {DbPlayerAdsCooldownConstants.PlayerId} = @player_id AND {DbPlayerAdsCooldownConstants.PanelId} = @panel_id",
-                new QueryParameters
-                {
-                    { "player_id", model.player_id },
-                    { "panel_id", model.panel_id },
-                    { "timestamp", model.end_timestamp },
-                })
+                $"UPDATE {DbPlayerAdsCooldownConstants.TableName} SET {DbPlayerAdsCooldownConstants.EndTimestamp} = @end_timestamp" +
+                $" WHERE {DbPlayerAdsCooldownConstants.PlayerId} = @player_id AND {DbPlayerAdsCooldownConstants.PanelId} = @panel_id",
+                model)
             ));
     }
 
-    public async Task<int> InsertPlayerAdsCooldownAsync(DbPlayerAdsCooldownModel model)
+    public async Task<int> UpdateOrInsertPlayerAdsCooldownAsync(DbPlayerAdsCooldownModel model)
     {
         return await Task.Run(async () => await _dbConnector.ExecuteAsync(session
             => session.UnitOfWork.Connection.ExecuteAsync(
                 $"INSERT INTO {DbPlayerAdsCooldownConstants.TableName}" +
-                $"VALUES (@player_id, @panel_id, @timestamp)",
-                new QueryParameters
-                {
-                    { "player_id", model.player_id },
-                    { "panel_id", model.panel_id },
-                    { "timestamp", model.end_timestamp },
-                })
+                $" ({DbPlayerAdsCooldownConstants.PlayerId}, {DbPlayerAdsCooldownConstants.PanelId}, {DbPlayerAdsCooldownConstants.EndTimestamp})" +
+                $" VALUES (@player_id, @panel_id, @end_timestamp)" +
+                $" ON DUPLICATE KEY UPDATE {DbPlayerAdsCooldownConstants.EndTimestamp} = @end_timestamp",
+                model)
             ));
     }
 
@@ -64,11 +56,7 @@ public class AdsDbService : IInitializer
         return await Task.Run(async () => await _dbConnector.ExecuteAsync(session
             => session.UnitOfWork.Connection.ExecuteAsync(
                 $@"DELETE FROM {DbPlayerAdsCooldownConstants.TableName} WHERE {DbPlayerAdsCooldownConstants.PlayerId} = @player_id AND {DbPlayerAdsCooldownConstants.PanelId} = @panel_id",
-                new QueryParameters
-                {
-                    { "player_id", model.player_id },
-                    { "panel_id", model.panel_id },
-                })
+                model)
         ));
     }
 

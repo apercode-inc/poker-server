@@ -66,6 +66,7 @@ public class AdsRewardedVideoSyncSystem : IInitializer
             if (rewardConfig.Amount > 0)
             {
                 _currencyPlayerService.Give(playerEntity, rewardConfig.CurrencyType, rewardConfig.Amount);
+                // TODO: trigger rewards window on client
             }
         }
     }

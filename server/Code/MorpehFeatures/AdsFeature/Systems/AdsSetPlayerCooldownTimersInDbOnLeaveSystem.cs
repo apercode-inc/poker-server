@@ -45,31 +45,17 @@ public class AdsSetPlayerCooldownTimersInDbOnLeaveSystem : ICleanupSystem
                 }
 
                 ref var cooldownModels = ref _playerAdsDbCooldownModels.Get(entity);
-                bool foundPanel = false;
                 int endTimestamp = _gameTimeService.CurrentTimeStamp + (int)timer.Item2;
-
-                foreach (var dbModel in cooldownModels.Value)
+                
+                ref var authData = ref _playerAuthData.Get(entity);
+                var dbModel = new DbPlayerAdsCooldownModel
                 {
-                    if (dbModel.panel_id == timer.Item1)
-                    {
-                        dbModel.end_timestamp = endTimestamp;
-                        _adsDbService.UpdatePlayerAdsCooldownAsync(dbModel).Forget();
-                        foundPanel = true;
-                    }
-                }
-
-                if (!foundPanel)
-                {
-                    ref var authData = ref _playerAuthData.Get(entity);
-                    var dbModel = new DbPlayerAdsCooldownModel
-                    {
-                        player_id = authData.Guid,
-                        panel_id = timer.Item1,
-                        end_timestamp = endTimestamp
-                    };
-                    _adsDbService.InsertPlayerAdsCooldownAsync(dbModel).Forget();
-                    cooldownModels.Value.Add(dbModel);
-                }
+                    player_id = authData.Guid,
+                    panel_id = timer.Item1,
+                    end_timestamp = endTimestamp
+                };
+                _adsDbService.UpdateOrInsertPlayerAdsCooldownAsync(dbModel).Forget();
+                cooldownModels.Value.Add(dbModel);
             }
         }
     }
