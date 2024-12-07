@@ -1,6 +1,8 @@
-﻿using Scellecs.Morpeh;
+﻿using NetFrame.Server;
+using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AdsFeature.Components;
+using server.Code.MorpehFeatures.AdsFeature.Dataframes;
 using server.Code.MorpehFeatures.GameTimeFeature;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 
@@ -13,6 +15,7 @@ public class AdsInitializePlayerSystem : ISystem
     [Injectable] private Stash<PlayerInitializeAds> _playerInitializeAds;
 
     [Injectable] private GameTimeService _gameTimeService;
+    [Injectable] private NetFrameServer _server;
     
     private Filter _filter;
 
@@ -42,10 +45,18 @@ public class AdsInitializePlayerSystem : ISystem
             foreach (var adsCooldownModel in dbModels.Value)
             {
                 int remainingSeconds = adsCooldownModel.end_timestamp - timeStamp;
-                if (remainingSeconds > 0)
+                if (remainingSeconds <= 0)
                 {
-                    timers.Add((adsCooldownModel.panel_id, remainingSeconds));
+                    continue;
                 }
+                
+                timers.Add((adsCooldownModel.panel_id, remainingSeconds));
+                var dataframe = new AdsSetRewardedVideoSetCooldownDataframe
+                {
+                    PanelId = adsCooldownModel.panel_id,
+                    RemainingSeconds = remainingSeconds,
+                };
+                _server.Send(ref dataframe, entity);
             }
 
             _playerInitializeAds.Remove(entity);
