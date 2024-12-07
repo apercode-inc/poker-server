@@ -73,7 +73,12 @@ public class AdsRewardedVideoSyncSystem : IInitializer
 
     private bool IsAdPanelOnCooldown(string panelId, Entity playerEntity)
     {
-        ref var cooldownPanels = ref _playerAdsRewardedVideoCooldown.Get(playerEntity);
+        ref var cooldownPanels = ref _playerAdsRewardedVideoCooldown.Get(playerEntity, out bool exist);
+        if (!exist)
+        {
+            return true;
+        }
+        
         foreach (var timer in cooldownPanels.TimersByPanelId)
         {
             if (timer.Item1 == panelId)
