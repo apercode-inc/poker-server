@@ -61,6 +61,12 @@ public class RoomPokerGameInitializeSystem : ISystem
                     CardDesk = _cardDeskService.CreateCardDeskPokerStandard()
                 });
             }
+            else
+            {
+                ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
+
+                _cardDeskService.FillTheDesk(roomPokerCardDesk.CardDesk);
+            }
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             

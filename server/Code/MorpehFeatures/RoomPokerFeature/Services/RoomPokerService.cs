@@ -57,7 +57,6 @@ public class RoomPokerService : IInitializer
         var playerPotModels = roomPokerPlayers.PlayerPotModels;
 
         _markersByPlayer.Clear();
-        _roomPokerCardDeskService.ReturnCardsInDeskToPlayer(roomEntity, playerLeft);
 
         SetPlayerFoldForPotModels(playerLeft, playerPotModels);
         RemoveFromMarkedPlayers(roomEntity, playerLeft, markedPlayersBySeat);
@@ -66,8 +65,6 @@ public class RoomPokerService : IInitializer
 
     public void DropCards(Entity roomEntity, Entity playerEntity, bool isNextTurn = true)
     {
-        _roomPokerCardDeskService.ReturnCardsInDeskToPlayer(roomEntity, playerEntity);
-
         ref var playerId = ref _playerId.Get(playerEntity);
         ref var playerSeat = ref _playerSeat.Get(playerEntity);
                 
@@ -157,7 +154,6 @@ public class RoomPokerService : IInitializer
             {
                 continue;
             }
-
             playerPotModel.SetFold();
             break;
         }

@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AdsFeature.Components;
 using server.Code.MorpehFeatures.CurrencyFeature.Dataframe;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -15,6 +16,7 @@ public class PlayerInitializeSystem : ISystem
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerAvatar> _playerAvatar;
     [Injectable] private Stash<PlayerInitialize> _playerInitialize;
+    [Injectable] private Stash<PlayerAdsDbCooldownModelRequest> _playerAdsDbCooldownModelRequest;
 
     [Injectable] private NetFrameServer _server;
     
@@ -81,6 +83,7 @@ public class PlayerInitializeSystem : ISystem
             };
             _server.Send(ref playerInitializeDataframe, playerEntity);
 
+            _playerAdsDbCooldownModelRequest.Set(playerEntity);
             _playerInitialize.Remove(playerEntity);
         }
     }

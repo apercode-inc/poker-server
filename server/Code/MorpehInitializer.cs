@@ -1,5 +1,6 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AdsFeature;
 using server.Code.MorpehFeatures.CleanupDestroyFeature;
 using server.Code.MorpehFeatures.ConfigsFeature;
 using server.Code.MorpehFeatures.ConnectionFeature;
@@ -10,6 +11,7 @@ using server.Code.MorpehFeatures.DataBaseFeature;
 using server.Code.MorpehFeatures.RoomChatFeature;
 using server.Code.MorpehFeatures.NotificationFeature;
 using server.Code.MorpehFeatures.AuthenticationFeature;
+using server.Code.MorpehFeatures.GameTimeFeature;
 using server.Code.MorpehFeatures.LocalizationFeature;
 
 namespace server.Code;
@@ -23,6 +25,7 @@ public static class MorpehInitializer
         container.AddResolver(type => world.GetReflectionStash(type.GenericTypeArguments[0]), typeof(Stash));
             
         // Storages
+        GameTimeFeature.AddService(world, ref groupIndex, container);
         ConfigsFeature.AddStorage(world, ref groupIndex, container);
         DataBaseFeature.AddStorage(world, ref groupIndex, container);
         AuthenticationFeature.AddStorage(world, ref groupIndex, container);
@@ -36,6 +39,7 @@ public static class MorpehInitializer
 
         // Systems
         AuthenticationFeature.Add(world, ref groupIndex, container);
+        AdsFeature.Add(world, ref groupIndex, container);
         ConfigsFeature.Add(world, ref groupIndex, container);
         ConnectionFeature.Add(world, ref groupIndex, container);
         PlayersFeature.Add(world, ref groupIndex, container);
@@ -44,6 +48,7 @@ public static class MorpehInitializer
         RoomChatFeature.Add(world, ref groupIndex, container);
 
         // Cleanup
+        AdsFeature.AddCleanup(world, ref groupIndex, container);
         CleanupDestroyFeature.Add(world, ref groupIndex, container);
     }
 }
