@@ -104,21 +104,7 @@ public class RoomPokerCardDeskService : IInitializer
             cardDesk.Add(card);
         }
     }
-    
-    public void ReturnCardsInDeskToTable(Entity roomEntity)
-    {
-        ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
-        ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
 
-        while (roomPokerCardsToTable.Cards.Count > 0)
-        {
-            var card = roomPokerCardsToTable.Cards.Dequeue();
-            roomPokerCardDesk.CardDesk.Add(card);
-        }
-
-        roomPokerCardsToTable.State = CardToTableState.PreFlop;
-    }
-    
     public void Dispose()
     {
         _cardDeskPokerStandard = null;

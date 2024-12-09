@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
@@ -83,8 +84,6 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                 case CardToTableState.Showdown:
                     _roomPokerDetectCombination.Set(roomEntity);
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
     }
