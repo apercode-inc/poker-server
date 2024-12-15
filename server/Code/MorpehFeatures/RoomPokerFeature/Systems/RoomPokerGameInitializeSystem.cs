@@ -19,10 +19,12 @@ public class RoomPokerGameInitializeSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayerSet> _roomPokerDealingCardsToPlayerSet;
+    [Injectable] private Stash<RoomPokerSetBlinds> _roomPokerSetBlinds;
+    [Injectable] private Stash<RoomPokerCleanedGame> _roomPokerCleanedGame;
+    
     [Injectable] private Stash<PlayerDealer> _playerDealer;
     [Injectable] private Stash<PlayerNotGame> _playerNotGame;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
-    [Injectable] private Stash<RoomPokerSetBlinds> _roomPokerSetBlinds;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
@@ -122,6 +124,7 @@ public class RoomPokerGameInitializeSystem : ISystem
                 QueuePlayers = playersEntity,
             });
             _roomPokerDealingCardsToPlayerSet.Set(roomEntity);
+            _roomPokerCleanedGame.Remove(roomEntity);
             _roomPokerGameInitialize.Remove(roomEntity);
         }
     }

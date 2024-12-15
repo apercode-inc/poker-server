@@ -15,6 +15,7 @@ public class RoomPokerShowdownTurnCheckSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
+    [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerPokerShowdownTurnRequest> _playerPokerShowdownTurnRequest;
@@ -40,14 +41,7 @@ public class RoomPokerShowdownTurnCheckSystem : ISystem
             _roomPokerShowdownChoiceCheck.Remove(roomEntity);
             
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-            
-            if (roomPokerPlayers.MarkedPlayersBySeat.Count == 1)
-            {
-                _roomPokerPayoutWinnings.Set(roomEntity);
-                RunRoomPokerCleanup(roomEntity);
-                continue;
-            }
-            
+
             var isSkipCleanup = false;
 
             foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
@@ -56,13 +50,15 @@ public class RoomPokerShowdownTurnCheckSystem : ISystem
 
                 ref var playerCards = ref _playerCards.Get(playerEntity);
 
-                if (playerCards.CardsState == CardsState.Close)
+                if (playerCards.CardsState != CardsState.Close)
                 {
-                    isSkipCleanup = true;
-                    _playerPokerShowdownTurnRequest.Set(playerEntity);
-
-                    break;
+                    continue;
                 }
+                
+                isSkipCleanup = true;
+                _playerPokerShowdownTurnRequest.Set(playerEntity);
+
+                break;
             }
 
             if (isSkipCleanup)
@@ -70,17 +66,12 @@ public class RoomPokerShowdownTurnCheckSystem : ISystem
                 continue;
             }
             
-            RunRoomPokerCleanup(roomEntity);
+            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
+            _roomPokerCleanupTimer.Set(roomEntity, new RoomPokerCleanupTimer
+            {
+                Value = config.DelayCleanup,
+            });
         }
-    }
-
-    private void RunRoomPokerCleanup(Entity roomEntity)
-    {
-        var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
-        _roomPokerCleanupTimer.Set(roomEntity, new RoomPokerCleanupTimer
-        {
-            Value = config.DelayCleanup,
-        });
     }
 
     public void Dispose()

@@ -1,5 +1,4 @@
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -40,21 +39,12 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
                 continue;
             }
 
-            ref var roomPokerDealingCardsToPlayer = ref _roomPokerDealingCardsToPlayer.Get(roomEntity);
+            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            if (roomPokerDealingCardsToPlayer.QueuePlayers.Count > 0)
+            if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer,
+                    out var nextPlayerByMarked))
             {
-                _roomPokerDealingCardsToPlayerSet.Set(roomEntity);
-            }
-            else
-            {
-                ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-                if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer,
-                        out var nextPlayerByMarked))
-                {
-                    _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
-                }
+                _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
             }
 
             _pokerDealingTimer.Remove(roomEntity);

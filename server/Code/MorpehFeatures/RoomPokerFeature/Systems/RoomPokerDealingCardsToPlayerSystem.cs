@@ -17,108 +17,111 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
 {
     private const int HOLDEM_CARD_COUNT = 2;
     
-    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayerSet> _roomPokerDealingCardsToPlayerSet;
-    [Injectable] private Stash<RoomPokerCardDesk> _pokerCardDesk;
-    [Injectable] private Stash<RoomPokerDealingTimer> _pokerDealingTimer;
+    [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
+    [Injectable] private Stash<RoomPokerDealingTimer> _roomPokerDealingTimer;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
-    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private ConfigsService _configsService;
+    
+    private List<RoomPokerCardNetworkModel> _networkCardsModel;
 
     private Filter _filter;
-
-    private List<RoomPokerCardNetworkModel> _networkCardsModel;
     
     public World World { get; set; }
 
     public void OnAwake()
     {
-        _networkCardsModel = new List<RoomPokerCardNetworkModel>();
-
         _filter = World.Filter
             .With<RoomPokerActive>()
             .With<RoomPokerCardDesk>()
             .With<RoomPokerDealingCardsToPlayer>()
             .With<RoomPokerDealingCardsToPlayerSet>()
             .Build();
+        
+        _networkCardsModel = new List<RoomPokerCardNetworkModel>();
     }
 
     public void OnUpdate(float deltaTime)
     {
         foreach (var roomEntity in _filter)
         {
-            ref var pokerCardDesk = ref _pokerCardDesk.Get(roomEntity);
+            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
+            var dealingCardsTime = config.DealingCardsTime;
+            
+            DealingCardsAllPlayers(roomEntity, dealingCardsTime);
 
-            ref var roomPokerDealingCardsToPlayer = ref _roomPokerDealingCardsToPlayer.Get(roomEntity);
+            _roomPokerDealingTimer.Set(roomEntity,new RoomPokerDealingTimer
+            {
+                Timer = dealingCardsTime,
+            });
 
-            var playerEntity = roomPokerDealingCardsToPlayer.QueuePlayers.Dequeue();
+            _roomPokerDealingCardsToPlayerSet.Remove(roomEntity);
+        }
+    }
 
+    private void DealingCardsAllPlayers(Entity roomEntity, float dealingCardsTime)
+    {
+        ref var roomPokerDealingCardsToPlayer = ref _roomPokerDealingCardsToPlayer.Get(roomEntity);
+        ref var pokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
+
+        foreach (var playerEntity in roomPokerDealingCardsToPlayer.QueuePlayers)
+        {
             if (playerEntity.IsNullOrDisposed())
             {
-                _pokerDealingTimer.Set(roomEntity);
-                _roomPokerDealingCardsToPlayerSet.Remove(roomEntity);
                 continue;
             }
-            
-            ref var playerId = ref _playerId.Get(playerEntity);
-            
+
             _networkCardsModel.Clear();
-            
             var cardsModel = new Queue<CardModel>();
-            
+
             for (var i = 0; i < HOLDEM_CARD_COUNT; i++)
             {
-                if (pokerCardDesk.CardDesk.TryRandomRemove(out var cardModel))
+                if (!pokerCardDesk.CardDesk.TryRandomRemove(out var cardModel))
                 {
-                    cardModel.IsHands = true;
-                    cardsModel.Enqueue(cardModel);
+                    continue;
                 }
-                else
-                {
-                    throw new Exception("No cards in deck!!!");
-                }
-                    
+
+                cardModel.IsHands = true;
+                cardsModel.Enqueue(cardModel);
+
                 _networkCardsModel.Add(new RoomPokerCardNetworkModel
                 {
                     Rank = cardModel.Rank,
                     Suit = cardModel.Suit,
                 });
             }
-            
+
             _playerCards.Set(playerEntity, new PlayerCards
             {
                 CardsState = CardsState.Close,
                 Cards = cardsModel,
             });
-            
-            var dataframe = new RoomPokerSetCardsByPlayerDataframe
-            {
-                PlayerId = playerId.Id,
-                CardsState = CardsState.Close,
-                Cards = _networkCardsModel,
-            };
-            _server.Send(ref dataframe, playerId.Id);
-            
-            var dataframeOtherPlayers = new RoomPokerSetCardsByPlayerDataframe
-            {
-                PlayerId = playerId.Id,
-                CardsState = CardsState.Close,
-            };
-            _server.SendInRoomExcept(ref dataframeOtherPlayers, roomEntity, playerEntity);
 
-            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
-            
-            _pokerDealingTimer.Set(roomEntity,new RoomPokerDealingTimer
+            var allPlayerIdsForDealing = new List<int>();
+
+            foreach (var otherPlayerEntity in roomPokerDealingCardsToPlayer.QueuePlayers)
             {
-                Timer = config.DealingCardsTime,
-            });
-            
-            _roomPokerDealingCardsToPlayerSet.Remove(roomEntity);
+                if (playerEntity.IsNullOrDisposed())
+                {
+                    continue;
+                }
+
+                ref var playerId = ref _playerId.Get(otherPlayerEntity);
+                allPlayerIdsForDealing.Add(playerId.Id);
+            }
+
+            var dataframe = new RoomPokerDealingCardsByPlayerDataframe
+            {
+                DealingCardsTime = dealingCardsTime,
+                Cards = _networkCardsModel,
+                AllPlayersIds = allPlayerIdsForDealing,
+            };
+            _server.Send(ref dataframe, playerEntity);
         }
     }
 

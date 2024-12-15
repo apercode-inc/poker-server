@@ -46,6 +46,7 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerPlayerDestroySystem>());
 
         //Poker game logic
+        systemsGroup.AddSystem(container.New<RoomPokerCheckStopGameSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerGameCheckStartSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerGameStartTimerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerGameInitializeSystem>());
