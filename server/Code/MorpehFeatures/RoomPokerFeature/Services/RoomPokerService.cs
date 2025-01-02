@@ -61,7 +61,6 @@ public class RoomPokerService : IInitializer
 
         SetPlayerFoldForPotModels(playerLeft, playerPotModels);
         RemoveFromMarkedPlayers(roomEntity, playerLeft, markedPlayersBySeat);
-        RemoveShowdown(roomEntity, playerLeft);
         CleanupPlayer(roomEntity, playerLeft, markedPlayersBySeat);
     }
 
@@ -169,16 +168,6 @@ public class RoomPokerService : IInitializer
             }
         }
     }
-    
-    private void RemoveShowdown(Entity roomEntity, Entity playerLeft)
-    {
-        if (!_playerTurnShowdownTimer.Has(playerLeft))
-        {
-            return;
-        }
-        
-        _roomPokerShowdownChoiceCheck.Set(roomEntity);
-    }
 
     private void SetActivePlayerMarkerOrGivenBank(Entity roomEntity)
     {
@@ -206,6 +195,12 @@ public class RoomPokerService : IInitializer
         {
             _roomPokerShowOrHideCardsActivate.Set(roomEntity);
             _playerShowOrHideTimer.Remove(playerLeft);
+        }
+        
+        if (_playerTurnShowdownTimer.Has(playerLeft))
+        {
+            _playerTurnShowdownTimer.Remove(playerLeft);
+            _roomPokerShowdownChoiceCheck.Set(roomEntity);
         }
 
         ref var playerId = ref _playerId.Get(playerLeft);

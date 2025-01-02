@@ -57,7 +57,7 @@ public class RoomPokerShowdownTurnCheckSystem : ISystem
                 
                 isSkipCleanup = true;
                 _playerPokerShowdownTurnRequest.Set(playerEntity);
-
+                    
                 break;
             }
 
