@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.GlobalUtils.CustomCollections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -100,33 +101,6 @@ public class RoomPokerService : IInitializer
                 SetActivePlayerMarkerOrGivenBank(roomEntity);
             }
         }
-    }
-    
-    public bool TryOnePlayerRoundGame(Entity roomEntity)
-    {
-        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-        var playersWithCardsPlayersCount = 0;
-        
-        foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
-        {
-            var player = markedPlayer.Value;
-            ref var playerCards = ref _playerCards.Get(player);
-            
-            if (playerCards.CardsState != CardsState.Empty)
-            {
-                playersWithCardsPlayersCount++;
-            }
-        }
-
-        if (playersWithCardsPlayersCount > 1)
-        {
-            return false;
-        }
-        
-        _roomPokerOnePlayerRoundGame.Set(roomEntity);
-        _roomPokerPayoutWinnings.Set(roomEntity);
-
-        return true;
     }
 
     public void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)

@@ -58,11 +58,6 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         {
             _roomPokerSetCardsToTable.Remove(roomEntity);
 
-            if (_roomPokerService.TryOnePlayerRoundGame(roomEntity))
-            {
-                continue;
-            }
-
             ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
 
             var cards = roomPokerCardsToTable.Cards;

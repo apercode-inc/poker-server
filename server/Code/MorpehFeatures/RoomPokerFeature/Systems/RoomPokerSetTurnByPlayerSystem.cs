@@ -66,11 +66,6 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                 continue;
             }
 
-            if (_roomPokerService.TryOnePlayerRoundGame(roomEntity))
-            {
-                continue;
-            }
-
             if (AllInExceptOne(playerEntity, roomEntity))
             {
                 continue;
