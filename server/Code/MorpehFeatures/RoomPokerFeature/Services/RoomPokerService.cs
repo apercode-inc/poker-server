@@ -21,6 +21,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
     [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
+    [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
 
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
@@ -35,6 +36,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerAllin> _playerAllin;
+    [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
@@ -59,6 +61,7 @@ public class RoomPokerService : IInitializer
 
         SetPlayerFoldForPotModels(playerLeft, playerPotModels);
         RemoveFromMarkedPlayers(roomEntity, playerLeft, markedPlayersBySeat);
+        RemoveShowdown(roomEntity, playerLeft);
         CleanupPlayer(roomEntity, playerLeft, markedPlayersBySeat);
     }
 
@@ -165,6 +168,16 @@ public class RoomPokerService : IInitializer
                 }
             }
         }
+    }
+    
+    private void RemoveShowdown(Entity roomEntity, Entity playerLeft)
+    {
+        if (!_playerTurnShowdownTimer.Has(playerLeft))
+        {
+            return;
+        }
+        
+        _roomPokerShowdownChoiceCheck.Set(roomEntity);
     }
 
     private void SetActivePlayerMarkerOrGivenBank(Entity roomEntity)

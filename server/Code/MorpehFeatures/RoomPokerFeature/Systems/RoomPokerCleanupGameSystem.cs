@@ -105,7 +105,6 @@ public class RoomPokerCleanupGameSystem : ISystem
     {
         var cardsToTableDataframe = new RoomPokerSetCardsToTableDataframe
         {
-            Bank = 0,
             CardToTableState = CardToTableState.PreFlop,
             Cards = new List<RoomPokerCardNetworkModel>(),
         };
