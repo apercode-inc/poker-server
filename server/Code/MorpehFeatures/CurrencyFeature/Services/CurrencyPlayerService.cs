@@ -45,6 +45,9 @@ public class CurrencyPlayerService : IInitializer
             return false;
         }
 
+        roomPokerBank.Total -= cost;
+        roomPokerBank.OnTable -= cost;
+
         ref var playerCurrency = ref _playerCurrency.Get(player);
         ref var playerId = ref _playerId.Get(player);
         ref var playerPokerContribution = ref _playerPokerContribution.Get(player);
@@ -61,6 +64,7 @@ public class CurrencyPlayerService : IInitializer
             ContributionBalance = playerPokerContribution.Value,
             AllBalance = playerCurrency.CurrencyByType[currencyType],
             PlayerId = playerId.Id,
+            Bank = roomPokerBank.OnTable,
         };
         _server.SendInRoom(ref dataframe, room);
 

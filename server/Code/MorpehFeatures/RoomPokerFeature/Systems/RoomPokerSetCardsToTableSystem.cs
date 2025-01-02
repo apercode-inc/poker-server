@@ -73,22 +73,23 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                 case CardToTableState.PreFlop:
                     throw new ArgumentOutOfRangeException();
                 case CardToTableState.Flop:
-                    SetCards(roomEntity, roomPokerCardsToTable.State, cards, CardFlopCount);
+                    SetCardsAndBank(roomEntity, roomPokerCardsToTable.State, cards, CardFlopCount);
                     break;
                 case CardToTableState.Turn:
-                    SetCards(roomEntity, roomPokerCardsToTable.State, cards, CardTurnCount);
+                    SetCardsAndBank(roomEntity, roomPokerCardsToTable.State, cards, CardTurnCount);
                     break;
                 case CardToTableState.River:
-                    SetCards(roomEntity, roomPokerCardsToTable.State, cards, CardRiverCount);
+                    SetCardsAndBank(roomEntity, roomPokerCardsToTable.State, cards, CardRiverCount);
                     break;
                 case CardToTableState.Showdown:
+                    SetBank(roomEntity, roomPokerCardsToTable.State);
                     _roomPokerDetectCombination.Set(roomEntity);
                     break;
             }
         }
     }
 
-    private void SetCards(Entity roomEntity, CardToTableState cardToTableState, Queue<CardModel> cards, int cardCount)
+    private void SetCardsAndBank(Entity roomEntity, CardToTableState cardToTableState, Queue<CardModel> cards, int cardCount)
     {
         ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
         ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
@@ -128,6 +129,19 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         {
             Value = config.DealingCardTimeToTable,
         });
+    }
+    
+    private void SetBank(Entity roomEntity, CardToTableState cardToTableState)
+    {
+        ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
+        roomPokerBank.OnTable = roomPokerBank.Total;
+        
+        var dataframe = new RoomPokerSetCardsToTableDataframe
+        {
+            Bank = roomPokerBank.OnTable,
+            CardToTableState = cardToTableState,
+        };
+        _server.SendInRoom(ref dataframe, roomEntity);
     }
 
     public void Dispose()
