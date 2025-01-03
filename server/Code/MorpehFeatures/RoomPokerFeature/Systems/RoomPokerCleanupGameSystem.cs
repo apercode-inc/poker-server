@@ -30,6 +30,10 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
     [Injectable] private Stash<PlayerAllin> _playerAllin;
     [Injectable] private Stash<PlayerCards> _playerCards;
+    [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
+    [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
+    [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
+    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
 
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -87,10 +91,16 @@ public class RoomPokerCleanupGameSystem : ISystem
             _playerTurnCompleteFlag.Remove(player);
             _playerPokerCombination.Remove(player);
             _playerAllin.Remove(player);
+            _playerTurnTimer.Remove(player);
+            _playerTurnShowdownTimer.Remove(player);
+            _playerSetPokerTurn.Remove(player);
 
             ref var playerCards = ref _playerCards.Get(player);
             playerCards.CardsState = CardsState.Empty;
             playerCards.Cards = null;
+
+            ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
+            playerPokerCurrentBet.Value = 0;
 
             var cardsDataframe = new RoomPokerSetCardsByPlayerDataframe
             {
@@ -98,6 +108,9 @@ public class RoomPokerCleanupGameSystem : ISystem
                 PlayerId = playerId.Id,
             };
             _server.SendInRoom(ref cardsDataframe, roomEntity);
+            
+            var dataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();
+            _server.Send(ref dataframe, player);
         }
     }
     

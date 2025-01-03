@@ -39,6 +39,12 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
             var roomEntity = playerRoomPoker.RoomEntity;
             
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+
+            if (roomPokerPlayers.MarkedPlayersBySeat.Count == 1)
+            {
+                continue;
+            }
+            
             ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
 
             var isContinueBiddingRound = false;

@@ -55,6 +55,11 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
+            if (roomPokerPlayers.MarkedPlayersBySeat.Count == 1)
+            {
+                continue;
+            }
+
             if (playerCards.CardsState == CardsState.Empty || _playerAllin.Has(playerEntity))
             {
                 if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer,
