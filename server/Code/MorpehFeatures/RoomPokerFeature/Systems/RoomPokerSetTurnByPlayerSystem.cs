@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils.CustomCollections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -25,6 +26,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
+    [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
 
     [Injectable] private RoomPokerService _roomPokerService;
     [Injectable] private NetFrameServer _server;
@@ -56,6 +58,11 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
             if (roomPokerPlayers.MarkedPlayersBySeat.Count == 1)
+            {
+                continue;
+            }
+
+            if (_roomPokerOnePlayerRoundGame.Has(roomEntity))
             {
                 continue;
             }
@@ -178,7 +185,6 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
         _playerTurnTimerReset.Set(playerEntity);
             
         return true;
-
     }
 
     public void Dispose()

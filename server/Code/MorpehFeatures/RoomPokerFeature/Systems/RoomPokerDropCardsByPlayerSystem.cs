@@ -1,6 +1,9 @@
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils.CustomCollections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -10,6 +13,12 @@ public class RoomPokerDropCardsByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerDropCards> _playerDropCards;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
+    [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
+    [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<RoomPokerSetCardsToTable> _roomPokerSetCardsToTable;
+
+    [Injectable] private Stash<PlayerCards> _playerCards;
 
     [Injectable] private RoomPokerService _roomPokerService;
     
@@ -37,6 +46,31 @@ public class RoomPokerDropCardsByPlayerSystem : ISystem
             
             _playerTurnCompleteFlag.Set(playerEntity);
             _playerDropCards.Remove(playerEntity);
+
+            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+            
+            var playersWithCardsPlayersCount = 0;
+        
+            foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
+            {
+                var player = markedPlayer.Value;
+                ref var playerCards = ref _playerCards.Get(player);
+            
+                if (playerCards.CardsState != CardsState.Empty)
+                {
+                    playersWithCardsPlayersCount++;
+                }
+            }
+
+            if (playersWithCardsPlayersCount > 1)
+            {
+                continue;
+            }
+        
+            _roomPokerOnePlayerRoundGame.Set(roomEntity);
+            _roomPokerSetCardsToTable.Set(roomEntity);
+            
+            _roomPokerPayoutWinnings.Set(roomEntity);
         }
     }
 

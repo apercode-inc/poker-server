@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
@@ -30,6 +29,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
     [Injectable] private Stash<RoomPokerSetCardsTickTimer> _roomPokerSetCardsTickTimer;
     [Injectable] private Stash<RoomPokerDetectCombination> _roomPokerDetectCombination;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
 
@@ -57,8 +57,14 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         foreach (var roomEntity in _filter)
         {
             _roomPokerSetCardsToTable.Remove(roomEntity);
-
             ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
+
+            if (_roomPokerOnePlayerRoundGame.Has(roomEntity))
+            {
+                roomPokerCardsToTable.State = CardToTableState.Showdown;
+                SetBank(roomEntity, roomPokerCardsToTable.State);
+                continue;
+            }
 
             var cards = roomPokerCardsToTable.Cards;
             roomPokerCardsToTable.State++;
