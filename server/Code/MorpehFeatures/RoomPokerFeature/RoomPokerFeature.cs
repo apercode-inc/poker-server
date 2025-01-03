@@ -81,6 +81,9 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerCleanupGameSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerNextDealingDelaySystem>());
         
+        //Cleanup
+        systemsGroup.AddSystem(container.New<RoomPokerDestroySystem>());
+        
         world.AddSystemsGroup(index++, systemsGroup);
     }
 }

@@ -1,6 +1,8 @@
+using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -10,6 +12,10 @@ public class RoomPokerCheckStopGameSystem : ISystem
     [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
+    [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
+    [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
+
+    [Injectable] private NetFrameServer _server;
     
     private Filter _filter;
     
@@ -41,6 +47,18 @@ public class RoomPokerCheckStopGameSystem : ISystem
             {
                 Value = 0,
             });
+            
+            ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
+            roomPokerBank.OnTable = roomPokerBank.Total;
+
+            ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
+        
+            var dataframe = new RoomPokerSetCardsToTableDataframe
+            {
+                Bank = roomPokerBank.OnTable,
+                CardToTableState = roomPokerCardsToTable.State,
+            };
+            _server.SendInRoom(ref dataframe, roomEntity);
         }
     }
     
