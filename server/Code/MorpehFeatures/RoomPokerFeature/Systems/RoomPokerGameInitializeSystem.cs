@@ -25,7 +25,7 @@ public class RoomPokerGameInitializeSystem : ISystem
     [Injectable] private Stash<PlayerDealer> _playerDealer;
     [Injectable] private Stash<PlayerNotGame> _playerNotGame;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
-
+    [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
 
@@ -112,9 +112,10 @@ public class RoomPokerGameInitializeSystem : ISystem
                 }
 
                 ref var playerAuthData = ref _playerAuthData.Get(playerEntity);
+                ref var playerNickname = ref _playerNickname.Get(playerEntity);
                 
                 playersEntity.Enqueue(playerEntity);
-                roomPokerPlayers.PlayerPotModels.Add(new PlayerPotModel(playerAuthData.Guid));
+                roomPokerPlayers.PlayerPotModels.Add(new PlayerPotModel(playerAuthData.Guid, playerNickname.Value));
             }
             
             _roomPokerSetBlinds.Set(roomEntity, new RoomPokerSetBlinds());

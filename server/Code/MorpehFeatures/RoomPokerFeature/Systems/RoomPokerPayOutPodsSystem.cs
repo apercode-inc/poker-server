@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
@@ -8,6 +9,8 @@ using server.Code.MorpehFeatures.DataBaseFeature.Utils;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
+using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -80,6 +83,7 @@ public class RoomPokerPayOutPodsSystem : ISystem
                         }
                         else
                         {
+                            SendRefundInfo(playerPotModel, roomEntity);
                             _currencyPlayerService.Give(player, roomPokerStats.CurrencyType,
                                 playerPotModel.ChipsRemaining);
                         }
@@ -97,6 +101,8 @@ public class RoomPokerPayOutPodsSystem : ISystem
                             case CurrencyType.Stars:
                                 break;
                         }
+                        
+                        SendRefundInfo(playerPotModel, roomEntity);
                     }
                 }
                 
@@ -117,6 +123,16 @@ public class RoomPokerPayOutPodsSystem : ISystem
                 _roomPokerShowdownChoiceCheck.Set(roomEntity);
             }
         }
+    }
+
+    private void SendRefundInfo(PlayerPotModel playerPotModel, Entity roomEntity)
+    {
+        var dataframe = new RoomPokerCroupierRefundDataframe
+        {
+            Nickname = playerPotModel.Nickname,
+            RefundValue = playerPotModel.ChipsRemaining,
+        };
+        _server.SendInRoom(ref dataframe, roomEntity);
     }
 
     public void Dispose()
