@@ -37,13 +37,18 @@ public class StartServerSystem : ISystem
 
     private void OnClientConnection(int id)
     {
-        Logger.DebugColor($"connected player id = {id}", ConsoleColor.Green);
+        var currentDateTime = DateTime.Now;
+        var ipAddress = _server.GetClientAddress(id);
+        Logger.Debug($"[{currentDateTime}] connected player ip = {ipAddress}, id = {id}");
+        
         _playerStorage.Add(id);
     }
-    
+
     private void OnClientDisconnect(int id)
     {
-        Logger.DebugColor($"disconnected player id = {id}", ConsoleColor.Yellow);
+        var currentDateTime = DateTime.Now;
+        Logger.Debug($"[{currentDateTime}] disconnected player, id = {id}");
+        
         _playerStorage.Remove(id);
     }
 
