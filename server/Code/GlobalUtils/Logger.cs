@@ -7,6 +7,8 @@ public static class Logger
 {
     public static void Debug(string text, bool isSend = false)
     {
+        Console.WriteLine(text);
+        
         if (isSend)
         {
             SentrySdk.CaptureMessage(text, SentryLevel.Debug);
