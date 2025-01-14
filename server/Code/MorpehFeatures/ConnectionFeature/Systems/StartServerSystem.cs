@@ -39,22 +39,21 @@ public class StartServerSystem : ISystem
 
     private void OnClientConnection(int id)
     {
-        ShowLogPlayerInfo("connected player", id);
+        var currentDateTime = DateTime.Now;
+        var ipAddress = _server.GetClientAddress(id);
+        Logger.Debug($"[{currentDateTime}] connected player ip = {ipAddress}, id = {id}");
+        
         _playerStorage.Add(id);
     }
-    
+
     private void OnClientDisconnect(int id)
     {
-        ShowLogPlayerInfo("disconnected player", id);
+        var currentDateTime = DateTime.Now;
+        Logger.Debug($"[{currentDateTime}] disconnected player, id = {id}");
+        
         _playerStorage.Remove(id);
     }
 
-    private void ShowLogPlayerInfo(string message, int id)
-    {
-        var currentDateTime = DateTime.Now;
-        Logger.Debug($"[{currentDateTime}] {message} id = {id}");
-    }
-    
     private void OnCallLog(NetworkLogType logType, string message)
     {
         switch (logType)
