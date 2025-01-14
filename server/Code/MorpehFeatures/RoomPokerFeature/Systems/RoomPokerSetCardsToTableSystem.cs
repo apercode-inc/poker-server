@@ -62,7 +62,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
             if (_roomPokerOnePlayerRoundGame.Has(roomEntity))
             {
                 roomPokerCardsToTable.State = CardToTableState.Showdown;
-                SetBank(roomEntity, roomPokerCardsToTable.State);
+                SetBankAndSendDataframe(roomEntity, roomPokerCardsToTable.State);
                 continue;
             }
 
@@ -83,7 +83,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                     SetCardsAndBank(roomEntity, roomPokerCardsToTable.State, cards, CardRiverCount);
                     break;
                 case CardToTableState.Showdown:
-                    SetBank(roomEntity, roomPokerCardsToTable.State);
+                    SetBankAndSendDataframe(roomEntity, roomPokerCardsToTable.State);
                     _roomPokerDetectCombination.Set(roomEntity);
                     break;
             }
@@ -93,10 +93,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
     private void SetCardsAndBank(Entity roomEntity, CardToTableState cardToTableState, Queue<CardModel> cards, int cardCount)
     {
         ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
-        ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
 
-        roomPokerBank.OnTable = roomPokerBank.Total;
-        
         var cardsNetworkModels = new List<RoomPokerCardNetworkModel>();
         
         for (var i = 0; i < cardCount; i++)
@@ -116,14 +113,8 @@ public class RoomPokerSetCardsToTableSystem : ISystem
                 throw new Exception($"[RoomPokerSetCardsToTableSystem.SetCards] No cards in deck, roomId = {roomPokerId.Value}");
             }
         }
-        
-        var dataframe = new RoomPokerSetCardsToTableDataframe
-        {
-            Bank = roomPokerBank.OnTable,
-            CardToTableState = cardToTableState,
-            Cards = cardsNetworkModels,
-        };
-        _server.SendInRoom(ref dataframe, roomEntity);
+
+        SetBankAndSendDataframe(roomEntity, cardToTableState, cardsNetworkModels);
         
         var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
         _roomPokerSetCardsTickTimer.Set(roomEntity, new RoomPokerSetCardsTickTimer
@@ -132,7 +123,8 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         });
     }
     
-    private void SetBank(Entity roomEntity, CardToTableState cardToTableState)
+    private void SetBankAndSendDataframe(Entity roomEntity, CardToTableState cardToTableState, 
+        List<RoomPokerCardNetworkModel> cards = null)
     {
         ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
         roomPokerBank.OnTable = roomPokerBank.Total;
@@ -141,6 +133,7 @@ public class RoomPokerSetCardsToTableSystem : ISystem
         {
             Bank = roomPokerBank.OnTable,
             CardToTableState = cardToTableState,
+            Cards = cards,
         };
         _server.SendInRoom(ref dataframe, roomEntity);
     }
