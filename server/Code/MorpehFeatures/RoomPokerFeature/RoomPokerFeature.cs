@@ -78,6 +78,7 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerShowdownForcedByPlayerSystem>());
         
         //End game logic
+        systemsGroup.AddSystem(container.New<RoomPokerCleanupTimerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerCleanupGameSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerNextDealingDelaySystem>());
         

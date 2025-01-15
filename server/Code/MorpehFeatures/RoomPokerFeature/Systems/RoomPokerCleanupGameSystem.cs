@@ -16,7 +16,7 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
 public class RoomPokerCleanupGameSystem : ISystem
 {
-    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
+    [Injectable] private Stash<RoomPokerCleanup> _roomPokerCleanup;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
@@ -46,8 +46,8 @@ public class RoomPokerCleanupGameSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
-            .With<RoomPokerCleanupTimer>()
             .With<RoomPokerPlayers>()
+            .With<RoomPokerCleanup>()
             .Without<RoomPokerShowOrHideCards>()
             .Build();
     }
@@ -56,24 +56,10 @@ public class RoomPokerCleanupGameSystem : ISystem
     {
         foreach (var roomEntity in _filter)
         {
-            ref var roomPokerNextDealingTimer = ref _roomPokerCleanupTimer.Get(roomEntity);
-            
-            if (!_roomPokerActive.Has(roomEntity))
-            {
-                roomPokerNextDealingTimer.Value = 0;
-            }
-
-            roomPokerNextDealingTimer.Value -= deltaTime;
-
-            if (roomPokerNextDealingTimer.Value > 0)
-            {
-                continue;
-            }
-            
             CleanupPlayers(roomEntity);
             CleanupGame(roomEntity);
             
-            _roomPokerCleanupTimer.Remove(roomEntity);
+            _roomPokerCleanup.Remove(roomEntity);
         }
     }
 

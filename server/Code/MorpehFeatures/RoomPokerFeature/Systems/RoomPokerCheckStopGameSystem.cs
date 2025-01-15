@@ -9,7 +9,7 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerCheckStopGameSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
+    [Injectable] private Stash<RoomPokerCleanup> _roomPokerCleanup;
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
@@ -41,12 +41,9 @@ public class RoomPokerCheckStopGameSystem : ISystem
             }
             
             _roomPokerPayoutWinnings.Set(roomEntity);
+            _roomPokerCleanup.Set(roomEntity);
+            
             _roomPokerActive.Remove(roomEntity);
-                
-            _roomPokerCleanupTimer.Set(roomEntity, new RoomPokerCleanupTimer
-            {
-                Value = 0,
-            });
             
             ref var roomPokerBank = ref _roomPokerBank.Get(roomEntity);
             roomPokerBank.OnTable = roomPokerBank.Total;
