@@ -23,7 +23,7 @@ public class RoomPokerStorage : IInitializer
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
     [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
-    [Injectable] private Stash<Destroy> _destroy;
+    [Injectable] private Stash<RoomPokerReadyDestroy> _roomPokerReadyDestroy;
 
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
 
@@ -122,11 +122,13 @@ public class RoomPokerStorage : IInitializer
         {
             ref var roomPokerId = ref _roomPokerId.Get(entity);
 
-            if (roomPokerId.Value == id)
+            if (roomPokerId.Value != id)
             {
-                _destroy.Set(entity);
-                break;
+                continue;
             }
+            
+            _roomPokerReadyDestroy.Set(entity);
+            break;
         }
     }
 

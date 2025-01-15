@@ -56,7 +56,7 @@ public class RoomPokerCalculatePayoutWinningsSystem : ISystem
             _roomPokerPaidOutToPlayers.Set(roomEntity, new RoomPokerPaidOutToPlayers
             {
                 PaidDelay = delayPayOut,
-                PaidCooldown = delayPayOut,
+                PaidCooldown = 0,
                 PaidOutToPlayers = paidOutToPlayers,
             });
 

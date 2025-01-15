@@ -1,7 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using Scellecs.Morpeh.Collections;
-using server.Code.GlobalUtils;
 using server.Code.GlobalUtils.CustomCollections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -22,6 +20,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
     [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
+    [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
 
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
@@ -36,6 +35,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerAllin> _playerAllin;
+    [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
@@ -102,33 +102,6 @@ public class RoomPokerService : IInitializer
                 SetActivePlayerMarkerOrGivenBank(roomEntity);
             }
         }
-    }
-    
-    public bool TryOnePlayerRoundGame(Entity roomEntity)
-    {
-        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-        var playersWithCardsPlayersCount = 0;
-        
-        foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
-        {
-            var player = markedPlayer.Value;
-            ref var playerCards = ref _playerCards.Get(player);
-            
-            if (playerCards.CardsState != CardsState.Empty)
-            {
-                playersWithCardsPlayersCount++;
-            }
-        }
-
-        if (playersWithCardsPlayersCount > 1)
-        {
-            return false;
-        }
-        
-        _roomPokerOnePlayerRoundGame.Set(roomEntity);
-        _roomPokerPayoutWinnings.Set(roomEntity);
-
-        return true;
     }
 
     public void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
@@ -214,20 +187,22 @@ public class RoomPokerService : IInitializer
     private void CleanupPlayer(Entity roomEntity, Entity playerLeft,
         MovingMarkersDictionary<Entity, PokerPlayerMarkerType> markedPlayersBySeat)
     {
-        
-        ref var roomPokerId = ref _roomPokerId.Get(roomEntity);
-        
         if (_playerShowOrHideTimer.Has(playerLeft))
         {
             _roomPokerShowOrHideCardsActivate.Set(roomEntity);
             _playerShowOrHideTimer.Remove(playerLeft);
         }
+        
+        if (_playerTurnShowdownTimer.Has(playerLeft))
+        {
+            _playerTurnShowdownTimer.Remove(playerLeft);
+            _roomPokerShowdownChoiceCheck.Set(roomEntity);
+        }
 
         ref var playerId = ref _playerId.Get(playerLeft);
 
-        var dataframe = new RoomPokerLeftResponseDataframe
+        var dataframe = new RoomPokerLeaveResponseDataframe
         {
-            RoomId = roomPokerId.Value,
             PlayerId = playerId.Id,
         };
         _server.SendInRoom(ref dataframe, roomEntity);
@@ -246,7 +221,9 @@ public class RoomPokerService : IInitializer
         {
             return;
         }
-
+        
+        ref var roomPokerId = ref _roomPokerId.Get(roomEntity);
+        
         _roomPokerStorage.Remove(roomPokerId.Value);
     }
 

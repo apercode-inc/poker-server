@@ -21,7 +21,6 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
     [Injectable] private Stash<Destroy> _destroy;
     
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
-    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
 
     [Injectable] private NetFrameServer _server;
@@ -51,15 +50,6 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
             var roomEntity = playerRoomPoker.RoomEntity;
 
-            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-            if (_destroy.Has(playerEntity) || roomPokerPlayers.MarkedPlayersBySeat.Count == 1)
-            {
-                _roomPokerPayoutWinnings.Set(roomEntity);
-                ResetTimer(playerEntity);
-                continue;
-            }
-            
             if (playerTurnTimer.TimeCurrent < playerTurnTimer.TimeMax)
             {
                 continue;
@@ -78,16 +68,11 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
                 _playerPokerCheck.Set(playerEntity);
             }
 
-            ResetTimer(playerEntity);
+            var dataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();
+            _server.Send(ref dataframe, playerEntity);
+
+            _playerTurnTimerReset.Set(playerEntity);
         }
-    }
-
-    private void ResetTimer(Entity playerEntity)
-    {
-        var dataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();
-        _server.Send(ref dataframe, playerEntity);
-
-        _playerTurnTimerReset.Set(playerEntity);
     }
 
     public void Dispose()

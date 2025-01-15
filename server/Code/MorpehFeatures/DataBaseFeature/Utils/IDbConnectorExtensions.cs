@@ -14,7 +14,8 @@ public static class IDbConnectorExtensions
         public static async Task<T> ExecuteAsync<T>(this IDbConnector connector, Func<DatabaseSession, Task<T>> func)
         {
 #if DEBUG
-            Logger.Debug($"IDbConnectorExtensions call at {func.GetMethodInfo()}");
+            var dateTime = DateTime.Now;
+            Logger.Debug($"[{dateTime}] IDbConnectorExtensions call at {func.GetMethodInfo()}");
 #endif
             
             ThrowIfMainThread();

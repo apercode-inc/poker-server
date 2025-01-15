@@ -1,5 +1,4 @@
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -10,6 +9,8 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerDealingCardsTimerSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerDealingTimer> _pokerDealingTimer;
+    [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
+    [Injectable] private Stash<RoomPokerDealingCardsToPlayerSet> _roomPokerDealingCardsToPlayerSet;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
 
@@ -21,6 +22,7 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
     {
         _filter = World.Filter
             .With<RoomPokerDealingTimer>()
+            .With<RoomPokerDealingCardsToPlayer>()
             .Build();
     }
 

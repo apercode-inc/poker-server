@@ -34,6 +34,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
             .With<RoomPokerId>()
             .With<RoomPokerPlayers>()
             .With<RoomPokerStats>()
+            .Without<RoomPokerReadyDestroy>()
             .Build();
     }
 

@@ -16,18 +16,24 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
 public class RoomPokerCleanupGameSystem : ISystem
 {
-    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
+    [Injectable] private Stash<RoomPokerCleanup> _roomPokerCleanup;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
     [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
+    [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
+    [Injectable] private Stash<RoomPokerCleanedGame> _roomPokerCleanedGame;
 
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
     [Injectable] private Stash<PlayerAllin> _playerAllin;
     [Injectable] private Stash<PlayerCards> _playerCards;
+    [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
+    [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
+    [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
+    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
 
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -40,8 +46,8 @@ public class RoomPokerCleanupGameSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
-            .With<RoomPokerCleanupTimer>()
             .With<RoomPokerPlayers>()
+            .With<RoomPokerCleanup>()
             .Without<RoomPokerShowOrHideCards>()
             .Build();
     }
@@ -50,22 +56,10 @@ public class RoomPokerCleanupGameSystem : ISystem
     {
         foreach (var roomEntity in _filter)
         {
-            ref var roomPokerNextDealingTimer = ref _roomPokerCleanupTimer.Get(roomEntity);
-            
-            if (!_roomPokerActive.Has(roomEntity))
-            {
-                roomPokerNextDealingTimer.Value = 0;
-            }
-
-            roomPokerNextDealingTimer.Value -= deltaTime;
-
-            if (roomPokerNextDealingTimer.Value > 0)
-            {
-                continue;
-            }
-
             CleanupPlayers(roomEntity);
             CleanupGame(roomEntity);
+            
+            _roomPokerCleanup.Remove(roomEntity);
         }
     }
 
@@ -83,10 +77,16 @@ public class RoomPokerCleanupGameSystem : ISystem
             _playerTurnCompleteFlag.Remove(player);
             _playerPokerCombination.Remove(player);
             _playerAllin.Remove(player);
+            _playerTurnTimer.Remove(player);
+            _playerTurnShowdownTimer.Remove(player);
+            _playerSetPokerTurn.Remove(player);
 
             ref var playerCards = ref _playerCards.Get(player);
             playerCards.CardsState = CardsState.Empty;
             playerCards.Cards = null;
+
+            ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
+            playerPokerCurrentBet.Value = 0;
 
             var cardsDataframe = new RoomPokerSetCardsByPlayerDataframe
             {
@@ -94,6 +94,9 @@ public class RoomPokerCleanupGameSystem : ISystem
                 PlayerId = playerId.Id,
             };
             _server.SendInRoom(ref cardsDataframe, roomEntity);
+            
+            var dataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();
+            _server.Send(ref dataframe, player);
         }
     }
     
@@ -101,7 +104,6 @@ public class RoomPokerCleanupGameSystem : ISystem
     {
         var cardsToTableDataframe = new RoomPokerSetCardsToTableDataframe
         {
-            Bank = 0,
             CardToTableState = CardToTableState.PreFlop,
             Cards = new List<RoomPokerCardNetworkModel>(),
         };
@@ -109,9 +111,12 @@ public class RoomPokerCleanupGameSystem : ISystem
 
         var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
 
-        _roomPokerCleanupTimer.Remove(roomEntity);
-        _roomPokerCardDeskService.ReturnCardsInDeskToTable(roomEntity);
+        ref var roomPokerCardsToTable = ref _roomPokerCardsToTable.Get(roomEntity);
+        roomPokerCardsToTable.State = CardToTableState.PreFlop;
+        roomPokerCardsToTable.Cards.Clear();
+        
         _roomPokerOnePlayerRoundGame.Remove(roomEntity);
+        _roomPokerCleanedGame.Set(roomEntity);
 
         if (!_roomPokerActive.Has(roomEntity))
         {

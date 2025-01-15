@@ -33,7 +33,7 @@ public struct RoomPokerSetCardsByPlayerDataframe : INetworkDataframe
         PlayerId = reader.ReadInt();
         CardsState = (CardsState) reader.ReadInt();    
             
-        Cards = null; //todo временный костыль, нужно исправлять в NetFrame.  Переиспользуется коллекция с прошлой отправки
+        Cards = null; //todo временный костыль, нужно исправлять в NetFrame. Переиспользуется коллекция с прошлой отправки
         var count = reader.ReadInt(); 
         
         if (count != 0)
