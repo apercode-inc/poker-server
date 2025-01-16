@@ -56,7 +56,7 @@ public class RoomPokerSetStrengthHandSystem : ISystem
                 }
 
                 playerPokerCombination.HandStrength = GetStrengthCombination(playerPokerCombination.CombinationType,
-                    playerPokerCombination.CombinationCards);
+                    ref playerPokerCombination.CombinationCards);
 
                 ref var playerAuthData = ref _playerAuthData.Get(player);
 
@@ -76,7 +76,7 @@ public class RoomPokerSetStrengthHandSystem : ISystem
         }
     }
 
-    private int GetStrengthCombination(CombinationType combinationStrength, List<CardModel> combinationCards)
+    private int GetStrengthCombination(CombinationType combinationStrength, ref List<CardModel> combinationCards)
     {
         var strength = 0;
         switch (combinationStrength)
@@ -123,7 +123,7 @@ public class RoomPokerSetStrengthHandSystem : ISystem
         return sortedCards;
     }
     
-    private int GetStrengthCombination(List<CardModel> combinationCards)
+    private int GetStrengthCombination(IReadOnlyList<CardModel> combinationCards)
     {
         var multiplier = 1;
         var strength = 0;

@@ -33,7 +33,6 @@ public struct RoomPokerPlayerTurnRequestDataframe : INetworkDataframe
     {
         TurnType = (PokerPlayerTurnType)reader.ReadInt();
         RequiredBet = reader.ReadLong();
-        RaiseBets = null; //todo временный костыль, нужно исправлять в NetFrame. Переиспользуется коллекция с прошлой отправки
 
         if (reader.ReadBool())
         {
