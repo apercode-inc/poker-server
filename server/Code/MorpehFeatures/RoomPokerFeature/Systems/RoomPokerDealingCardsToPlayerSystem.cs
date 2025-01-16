@@ -85,8 +85,7 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
                 {
                     continue;
                 }
-
-                cardModel.IsHands = true;
+                
                 cardsModel.Enqueue(cardModel);
 
                 _networkCardsModel.Add(new RoomPokerCardNetworkModel

@@ -13,6 +13,7 @@ using server.Code.MorpehFeatures.NotificationFeature;
 using server.Code.MorpehFeatures.AuthenticationFeature;
 using server.Code.MorpehFeatures.GameTimeFeature;
 using server.Code.MorpehFeatures.LocalizationFeature;
+using server.Code.MorpehFeatures.ShowCombinationFeature;
 
 namespace server.Code;
 
@@ -45,6 +46,7 @@ public static class MorpehInitializer
         PlayersFeature.Add(world, ref groupIndex, container);
         CurrencyFeature.Add(world, ref groupIndex, container);
         RoomPokerFeature.Add(world, ref groupIndex, container);
+        ShowCombinationFeature.Add(world, ref groupIndex, container);
         RoomChatFeature.Add(world, ref groupIndex, container);
 
         // Cleanup

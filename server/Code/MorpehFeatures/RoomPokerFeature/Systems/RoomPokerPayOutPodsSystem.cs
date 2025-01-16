@@ -25,9 +25,9 @@ public class RoomPokerPayOutPodsSystem : ISystem
     [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
 
     [Injectable] private Stash<PlayerNickname> _playerNickname;
-    [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerShowdownForced> _playerShowdownForced;
+    [Injectable] private Stash<PlayerSendWinCombination> _playerSendWinCombination;
 
     [Injectable] private ConfigsService _configsService;
     [Injectable] private PlayerStorage _playerStorage;
@@ -80,6 +80,8 @@ public class RoomPokerPayOutPodsSystem : ISystem
                             {
                                 _playerShowdownForced.Set(player);
                             }
+                            
+                            _playerSendWinCombination.Set(player);
                         }
                         else
                         {
