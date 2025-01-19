@@ -51,14 +51,14 @@ public class RoomPokerShowdownTurnRequestByPlayerSystem : ISystem
             var timeDataframe = new RoomPokerSetTimerTurnDataframe
             {
                 PlayerId = playerId.Id,
-                Time = roomPokerStats.TurnTime,
+                Time = roomPokerStats.TurnShowdownTime,
             };
             _server.SendInRoom(ref timeDataframe, roomEntity);
             
             _playerTurnShowdownTimer.Set(playerEntity, new PlayerTurnShowdownTimer
             {
                 TimeCurrent = 0,
-                TimeMax = roomPokerStats.TurnTime,
+                TimeMax = roomPokerStats.TurnShowdownTime,
             });
             
             _playerPokerShowdownTurnRequest.Remove(playerEntity);

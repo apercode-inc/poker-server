@@ -7,5 +7,5 @@ public struct RoomPokerPaidOutToPlayers : IComponent
 {
     public float PaidDelay;
     public float PaidCooldown;
-    public List<List<PlayerPotModel>> PaidOutToPlayers;
+    public List<PlayerPotModel> PaidOutToPlayers;
 }

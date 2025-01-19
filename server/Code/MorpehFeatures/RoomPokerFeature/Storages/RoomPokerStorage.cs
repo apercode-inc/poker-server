@@ -63,6 +63,7 @@ public class RoomPokerStorage : IInitializer
         
         var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
         var turnTime = isFastTurn ? config.PlayerTurnTimeFast : config.PlayerTurnTime;
+        var turnShowdownTime = isFastTurn ? config.PlayerTurnShowdownTimeFast : config.PlayerTurnShowdownTime;
 
         _roomPokerId.Set(roomEntity, new RoomPokerId
         {
@@ -75,6 +76,7 @@ public class RoomPokerStorage : IInitializer
             Contribution = contribution,
             BigBet = bigBet,
             TurnTime = turnTime,
+            TurnShowdownTime = turnShowdownTime,
         });
         
         var markedPlayersBySeat = _pokerSeatsFactory

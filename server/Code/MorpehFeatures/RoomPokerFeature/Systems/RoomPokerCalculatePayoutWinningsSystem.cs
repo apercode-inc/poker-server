@@ -39,16 +39,16 @@ public class RoomPokerCalculatePayoutWinningsSystem : ISystem
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             var players = roomPokerPlayers.PlayerPotModels;
 
-            var paidOutToPlayers = new List<List<PlayerPotModel>>();
+            var paidOutToPlayers = new List<PlayerPotModel>();
             
             while (PotChipsRemaining(players) > 0)
             {
                 var payOutWinners = GetPayOutWinners(CalculateAndSortWinners(players), players);
-                paidOutToPlayers.Add(payOutWinners);
+                paidOutToPlayers.AddRange(payOutWinners);
             }
 
             // Refund players if remaining chips in pot (bigger/folded stacks)
-            paidOutToPlayers.Add(GetPayOutRefund(players));
+            paidOutToPlayers.AddRange(GetPayOutRefund(players));
             
             var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
             var delayPayOut = config.DelayPayOut;

@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
@@ -62,54 +61,51 @@ public class RoomPokerPayOutPodsSystem : ISystem
                     continue;
                 }
 
-                var paidOutToPlayer = roomPokerPaidOutToPlayers.PaidOutToPlayers.First();
+                var playerPotModel = roomPokerPaidOutToPlayers.PaidOutToPlayers.First();
 
-                foreach (var playerPotModel in paidOutToPlayer)
-                {
-                    ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
+                ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
                     
-                    if (_playerStorage.TryGetPlayerByGuid(playerPotModel.Guid, out var player))
+                if (_playerStorage.TryGetPlayerByGuid(playerPotModel.Guid, out var player))
+                {
+                    ref var playerRoomPoker = ref _playerRoomPoker.Get(player, out var playerRoomExist);
+
+                    if (playerRoomExist && playerRoomPoker.RoomEntity == roomEntity)
                     {
-                        ref var playerRoomPoker = ref _playerRoomPoker.Get(player, out var playerRoomExist);
+                        _currencyPlayerService.TryGiveBank(roomEntity, player, playerPotModel.ChipsRemaining);
 
-                        if (playerRoomExist && playerRoomPoker.RoomEntity == roomEntity)
+                        if (!_roomPokerOnePlayerRoundGame.Has(roomEntity))
                         {
-                            _currencyPlayerService.TryGiveBank(roomEntity, player, playerPotModel.ChipsRemaining);
-
-                            if (!_roomPokerOnePlayerRoundGame.Has(roomEntity))
-                            {
-                                _playerShowdownForced.Set(player);
-                            }
+                            _playerShowdownForced.Set(player);
+                        }
                             
-                            _playerSendWinCombination.Set(player);
-                        }
-                        else
-                        {
-                            SendRefundInfo(playerPotModel, roomEntity);
-                            _currencyPlayerService.Give(player, roomPokerStats.CurrencyType,
-                                playerPotModel.ChipsRemaining);
-                        }
+                        _playerSendWinCombination.Set(player);
                     }
                     else
                     {
-                        switch (roomPokerStats.CurrencyType)
-                        {
-                            case CurrencyType.Chips:
-                                _playerDbService.IncreaseChipsPlayerThreadPool(playerPotModel.Guid, playerPotModel.ChipsRemaining)
-                                    .Forget();
-                                break;
-                            case CurrencyType.Gold:
-                                break;
-                            case CurrencyType.Stars:
-                                break;
-                        }
-                        
                         SendRefundInfo(playerPotModel, roomEntity);
+                        _currencyPlayerService.Give(player, roomPokerStats.CurrencyType,
+                            playerPotModel.ChipsRemaining);
                     }
+                }
+                else
+                {
+                    switch (roomPokerStats.CurrencyType)
+                    {
+                        case CurrencyType.Chips:
+                            _playerDbService.IncreaseChipsPlayerThreadPool(playerPotModel.Guid, playerPotModel.ChipsRemaining)
+                                .Forget();
+                            break;
+                        case CurrencyType.Gold:
+                            break;
+                        case CurrencyType.Stars:
+                            break;
+                    }
+                        
+                    SendRefundInfo(playerPotModel, roomEntity);
                 }
                 
                 roomPokerPaidOutToPlayers.PaidCooldown = 0;
-                roomPokerPaidOutToPlayers.PaidOutToPlayers.Remove(paidOutToPlayer);
+                roomPokerPaidOutToPlayers.PaidOutToPlayers.Remove(playerPotModel);
             }
             else
             {

@@ -10,4 +10,5 @@ public struct RoomPokerStats : IComponent
     public long Contribution;
     public long BigBet;
     public float TurnTime;
+    public float TurnShowdownTime;
 }
