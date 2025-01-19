@@ -26,13 +26,10 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
     [Injectable] private PlayerStorage _playerStorage;
     [Injectable] private NetFrameServer _server;
 
-    private List<long> _tempRaiseBets;
-    
     public World World { get; set; }
 
     public void OnAwake()
     {
-        _tempRaiseBets = new List<long>();
         _server.Subscribe<RoomPokerHudSetBetRequestDataframe>(Handler);
     }
 
@@ -76,10 +73,10 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
         _playerTurnTimerReset.Set(player);
     }
 
-    private bool IsPlayerBetValid(Entity playerEntity, Entity roomEntity, long requestedBet)
+    private bool IsPlayerBetValid(Entity playerEntity, Entity roomEntity, long playerBet)
     {
         ref var playerPokerContribution = ref _playerPokerContribution.Get(playerEntity, out bool exist);
-        if (!exist && playerPokerContribution.Value < requestedBet)
+        if (!exist || playerPokerContribution.Value < playerBet)
         {
             return false;
         }
@@ -87,6 +84,17 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
         ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
         ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
         ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
+
+        if (roomPokerStats.BigBet <= 0)
+        {
+            Logger.LogWarning("Room big bet is 0. This should never happen");
+            return false;
+        }
+
+        if (playerBet == playerPokerContribution.Value)
+        {
+            return true;
+        }
 
         var requiredBet = roomPokerMaxBet.Value - playerPokerCurrentBet.Value;
         var remainderAfterCall = playerPokerContribution.Value - requiredBet;
@@ -96,25 +104,20 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
             requiredBet -= playerPokerContribution.Value;
         }
         
-        if (requestedBet == requiredBet && requiredBet > 0)
+        if (playerBet == requiredBet && requiredBet > 0)
         {
             return true;
         }
         
-        _tempRaiseBets.Clear();
-        if (roomPokerStats.BigBet > 0)
+        var raiseBet = requiredBet;
+        while (playerPokerContribution.Value > raiseBet)
         {
-            var raiseBet = requiredBet + roomPokerStats.BigBet;
-            _tempRaiseBets.Add(raiseBet);
-            while (playerPokerContribution.Value > raiseBet)
-            {
-                raiseBet += roomPokerStats.BigBet;
-                _tempRaiseBets.Add(raiseBet);
-            }
-            _tempRaiseBets.Add(playerPokerContribution.Value);
+            raiseBet += roomPokerStats.BigBet;
+            if (raiseBet == playerBet)
+                return true;
         }
-
-        return _tempRaiseBets.Contains(requestedBet);
+        
+        return false;
     }
 
     public void Dispose()
