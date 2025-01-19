@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
@@ -13,17 +14,25 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
+    [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
+    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
+    [Injectable] private Stash<PlayerSetBet> _playerSetBet;
+    [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    [Injectable] private Stash<PlayerSetBet> _playerSetBet;
+    [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
+    [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
 
     [Injectable] private PlayerStorage _playerStorage;
     [Injectable] private NetFrameServer _server;
+
+    private List<long> _tempRaiseBets;
     
     public World World { get; set; }
 
     public void OnAwake()
     {
+        _tempRaiseBets = new List<long>();
         _server.Subscribe<RoomPokerHudSetBetRequestDataframe>(Handler);
     }
 
@@ -53,11 +62,59 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
             return;
         }
 
+        if (!IsPlayerBetValid(player, roomEntity, dataframe.Bet))
+        {
+            ref var authData = ref _playerAuthData.Get(player);
+            Logger.LogWarning($"Player sent not valid bet! Guid: {authData.Guid}, bet: {dataframe.Bet}");
+            return;
+        }
+        
         _playerSetBet.Set(player, new PlayerSetBet
         {
             Bet = dataframe.Bet,
         });
         _playerTurnTimerReset.Set(player);
+    }
+
+    private bool IsPlayerBetValid(Entity playerEntity, Entity roomEntity, long requestedBet)
+    {
+        ref var playerPokerContribution = ref _playerPokerContribution.Get(playerEntity, out bool exist);
+        if (!exist && playerPokerContribution.Value < requestedBet)
+        {
+            return false;
+        }
+
+        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
+        ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
+        ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
+
+        var requiredBet = roomPokerMaxBet.Value - playerPokerCurrentBet.Value;
+        var remainderAfterCall = playerPokerContribution.Value - requiredBet;
+
+        if (requiredBet > 0 && remainderAfterCall == 0)
+        {
+            requiredBet -= playerPokerContribution.Value;
+        }
+        
+        if (requestedBet == requiredBet && requiredBet > 0)
+        {
+            return true;
+        }
+        
+        _tempRaiseBets.Clear();
+        if (roomPokerStats.BigBet > 0)
+        {
+            var raiseBet = requiredBet + roomPokerStats.BigBet;
+            _tempRaiseBets.Add(raiseBet);
+            while (playerPokerContribution.Value > raiseBet)
+            {
+                raiseBet += roomPokerStats.BigBet;
+                _tempRaiseBets.Add(raiseBet);
+            }
+            _tempRaiseBets.Add(playerPokerContribution.Value);
+        }
+
+        return _tempRaiseBets.Contains(requestedBet);
     }
 
     public void Dispose()
