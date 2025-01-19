@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils.CustomCollections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -109,26 +108,11 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                 turnType = PokerPlayerTurnType.OnlyAllIn;
                 requiredBet -= playerPokerContribution.Value;
             }
-
-            var raiseBets = new List<long>();
-
-            if (playerPokerContribution.Value > requiredBet)
-            {
-                var raiseBet = requiredBet + roomPokerStats.BigBet;
-                raiseBets.Add(raiseBet);
-                while (playerPokerContribution.Value > raiseBet)
-                {
-                    raiseBet += roomPokerStats.BigBet;
-                    raiseBets.Add(raiseBet);
-                }
-                raiseBets.Add(playerPokerContribution.Value);
-            }
            
             var dataframe = new RoomPokerPlayerTurnRequestDataframe
             {
                 TurnType = turnType,
                 RequiredBet = requiredBet,
-                RaiseBets = raiseBets,
             };
             _server.Send(ref dataframe, playerEntity);
 
