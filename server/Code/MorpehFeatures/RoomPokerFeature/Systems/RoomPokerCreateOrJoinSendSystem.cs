@@ -146,6 +146,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                 MaxPlayers = roomPokerStats.MaxPlayers,
                 CardToTableState = roomPokerCardsToTable.State,
                 Bank = roomPokerBank.OnTable,
+                BigBet = roomPokerStats.BigBet,
                 CardToTableModels = cardsToTableNetworkModel,
                 CurrencyType = roomPokerStats.CurrencyType,
                 PlayerModels = roomPlayerNetworkModels,
