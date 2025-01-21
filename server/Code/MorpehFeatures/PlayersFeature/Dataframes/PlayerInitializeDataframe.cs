@@ -10,6 +10,7 @@ public struct PlayerInitializeDataframe : INetworkDataframe
     public int AvatarIndex;
     public int Level;
     public int Experience;
+    public string PlayerGuid;
     
     public void Write(NetFrameWriter writer)
     {
@@ -18,6 +19,7 @@ public struct PlayerInitializeDataframe : INetworkDataframe
         writer.WriteInt(AvatarIndex);
         writer.WriteInt(Level);
         writer.WriteInt(Experience);
+        writer.WriteString(PlayerGuid);
     }
 
     public void Read(NetFrameReader reader)
@@ -27,5 +29,6 @@ public struct PlayerInitializeDataframe : INetworkDataframe
         AvatarIndex = reader.ReadInt();
         Level = reader.ReadInt();
         Experience = reader.ReadInt();
+        PlayerGuid = reader.ReadString();
     }
 }

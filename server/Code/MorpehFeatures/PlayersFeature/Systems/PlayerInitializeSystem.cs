@@ -17,6 +17,7 @@ public class PlayerInitializeSystem : ISystem
     [Injectable] private Stash<PlayerAvatar> _playerAvatar;
     [Injectable] private Stash<PlayerInitialize> _playerInitialize;
     [Injectable] private Stash<PlayerAdsDbCooldownModelRequest> _playerAdsDbCooldownModelRequest;
+    [Injectable] private Stash<PlayerAuthData> _playerAuthData;
 
     [Injectable] private NetFrameServer _server;
     
@@ -37,6 +38,7 @@ public class PlayerInitializeSystem : ISystem
         foreach (var playerEntity in _filter)
         {
             ref var playerInitialize = ref _playerInitialize.Get(playerEntity);
+            ref var playerAuthData = ref _playerAuthData.Get(playerEntity);
 
             var model = playerInitialize.DbPlayerModel;
             
@@ -80,6 +82,7 @@ public class PlayerInitializeSystem : ISystem
                 AvatarIndex = model.avatar_id,
                 Level = model.level,
                 Experience = model.experience,
+                PlayerGuid = playerAuthData.Guid,
             };
             _server.Send(ref playerInitializeDataframe, playerEntity);
 
