@@ -44,10 +44,7 @@ public struct RoomPokerDealingCardsByPlayerDataframe : INetworkDataframe
     public void Read(NetFrameReader reader)
     {
         DealingCardsTime = reader.ReadFloat();
-            
-        Cards = null; //todo временный костыль, нужно исправлять в NetFrame. Переиспользуется коллекция с прошлой отправки
-        AllPlayersIds = null; //todo временный костыль, нужно исправлять в NetFrame. Переиспользуется коллекция с прошлой отправки
-        
+
         if (reader.ReadBool())
         {
             var cardsCount = reader.ReadInt();

@@ -5,5 +5,5 @@ namespace server.Code.MorpehFeatures.PlayersFeature.Components;
 public struct PlayerTurnTimer : IComponent
 {
     public float TimeCurrent;
-    public int TimeMax;
+    public float TimeMax;
 }

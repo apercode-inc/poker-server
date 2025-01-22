@@ -3,24 +3,26 @@ using NetFrame.WriteAndRead;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
-namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
+namespace server.Code.MorpehFeatures.ShowCombinationFeature.Dataframes;
 
-public struct RoomPokerSetCardsByPlayerDataframe : INetworkDataframe
+public struct ShowCombinationWinDataframe : INetworkDataframe
 {
     public int PlayerId;
-    public CardsState CardsState;
+    public CombinationType CombinationType;
     public List<RoomPokerCardNetworkModel> Cards;
 
     public void Write(NetFrameWriter writer)
     {
         writer.WriteInt(PlayerId);
-        writer.WriteInt((int) CardsState);
+        writer.WriteShort((short) CombinationType);
 
-        var count = Cards?.Count ?? 0;
-        writer.WriteInt(count);
+        var haCards = Cards != null;
+        writer.WriteBool(haCards);
 
-        if (count != 0)
+        if (haCards)
         {
+            writer.WriteInt(Cards.Count);
+
             foreach (var card in Cards)
             {
                 writer.Write(card);
@@ -31,14 +33,13 @@ public struct RoomPokerSetCardsByPlayerDataframe : INetworkDataframe
     public void Read(NetFrameReader reader)
     {
         PlayerId = reader.ReadInt();
-        CardsState = (CardsState) reader.ReadInt();    
+        CombinationType = (CombinationType)reader.ReadShort();
         
-        var count = reader.ReadInt(); 
-        
-        if (count != 0)
+        if (reader.ReadBool())
         {
+            var count = reader.ReadInt();
             Cards = new List<RoomPokerCardNetworkModel>();
-
+            
             for (var i = 0; i < count; i++)
             {
                 Cards.Add(reader.Read<RoomPokerCardNetworkModel>());

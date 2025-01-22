@@ -70,7 +70,6 @@ while (true)
     framesPerSecond++;
     Time.UpdateDeltaTime();
     
-    //netFrameServer.Run(); //todo 
     systemExecutor.Execute();
     
     MainThread.Pulse();

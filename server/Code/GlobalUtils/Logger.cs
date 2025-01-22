@@ -51,25 +51,24 @@ public static class Logger
         }
     }
 
-    public static string GetCardsLog(List<CardModel> cardModels, string handSymbol = "")
+    public static string GetCardsLog(List<CardModel> cardModels)
     {
         var result = string.Empty;
 
         foreach (var card in cardModels)
         {
-            result += GetCardLog(card, handSymbol) + " ";
+            result += GetCardLog(card) + " ";
         }
 
         return result;
     }
 
-    public static string GetCardLog(CardModel cardModel, string handSymbol = "")
+    public static string GetCardLog(CardModel cardModel)
     {
         var result = string.Empty;
 
         var rank = cardModel.Rank;
         var suit = cardModel.Suit;
-        var isHand = cardModel.IsHands;
 
         switch (rank)
         {
@@ -128,11 +127,6 @@ public static class Logger
             case CardSuit.Clubs:
                 result += "♣";
                 break;
-        }
-
-        if (isHand)
-        {
-            result += handSymbol;
         }
 
         return result;

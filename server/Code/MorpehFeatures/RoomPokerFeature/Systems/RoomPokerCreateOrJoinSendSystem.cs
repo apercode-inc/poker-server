@@ -92,7 +92,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                 }
 
                 float timeCurrent = 0;
-                var timeMax = 0;
+                float timeMax = 0;
                 
                 if (turnTimerExist)
                 {

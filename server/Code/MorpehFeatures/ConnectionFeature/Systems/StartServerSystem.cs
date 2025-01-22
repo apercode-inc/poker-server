@@ -1,4 +1,5 @@
 using System.Reflection;
+using NetFrame.Enums;
 using NetFrame.Server;
 using NetFrame.Utils;
 using Scellecs.Morpeh;
@@ -24,12 +25,13 @@ public class StartServerSystem : ISystem
         _server.SetProtectionWithFilePath(_serverParameters.PrivateKeyPath, _serverParameters.SecretToken);
         _server.Start(_serverParameters.Port, _serverParameters.MaxPlayers);
         
-        Logger.DebugColor("Server started...", ConsoleColor.Green);
+        Logger.Debug("Server started...");
 
         _server.ClientConnection += OnClientConnection;
         _server.ClientDisconnect += OnClientDisconnect;
+        _server.LogCall += OnCallLog;
     }
-    
+
     public void OnUpdate(float deltaTime)
     {
         _server.Run(100);
@@ -51,6 +53,22 @@ public class StartServerSystem : ISystem
         
         _playerStorage.Remove(id);
     }
+    
+    private void OnCallLog(NetworkLogType logType, string message)
+    {
+        switch (logType)
+        {
+            case NetworkLogType.Info:
+                Logger.Debug(message);
+                break;
+            case NetworkLogType.Warning:
+                Logger.LogWarning(message);
+                break;
+            case NetworkLogType.Error:
+                Logger.Error(message);
+                break;
+        }
+    }
 
     public void Dispose()
     {
@@ -58,5 +76,6 @@ public class StartServerSystem : ISystem
         
         _server.ClientConnection -= OnClientConnection;
         _server.ClientDisconnect -= OnClientDisconnect;
+        _server.LogCall -= OnCallLog;
     }
 }

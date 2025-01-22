@@ -6,7 +6,6 @@ public class CardModel
 {
     public CardRank Rank;
     public CardSuit Suit;
-    public bool IsHands;
 
     public CardModel(CardRank rank, CardSuit suit)
     {
