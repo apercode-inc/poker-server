@@ -171,7 +171,7 @@ public class RoomPokerDetectCombinationSystem : ISystem
             cards.Remove(aceCard);
             cards.Add(aceCard);
             
-            isOrdered = true;
+            return isSameSuit ? CombinationType.LowStraightFlush : CombinationType.LowStraight;
         }
         
         var isHighAce = tmpValue == CardRank.Ace;

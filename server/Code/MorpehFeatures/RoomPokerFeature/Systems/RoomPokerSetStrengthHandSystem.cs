@@ -1,5 +1,4 @@
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
@@ -92,8 +91,10 @@ public class RoomPokerSetStrengthHandSystem : ISystem
                 strength = GetStrengthCombination(combinationCards);
                 break;
             case CombinationType.StraightFlush:
+            case CombinationType.LowStraightFlush:
             case CombinationType.Flush:
             case CombinationType.Straight:
+            case CombinationType.LowStraight:
             case CombinationType.HighCard:
                 strength = GetStrengthCombination(combinationCards);
                 break;
