@@ -5,7 +5,6 @@ using server;
 using server.Code;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
-// Gitaction test
 
 //Injection
 var container = new SimpleDImple();
