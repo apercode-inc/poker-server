@@ -76,7 +76,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
                 
                 continue;
             }
-
+            
             if (AllInExceptOne(playerEntity, roomEntity))
             {
                 continue;
@@ -159,8 +159,8 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
 
             count++;
         }
-
-        if (count <= 0)
+        
+        if (count < roomPokerPlayers.MarkedPlayersBySeat.Count - 1)
         {
             return false;
         }
