@@ -18,6 +18,8 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
     [Injectable] private Stash<RoomPokerSetCardsToTable> _roomPokerSetCardsToTable;
+    [Injectable] private Stash<RoomPokerShowdownForcedAllPlayers> _roomPokerShowdownForcedAllPlayers;
+    [Injectable] private Stash<RoomPokerShowdownForcedAllPlayersDone> _roomPokerShowdownForcedAllPlayersDone;
     
     private Filter _filter;
     
@@ -74,6 +76,16 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
                     break;
                 }
             }
+            
+            if (AllInExceptOne(playerEntity, roomEntity))
+            {
+                if (!_roomPokerShowdownForcedAllPlayersDone.Has(roomEntity))
+                {
+                    _roomPokerShowdownForcedAllPlayers.Set(roomEntity);
+                }
+
+                isContinueBiddingRound = false;
+            }
 
             if (isContinueBiddingRound)
             {
@@ -88,10 +100,42 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
                 ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
                 playerPokerCurrentBet.Value = 0;
             }
-
+            
             _playerSetPokerTurn.Remove(playerEntity);
             _roomPokerSetCardsToTable.Set(roomEntity);
         }
+    }
+    
+    private bool AllInExceptOne(Entity playerEntity, Entity roomEntity)
+    {
+        ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
+
+        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
+
+        var isCalled = playerPokerCurrentBet.Value >= roomPokerMaxBet.Value;
+    
+        if (!isCalled)
+        {
+            return false;
+        }
+        
+        var count = 0;
+        
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+        
+        foreach (var markedPlayers in roomPokerPlayers.MarkedPlayersBySeat)
+        {
+            var otherPlayerEntity = markedPlayers.Value;
+
+            if (playerEntity == otherPlayerEntity || !_playerAllin.Has(otherPlayerEntity))
+            {
+                continue;
+            }
+
+            count++;
+        }
+        
+        return count >= roomPokerPlayers.MarkedPlayersBySeat.Count - 1;
     }
 
     public void Dispose()
