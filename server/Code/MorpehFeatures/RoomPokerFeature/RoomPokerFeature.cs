@@ -74,7 +74,8 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerShowdownTurnRequestByPlayerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerTickTimerTurnShowdownByPlayerSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerResetTimerTurnShowdownByPlayerSystem>());
-        
+
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownForcedAllPlayersSystems>());
         systemsGroup.AddSystem(container.New<RoomPokerShowdownForcedByPlayerSystem>());
         
         //End game logic
