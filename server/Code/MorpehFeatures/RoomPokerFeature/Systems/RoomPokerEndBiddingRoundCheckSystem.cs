@@ -50,34 +50,44 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
             ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
 
             var isContinueBiddingRound = false;
+            var allInCount = 0;
 
             foreach (var markedPlayers in roomPokerPlayers.MarkedPlayersBySeat)
             {
-                var player = markedPlayers.Value;
-                
-                ref var playerCards = ref _playerCards.Get(player);
+                var otherPlayer = markedPlayers.Value;
 
-                if (_playerAllin.Has(player) || playerCards.CardsState == CardsState.Empty)
+                if (playerEntity != otherPlayer && _playerAllin.Has(otherPlayer))
+                {
+                    allInCount++;
+                    continue;
+                }
+                
+                ref var playerCards = ref _playerCards.Get(otherPlayer);
+
+                if (_playerAllin.Has(otherPlayer) || playerCards.CardsState == CardsState.Empty)
                 {
                     continue;
                 }
                 
-                if (!_playerTurnCompleteFlag.Has(player))
+                if (!_playerTurnCompleteFlag.Has(otherPlayer))
                 {
                     isContinueBiddingRound = true;
-                    break;
                 }
 
-                ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
+                ref var otherPlayerPokerCurrentBet = ref _playerPokerCurrentBet.Get(otherPlayer);
 
-                if (playerPokerCurrentBet.Value != roomPokerMaxBet.Value)
+                if (otherPlayerPokerCurrentBet.Value == roomPokerMaxBet.Value)
                 {
-                    isContinueBiddingRound = true;
-                    break;
+                    continue;
                 }
+                
+                isContinueBiddingRound = true;
             }
             
-            if (AllInExceptOne(playerEntity, roomEntity))
+            ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
+            var isCalled = playerPokerCurrentBet.Value >= roomPokerMaxBet.Value;
+
+            if (isCalled && allInCount >= roomPokerPlayers.MarkedPlayersBySeat.Count - 1)
             {
                 if (!_roomPokerShowdownForcedAllPlayersDone.Has(roomEntity))
                 {
@@ -97,45 +107,13 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
             foreach (var markedPlayers in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var player = markedPlayers.Value;
-                ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
-                playerPokerCurrentBet.Value = 0;
+                ref var otherPlayerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
+                otherPlayerPokerCurrentBet.Value = 0;
             }
             
             _playerSetPokerTurn.Remove(playerEntity);
             _roomPokerSetCardsToTable.Set(roomEntity);
         }
-    }
-    
-    private bool AllInExceptOne(Entity playerEntity, Entity roomEntity)
-    {
-        ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
-
-        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
-
-        var isCalled = playerPokerCurrentBet.Value >= roomPokerMaxBet.Value;
-    
-        if (!isCalled)
-        {
-            return false;
-        }
-        
-        var count = 0;
-        
-        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-        
-        foreach (var markedPlayers in roomPokerPlayers.MarkedPlayersBySeat)
-        {
-            var otherPlayerEntity = markedPlayers.Value;
-
-            if (playerEntity == otherPlayerEntity || !_playerAllin.Has(otherPlayerEntity))
-            {
-                continue;
-            }
-
-            count++;
-        }
-        
-        return count >= roomPokerPlayers.MarkedPlayersBySeat.Count - 1;
     }
 
     public void Dispose()
