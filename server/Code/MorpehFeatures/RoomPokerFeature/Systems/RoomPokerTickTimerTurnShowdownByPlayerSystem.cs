@@ -16,6 +16,7 @@ public class RoomPokerTickTimerTurnShowdownByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<Destroy> _destroy;
     [Injectable] private Stash<PlayerTurnShowdownResetTimer> _playerTurnShowdownResetTimer;
+    [Injectable] private Stash<PlayerDropCards> _playerDropCards;
     
     [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
@@ -52,7 +53,7 @@ public class RoomPokerTickTimerTurnShowdownByPlayerSystem : ISystem
                 continue;
             }
 
-            _roomPokerService.DropCards(roomEntity, playerEntity);
+            _playerDropCards.Set(playerEntity);
             
             var closeActivePanelDataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();
             _server.Send(ref closeActivePanelDataframe, playerEntity);

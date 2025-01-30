@@ -82,12 +82,15 @@ public class RoomPokerService : IInitializer
         };
         _server.SendInRoom(ref dataframe, roomEntity);
         
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+
+        SetPlayerFoldForPotModels(playerEntity, roomPokerPlayers.PlayerPotModels);
+        
         if (!isNextTurn)
         {
             return;
         }
         
-        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
 
         markedPlayersBySeat.TryGetValueByMarkers(playerSeat.SeatIndex, out var playerByMarkers);
@@ -116,8 +119,8 @@ public class RoomPokerService : IInitializer
         };
         _server.SendInRoom(ref dataframe, roomEntity);
     }
-    
-    public void SetPlayerFoldForPotModels(Entity playerEntity, List<PlayerPotModel> playerPotModels)
+
+    private void SetPlayerFoldForPotModels(Entity playerEntity, List<PlayerPotModel> playerPotModels)
     {
         ref var playerAuthData = ref _playerAuthData.Get(playerEntity);
 

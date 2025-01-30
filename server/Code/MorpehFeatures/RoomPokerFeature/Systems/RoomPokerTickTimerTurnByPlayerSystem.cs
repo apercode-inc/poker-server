@@ -18,6 +18,7 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
     [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
+    [Injectable] private Stash<PlayerDropCards> _playerDropCards;
     [Injectable] private Stash<Destroy> _destroy;
     
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
@@ -61,7 +62,7 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
 
             if (roomPokerMaxBet.Value - playerPokerCurrentBet.Value > 0)
             {
-                _roomPokerService.DropCards(roomEntity, playerEntity);
+                _playerDropCards.Set(playerEntity);
             }
             else
             {
