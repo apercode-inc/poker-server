@@ -3,6 +3,7 @@ using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -54,6 +55,7 @@ public class RoomPokerCheckStopGameSystem : ISystem
             {
                 Bank = roomPokerBank.OnTable,
                 CardToTableState = roomPokerCardsToTable.State,
+                Cards = new List<RoomPokerCardNetworkModel>(),
             };
             _server.SendInRoom(ref dataframe, roomEntity);
         }
