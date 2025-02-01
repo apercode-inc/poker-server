@@ -57,8 +57,6 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
 
         roomPokerPlayers.MarkedPlayersBySeat.TryGetValueByMarked(PokerPlayerMarkerType.ActivePlayer,
             out var playerByMarker);
-        
-        _roomPokerService.SetPlayerFoldForPotModels(player, roomPokerPlayers.PlayerPotModels);
 
         if (playerByMarker.Value != player)
         {
