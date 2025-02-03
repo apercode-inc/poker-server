@@ -25,4 +25,5 @@ public class RoomPokerBetsConfig
 {
     [JsonProperty("blind_big")] public long BlindBig;
     [JsonProperty("contribution")] public long Contribution;
+    [JsonProperty("min_contribution")] public long MinContribution;
 }
