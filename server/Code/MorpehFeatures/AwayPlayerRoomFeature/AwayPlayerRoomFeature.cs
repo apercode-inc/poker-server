@@ -10,7 +10,8 @@ public static class AwayPlayerRoomFeature
     {
         var systemsGroup = world.CreateSystemsGroup();
 
-        systemsGroup.AddSystem(container.New<AwayPlayerMakeSystem>());
+        systemsGroup.AddSystem(container.New<AwayPlayerAddSystem>());
+        systemsGroup.AddSystem(container.New<AwayPlayerRemoveSystem>());
         
         world.AddSystemsGroup(index++, systemsGroup);
     }

@@ -8,11 +8,11 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.AwayPlayerRoomFeature.Systems;
 
-public class AwayPlayerMakeSystem : ISystem
+public class AwayPlayerAddSystem : ISystem
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerAway> _playerAway;
-    [Injectable] private Stash<PlayerAwayMake> _playerAwayMake;
+    [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
@@ -25,7 +25,7 @@ public class AwayPlayerMakeSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
-            .With<PlayerAwayMake>()
+            .With<PlayerAwayAdd>()
             .With<PlayerRoomPoker>()
             .Build();
     }
@@ -35,7 +35,7 @@ public class AwayPlayerMakeSystem : ISystem
         foreach (var playerEntity in _filter)
         {
             _playerAway.Set(playerEntity);
-            _playerAwayMake.Remove(playerEntity);
+            _playerAwayAdd.Remove(playerEntity);
 
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(playerRoomPoker.RoomEntity);

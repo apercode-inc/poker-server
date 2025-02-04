@@ -2,6 +2,6 @@ using Scellecs.Morpeh;
 
 namespace server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 
-public struct PlayerAwayMake : IComponent
+public struct PlayerAwayRemove : IComponent
 {
 }

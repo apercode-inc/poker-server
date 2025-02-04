@@ -40,7 +40,7 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
-    [Injectable] private Stash<PlayerAwayMake> _playerAwayMake;
+    [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
 
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -119,7 +119,7 @@ public class RoomPokerCleanupGameSystem : ISystem
             }
             
             playersAwayCounter++;
-            _playerAwayMake.Set(player);
+            _playerAwayAdd.Set(player);
                 
             var topUpOpenDataframe = new TopUpOpenRequestDataframe();
             _server.Send(ref topUpOpenDataframe, player);
