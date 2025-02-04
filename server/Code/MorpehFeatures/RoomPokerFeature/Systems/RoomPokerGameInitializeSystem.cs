@@ -23,7 +23,6 @@ public class RoomPokerGameInitializeSystem : ISystem
     [Injectable] private Stash<RoomPokerCleanedGame> _roomPokerCleanedGame;
     
     [Injectable] private Stash<PlayerDealer> _playerDealer;
-    [Injectable] private Stash<PlayerNotGame> _playerNotGame;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerCards> _playerCards;
@@ -71,9 +70,6 @@ public class RoomPokerGameInitializeSystem : ISystem
             }
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-            
-            roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer, 
-                PokerPlayerMarkerType.NextRoundActivePlayer);
 
             Entity dealerPlayer;
 
@@ -105,12 +101,7 @@ public class RoomPokerGameInitializeSystem : ISystem
             foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var playerEntity = playerBySeat.Value;
-
-                if (_playerNotGame.Has(playerEntity))
-                {
-                    continue;
-                }
-
+                
                 ref var playerAuthData = ref _playerAuthData.Get(playerEntity);
                 ref var playerNickname = ref _playerNickname.Get(playerEntity);
                 

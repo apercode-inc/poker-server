@@ -2,6 +2,7 @@ using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils.CustomCollections;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
@@ -35,6 +36,7 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerAllin> _playerAllin;
+    [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
 
     [Injectable] private NetFrameServer _server;
@@ -135,7 +137,7 @@ public class RoomPokerService : IInitializer
         }
     }
 
-    private void RemoveFromMarkedPlayers(Entity roomEntity, Entity playerLeft, 
+    public void RemoveFromMarkedPlayers(Entity roomEntity, Entity playerLeft, 
         MovingMarkersDictionary<Entity, PokerPlayerMarkerType> markedPlayersBySeat)
     {
         var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);
@@ -219,6 +221,7 @@ public class RoomPokerService : IInitializer
         _playerTurnTimer.Remove(playerLeft);
         _playerTurnCompleteFlag.Remove(playerLeft);
         _playerAllin.Remove(playerLeft);
+        _playerAway.Remove(playerLeft);
 
         if (markedPlayersBySeat.Count != 0)
         {
