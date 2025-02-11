@@ -23,6 +23,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
     [Injectable] private Stash<PlayerShowOrHideTimer> _playerShowOrHideTimer;
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
     
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
@@ -63,70 +64,11 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             foreach (var playersBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var playerEntityFromRoom = playersBySeat.Value;
-                var seat = playersBySeat.Key;
 
-                var thisPlayer = playerEntityFromRoom == requestingPlayer;
-
-                ref var playerId = ref _playerId.Get(playerEntityFromRoom);
-                ref var playerNickname = ref _playerNickname.Get(playerEntityFromRoom);
-                ref var playerAvatar = ref _playerAvatar.Get(playerEntityFromRoom);
-                var isDealer = _playerDealer.Has(playerEntityFromRoom);
-                ref var playerPokerContribution = ref _playerPokerContribution.Get(playerEntityFromRoom);
-                ref var playerCurrency = ref _playerCurrency.Get(playerEntityFromRoom);
-                ref var playerCards = ref _playerCards.Get(playerEntityFromRoom);
-                ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntityFromRoom);
-                ref var playerTurnTimer = ref _playerTurnTimer.Get(playerEntityFromRoom, out var turnTimerExist);
-                ref var playerShowOrHideTimer = ref _playerShowOrHideTimer.Get(playerEntityFromRoom, out var playerShowOrHideExist);
-
-                var cardsModel = new List<RoomPokerCardNetworkModel>();
-
-                if (thisPlayer || playerCards.CardsState == CardsState.Open)
+                if (TryGetThisRoomPlayerNetworkModel(playerEntityFromRoom, requestingPlayer, roomPokerStats,
+                        roomPlayerNetworkModels, out var playerModel))
                 {
-                    foreach (var card in playerCards.Cards)
-                    {
-                        cardsModel.Add(new RoomPokerCardNetworkModel
-                        {
-                            Rank = card.Rank,
-                            Suit = card.Suit,
-                        });
-                    }
-                }
-
-                float timeCurrent = 0;
-                float timeMax = 0;
-                
-                if (turnTimerExist)
-                {
-                    timeCurrent = playerTurnTimer.TimeCurrent;
-                    timeMax = playerTurnTimer.TimeMax;
-                }
-                else if (playerShowOrHideExist)
-                {
-                    timeCurrent = playerShowOrHideTimer.TimeCurrent;
-                    timeMax = playerShowOrHideTimer.TimeMax;
-                }
-
-                var playerNetworkModel = new RoomPlayerNetworkModel
-                {
-                    Id = playerId.Id,
-                    Nickname = playerNickname.Value,
-                    AvatarIndex = playerAvatar.AvatarIndex,
-                    AvatarUrl = playerAvatar.AvatarUrl,
-                    Seat = (byte) seat,
-                    IsDealer = isDealer,
-                    ContributionBalance = playerPokerContribution.Value,
-                    AllBalance = playerCurrency.CurrencyByType[roomPokerStats.CurrencyType],
-                    CurrentBet = playerPokerCurrentBet.Value,
-                    TurnTimeCurrent = timeCurrent,
-                    TurnTimeMax = timeMax,
-                    CardsState = playerCards.CardsState,
-                    CardsModel = cardsModel,
-                };
-                roomPlayerNetworkModels.Add(playerNetworkModel);
-
-                if (thisPlayer)
-                {
-                    thisPlayerModel = playerNetworkModel;
+                    thisPlayerModel = playerModel;
                 }
             }
 
@@ -167,6 +109,79 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             
             _playerRoomCreateSend.Remove(requestingPlayer);
         }
+    }
+
+    private bool TryGetThisRoomPlayerNetworkModel(Entity playerEntityFromRoom, Entity requestingPlayer,
+        RoomPokerStats roomPokerStats, ICollection<RoomPlayerNetworkModel> roomPlayerNetworkModels,
+        out RoomPlayerNetworkModel roomPlayerNetworkModel)
+    {
+        roomPlayerNetworkModel = default;
+        var thisPlayer = playerEntityFromRoom == requestingPlayer;
+
+        ref var playerId = ref _playerId.Get(playerEntityFromRoom);
+        ref var playerNickname = ref _playerNickname.Get(playerEntityFromRoom);
+        ref var playerAvatar = ref _playerAvatar.Get(playerEntityFromRoom);
+        ref var playerSeat = ref _playerSeat.Get(playerEntityFromRoom);
+        var isDealer = _playerDealer.Has(playerEntityFromRoom);
+        ref var playerPokerContribution = ref _playerPokerContribution.Get(playerEntityFromRoom);
+        ref var playerCurrency = ref _playerCurrency.Get(playerEntityFromRoom);
+        ref var playerCards = ref _playerCards.Get(playerEntityFromRoom);
+        ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntityFromRoom);
+        ref var playerTurnTimer = ref _playerTurnTimer.Get(playerEntityFromRoom, out var turnTimerExist);
+        ref var playerShowOrHideTimer = ref _playerShowOrHideTimer.Get(playerEntityFromRoom, out var playerShowOrHideExist);
+
+        var cardsModel = new List<RoomPokerCardNetworkModel>();
+
+        if (thisPlayer || playerCards.CardsState == CardsState.Open)
+        {
+            foreach (var card in playerCards.Cards)
+            {
+                cardsModel.Add(new RoomPokerCardNetworkModel
+                {
+                    Rank = card.Rank,
+                    Suit = card.Suit,
+                });
+            }
+        }
+
+        float timeCurrent = 0;
+        float timeMax = 0;
+
+        if (turnTimerExist)
+        {
+            timeCurrent = playerTurnTimer.TimeCurrent;
+            timeMax = playerTurnTimer.TimeMax;
+        }
+        else if (playerShowOrHideExist)
+        {
+            timeCurrent = playerShowOrHideTimer.TimeCurrent;
+            timeMax = playerShowOrHideTimer.TimeMax;
+        }
+
+        var playerNetworkModel = new RoomPlayerNetworkModel
+        {
+            Id = playerId.Id,
+            Nickname = playerNickname.Value,
+            AvatarIndex = playerAvatar.AvatarIndex,
+            AvatarUrl = playerAvatar.AvatarUrl,
+            Seat = playerSeat.SeatIndex,
+            IsDealer = isDealer,
+            ContributionBalance = playerPokerContribution.Value,
+            AllBalance = playerCurrency.CurrencyByType[roomPokerStats.CurrencyType],
+            CurrentBet = playerPokerCurrentBet.Value,
+            TurnTimeCurrent = timeCurrent,
+            TurnTimeMax = timeMax,
+            CardsState = playerCards.CardsState,
+            CardsModel = cardsModel,
+        };
+        roomPlayerNetworkModels.Add(playerNetworkModel);
+
+        if (thisPlayer)
+        {
+            roomPlayerNetworkModel = playerNetworkModel;
+        }
+
+        return thisPlayer;
     }
 
     public void Dispose()
