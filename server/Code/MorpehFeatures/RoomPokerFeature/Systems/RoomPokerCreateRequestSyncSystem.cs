@@ -50,7 +50,7 @@ public class RoomPokerCreateRequestSyncSystem : IInitializer
         }
 
         _roomPokerStorage.CreateRoom(player, dataframe.MaxPlayers, dataframe.CurrencyType, dataframe.Contribution, 
-            dataframe.BigBet, dataframe.IsFastTurn);
+             dataframe.MinContribution, dataframe.BigBet, dataframe.IsFastTurn);
     }
 
     public void Dispose()

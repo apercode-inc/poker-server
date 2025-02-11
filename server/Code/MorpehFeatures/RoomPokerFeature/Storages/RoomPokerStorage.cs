@@ -50,7 +50,7 @@ public class RoomPokerStorage : IInitializer
     }
 
     public void CreateRoom(Entity createdPlayer, byte maxPlayers, CurrencyType currencyType, long contribution, 
-        long bigBet, bool isFastTurn)
+        long minContribution, long bigBet, bool isFastTurn)
     {
         if (_playerRoomPoker.Has(createdPlayer))
         {
@@ -74,6 +74,7 @@ public class RoomPokerStorage : IInitializer
             MaxPlayers = maxPlayers,
             CurrencyType = currencyType,
             Contribution = contribution,
+            MinContribution = minContribution,
             BigBet = bigBet,
             TurnTime = turnTime,
             TurnShowdownTime = turnShowdownTime,
@@ -85,6 +86,7 @@ public class RoomPokerStorage : IInitializer
         _roomPokerPlayers.Set(roomEntity, new RoomPokerPlayers
         {
             MarkedPlayersBySeat = markedPlayersBySeat,
+            AwayPlayers = new List<Entity>(),
             PlayerPotModels = new List<PlayerPotModel>(),
         });
         _roomPokerMaxBet.Set(roomEntity, new RoomPokerMaxBet

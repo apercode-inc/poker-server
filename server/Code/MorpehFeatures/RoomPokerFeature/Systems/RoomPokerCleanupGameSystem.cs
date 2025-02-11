@@ -1,6 +1,8 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -11,6 +13,7 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.StartTimer;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
+using server.Code.MorpehFeatures.TopUpFeature.Dataframes;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -25,6 +28,7 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
     [Injectable] private Stash<RoomPokerCleanedGame> _roomPokerCleanedGame;
     [Injectable] private Stash<RoomPokerShowdownForcedAllPlayersDone> _roomPokerShowdownForcedAllPlayersDone;
+    [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
 
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
@@ -35,6 +39,8 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
+    [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
+    [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
 
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -69,6 +75,11 @@ public class RoomPokerCleanupGameSystem : ISystem
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         roomPokerPlayers.PlayerPotModels.Clear();
 
+        var playersAwayCounter = 0;
+        
+        roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer, 
+            PokerPlayerMarkerType.NextRoundActivePlayer);
+
         foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
         {
             var player = markedPlayer.Value;
@@ -98,9 +109,28 @@ public class RoomPokerCleanupGameSystem : ISystem
             
             var dataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();
             _server.Send(ref dataframe, player);
+
+            ref var playerPokerContribution = ref _playerPokerContribution.Get(player);
+            ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
+
+            if (playerPokerContribution.Value >= roomPokerStats.BigBet)
+            {
+                continue;
+            }
+            
+            playersAwayCounter++;
+            _playerAwayAdd.Set(player);
+                
+            var topUpOpenDataframe = new TopUpOpenRequestDataframe();
+            _server.Send(ref topUpOpenDataframe, player);
+        }
+
+        if (playersAwayCounter >= roomPokerPlayers.MarkedPlayersBySeat.Count - 1)
+        {
+            _roomPokerActive.Remove(roomEntity);
         }
     }
-    
+
     private void CleanupGame(Entity roomEntity)
     {
         var cardsToTableDataframe = new RoomPokerSetCardsToTableDataframe

@@ -34,6 +34,7 @@ public class RoomPokerSettingRequestSyncSystem : IInitializer
             {
                 BlindBig = bet.BlindBig,
                 Contribution = bet.Contribution,
+                MinContribution = bet.MinContribution,
             });
         }
 

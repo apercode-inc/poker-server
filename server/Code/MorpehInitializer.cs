@@ -11,9 +11,11 @@ using server.Code.MorpehFeatures.DataBaseFeature;
 using server.Code.MorpehFeatures.RoomChatFeature;
 using server.Code.MorpehFeatures.NotificationFeature;
 using server.Code.MorpehFeatures.AuthenticationFeature;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature;
 using server.Code.MorpehFeatures.GameTimeFeature;
 using server.Code.MorpehFeatures.LocalizationFeature;
 using server.Code.MorpehFeatures.ShowCombinationFeature;
+using server.Code.MorpehFeatures.TopUpFeature;
 
 namespace server.Code;
 
@@ -47,6 +49,8 @@ public static class MorpehInitializer
         CurrencyFeature.Add(world, ref groupIndex, container);
         RoomPokerFeature.Add(world, ref groupIndex, container);
         ShowCombinationFeature.Add(world, ref groupIndex, container);
+        AwayPlayerRoomFeature.Add(world, ref groupIndex, container);
+        TopUpFeature.Add(world, ref groupIndex, container);
         RoomChatFeature.Add(world, ref groupIndex, container);
 
         // Cleanup
