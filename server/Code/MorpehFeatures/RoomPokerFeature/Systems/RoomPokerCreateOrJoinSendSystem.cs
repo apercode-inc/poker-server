@@ -63,6 +63,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             foreach (var playersBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var playerEntityFromRoom = playersBySeat.Value;
+                var seat = playersBySeat.Key;
 
                 var thisPlayer = playerEntityFromRoom == requestingPlayer;
 
@@ -111,7 +112,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                     Nickname = playerNickname.Value,
                     AvatarIndex = playerAvatar.AvatarIndex,
                     AvatarUrl = playerAvatar.AvatarUrl,
-                    Seat = (byte) playersBySeat.Key,
+                    Seat = (byte) seat,
                     IsDealer = isDealer,
                     ContributionBalance = playerPokerContribution.Value,
                     AllBalance = playerCurrency.CurrencyByType[roomPokerStats.CurrencyType],

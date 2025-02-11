@@ -52,7 +52,7 @@ public class RoomPokerService : IInitializer
         _markersByPlayer = new Dictionary<PokerPlayerMarkerType, Entity>();
     }
 
-    public void RemovePlayerFromRoom(Entity roomEntity, Entity playerLeft)
+    public void RemovePlayerFromRoom(Entity roomEntity, Entity playerLeave)
     {
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
@@ -60,9 +60,19 @@ public class RoomPokerService : IInitializer
 
         _markersByPlayer.Clear();
 
-        SetPlayerFoldForPotModels(playerLeft, playerPotModels);
-        RemoveFromMarkedPlayers(roomEntity, playerLeft, markedPlayersBySeat);
-        CleanupPlayer(roomEntity, playerLeft, markedPlayersBySeat);
+        SetPlayerFoldForPotModels(playerLeave, playerPotModels);
+        RemoveFromMarkedPlayers(roomEntity, playerLeave, markedPlayersBySeat);
+        CleanupPlayer(roomEntity, playerLeave, markedPlayersBySeat);
+    }
+
+    public void RemoveAwayPlayer(Entity roomEntity, Entity awayPlayer)
+    {
+        _markersByPlayer.Clear();
+        
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+        var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
+        
+        RemoveFromMarkedPlayers(roomEntity, awayPlayer, markedPlayersBySeat);
     }
 
     public void DropCards(Entity roomEntity, Entity playerEntity, bool isNextTurn = true)
@@ -137,10 +147,10 @@ public class RoomPokerService : IInitializer
         }
     }
 
-    public void RemoveFromMarkedPlayers(Entity roomEntity, Entity playerLeft, 
+    private void RemoveFromMarkedPlayers(Entity roomEntity, Entity playerLeave, 
         MovingMarkersDictionary<Entity, PokerPlayerMarkerType> markedPlayersBySeat)
     {
-        var isRemove = markedPlayersBySeat.Remove(playerLeft, _markersByPlayer);
+        var isRemove = markedPlayersBySeat.Remove(playerLeave, _markersByPlayer);
 
         if (isRemove)
         {
@@ -158,7 +168,7 @@ public class RoomPokerService : IInitializer
                     }
                     case PokerPlayerMarkerType.ActivePlayer:
                     {
-                        if (!_playerShowOrHideTimer.Has(playerLeft))
+                        if (!_playerShowOrHideTimer.Has(playerLeave))
                         {
                             SetActivePlayerMarkerOrGivenBank(roomEntity);
                         }
@@ -189,22 +199,22 @@ public class RoomPokerService : IInitializer
         }
     }
     
-    private void CleanupPlayer(Entity roomEntity, Entity playerLeft,
+    private void CleanupPlayer(Entity roomEntity, Entity playerLeave,
         MovingMarkersDictionary<Entity, PokerPlayerMarkerType> markedPlayersBySeat)
     {
-        if (_playerShowOrHideTimer.Has(playerLeft))
+        if (_playerShowOrHideTimer.Has(playerLeave))
         {
             _roomPokerShowOrHideCardsActivate.Set(roomEntity);
-            _playerShowOrHideTimer.Remove(playerLeft);
+            _playerShowOrHideTimer.Remove(playerLeave);
         }
         
-        if (_playerTurnShowdownTimer.Has(playerLeft))
+        if (_playerTurnShowdownTimer.Has(playerLeave))
         {
-            _playerTurnShowdownTimer.Remove(playerLeft);
+            _playerTurnShowdownTimer.Remove(playerLeave);
             _roomPokerShowdownChoiceCheck.Set(roomEntity);
         }
 
-        ref var playerId = ref _playerId.Get(playerLeft);
+        ref var playerId = ref _playerId.Get(playerLeave);
 
         var dataframe = new RoomPokerLeaveResponseDataframe
         {
@@ -212,16 +222,16 @@ public class RoomPokerService : IInitializer
         };
         _server.SendInRoom(ref dataframe, roomEntity);
 
-        _playerDealer.Remove(playerLeft);
-        _playerCards.Remove(playerLeft);
-        _playerRoomPoker.Remove(playerLeft);
-        _playerSeat.Remove(playerLeft);
-        _playerPokerContribution.Remove(playerLeft);
-        _playerPokerCurrentBet.Remove(playerLeft);
-        _playerTurnTimer.Remove(playerLeft);
-        _playerTurnCompleteFlag.Remove(playerLeft);
-        _playerAllin.Remove(playerLeft);
-        _playerAway.Remove(playerLeft);
+        _playerDealer.Remove(playerLeave);
+        _playerCards.Remove(playerLeave);
+        _playerRoomPoker.Remove(playerLeave);
+        _playerSeat.Remove(playerLeave);
+        _playerPokerContribution.Remove(playerLeave);
+        _playerPokerCurrentBet.Remove(playerLeave);
+        _playerTurnTimer.Remove(playerLeave);
+        _playerTurnCompleteFlag.Remove(playerLeave);
+        _playerAllin.Remove(playerLeave);
+        _playerAway.Remove(playerLeave);
 
         if (markedPlayersBySeat.Count != 0)
         {

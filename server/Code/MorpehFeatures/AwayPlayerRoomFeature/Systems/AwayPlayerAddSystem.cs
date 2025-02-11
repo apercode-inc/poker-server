@@ -1,5 +1,4 @@
 using Scellecs.Morpeh;
-using Scellecs.Morpeh.Collections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -42,8 +41,7 @@ public class AwayPlayerAddSystem : ISystem
             
             roomPokerPlayers.AwayPlayers.Add(playerEntity);
             
-            _roomPokerService.RemoveFromMarkedPlayers(playerRoomPoker.RoomEntity, playerEntity, 
-                roomPokerPlayers.MarkedPlayersBySeat);
+            _roomPokerService.RemoveAwayPlayer(playerRoomPoker.RoomEntity, playerEntity);
         }
     }
     
