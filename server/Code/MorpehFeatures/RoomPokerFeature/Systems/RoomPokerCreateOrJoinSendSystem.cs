@@ -65,10 +65,23 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             {
                 var playerEntityFromRoom = playersBySeat.Value;
 
-                if (TryGetThisRoomPlayerNetworkModel(playerEntityFromRoom, requestingPlayer, roomPokerStats,
-                        roomPlayerNetworkModels, out var playerModel))
+                var addedPlayerNetworkModel = AddRoomPlayerNetworkModel(playerEntityFromRoom, requestingPlayer, 
+                    roomPokerStats, roomPlayerNetworkModels);
+
+                if (playerEntityFromRoom == requestingPlayer)
                 {
-                    thisPlayerModel = playerModel;
+                    thisPlayerModel = addedPlayerNetworkModel;
+                }
+            }
+
+            foreach (var playerEntityFromRoom in roomPokerPlayers.AwayPlayers)
+            {
+                var addedPlayerNetworkModel = AddRoomPlayerNetworkModel(playerEntityFromRoom, requestingPlayer, 
+                    roomPokerStats, roomPlayerNetworkModels);
+                
+                if (playerEntityFromRoom == requestingPlayer)
+                {
+                    thisPlayerModel = addedPlayerNetworkModel;
                 }
             }
 
@@ -111,11 +124,9 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
         }
     }
 
-    private bool TryGetThisRoomPlayerNetworkModel(Entity playerEntityFromRoom, Entity requestingPlayer,
-        RoomPokerStats roomPokerStats, ICollection<RoomPlayerNetworkModel> roomPlayerNetworkModels,
-        out RoomPlayerNetworkModel roomPlayerNetworkModel)
+    private RoomPlayerNetworkModel AddRoomPlayerNetworkModel(Entity playerEntityFromRoom, Entity requestingPlayer,
+        RoomPokerStats roomPokerStats, ICollection<RoomPlayerNetworkModel> roomPlayerNetworkModels)
     {
-        roomPlayerNetworkModel = default;
         var thisPlayer = playerEntityFromRoom == requestingPlayer;
 
         ref var playerId = ref _playerId.Get(playerEntityFromRoom);
@@ -176,12 +187,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
         };
         roomPlayerNetworkModels.Add(playerNetworkModel);
 
-        if (thisPlayer)
-        {
-            roomPlayerNetworkModel = playerNetworkModel;
-        }
-
-        return thisPlayer;
+        return playerNetworkModel;
     }
 
     public void Dispose()
