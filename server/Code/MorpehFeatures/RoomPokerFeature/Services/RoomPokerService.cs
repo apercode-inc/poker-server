@@ -56,15 +56,18 @@ public class RoomPokerService : IInitializer
     {
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
+        var awayPlayers = roomPokerPlayers.AwayPlayers;
         var playerPotModels = roomPokerPlayers.PlayerPotModels;
 
         _markersByPlayer.Clear();
+        
+        roomPokerPlayers.AwayPlayers.Remove(playerLeave); //todo удаление протом будет происходить иначе
+        
+        var totalPlayersCount = awayPlayers.Count + markedPlayersBySeat.Count;
 
         SetPlayerFoldForPotModels(playerLeave, playerPotModels);
         RemoveFromMarkedPlayers(roomEntity, playerLeave, markedPlayersBySeat);
-        CleanupPlayer(roomEntity, playerLeave, markedPlayersBySeat);
-
-        roomPokerPlayers.AwayPlayers.Remove(playerLeave); //todo удаление потом будет происходить иначе!
+        CleanupPlayer(roomEntity, playerLeave, totalPlayersCount);
     }
 
     public void RemoveAwayPlayer(Entity roomEntity, Entity awayPlayer)
@@ -201,8 +204,7 @@ public class RoomPokerService : IInitializer
         }
     }
     
-    private void CleanupPlayer(Entity roomEntity, Entity playerLeave,
-        MovingMarkersDictionary<Entity, PokerPlayerMarkerType> markedPlayersBySeat)
+    private void CleanupPlayer(Entity roomEntity, Entity playerLeave, int totalPlayersCount)
     {
         if (_playerShowOrHideTimer.Has(playerLeave))
         {
@@ -235,7 +237,7 @@ public class RoomPokerService : IInitializer
         _playerAllin.Remove(playerLeave);
         _playerAway.Remove(playerLeave);
 
-        if (markedPlayersBySeat.Count != 0)
+        if (totalPlayersCount != 0)
         {
             return;
         }

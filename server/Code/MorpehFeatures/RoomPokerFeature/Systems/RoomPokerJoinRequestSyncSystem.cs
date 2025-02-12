@@ -52,8 +52,9 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-        if (roomPokerPlayers.MarkedPlayersBySeat.Count >= roomPokerStats.MaxPlayers)
+        var totalPlayersCount = roomPokerPlayers.MarkedPlayersBySeat.Count + roomPokerPlayers.AwayPlayers.Count;
+        
+        if (totalPlayersCount >= roomPokerStats.MaxPlayers)
         {
             _notificationService.Show(player, RoomPokerLocalizationKeys.RoomPokerJoinNoFreeSpace, NotificationType.Error);
             return;
