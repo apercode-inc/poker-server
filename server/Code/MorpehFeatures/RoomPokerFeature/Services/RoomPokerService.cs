@@ -63,6 +63,8 @@ public class RoomPokerService : IInitializer
         SetPlayerFoldForPotModels(playerLeave, playerPotModels);
         RemoveFromMarkedPlayers(roomEntity, playerLeave, markedPlayersBySeat);
         CleanupPlayer(roomEntity, playerLeave, markedPlayersBySeat);
+
+        roomPokerPlayers.AwayPlayers.Remove(playerLeave); //todo удаление потом будет происходить иначе!
     }
 
     public void RemoveAwayPlayer(Entity roomEntity, Entity awayPlayer)
