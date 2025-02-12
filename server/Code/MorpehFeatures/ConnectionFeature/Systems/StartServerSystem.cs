@@ -51,7 +51,7 @@ public class StartServerSystem : ISystem
         var currentDateTime = DateTime.Now;
         Logger.Debug($"[{currentDateTime}] disconnected player, id = {id}");
         
-        _playerStorage.Remove(id);
+        _playerStorage.RemoveWithAway(id);
     }
     
     private void OnCallLog(NetworkLogType logType, string message)

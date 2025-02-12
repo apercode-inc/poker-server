@@ -1,7 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -23,6 +23,7 @@ public class PlayerStorage : IInitializer
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
+    [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
     
     [Injectable] private NetFrameServer _server;
 
@@ -52,6 +53,24 @@ public class PlayerStorage : IInitializer
         });
         
         _playersByIds.Add(id, newEntity);
+    }
+
+    public void Replace(int oldId, int newId, Entity player)
+    {
+        _playersByIds.Remove(oldId);
+        
+        if (!_playersByIds.TryGetValue(newId, out var oldPlayer))
+        {
+            return;
+        }
+
+        _destroy.Set(oldPlayer);
+        _playersByIds[newId] = player;
+        
+        _playerId.Set(player, new PlayerId
+        {
+            Id = newId,
+        });
     }
 
     public void AddAuth(Entity player, string guid, int playerId)
@@ -93,6 +112,17 @@ public class PlayerStorage : IInitializer
             CardsState = CardsState.Empty,
         });
         _playerRoomCreateSend.Set(createdPlayer);
+    }
+
+    public void RemoveWithAway(int id)
+    {
+        if (!_playersByIds.TryGetValue(id, out var player))
+        {
+            return;
+        }
+
+        _playerAwayAdd.Set(player);
+        _playersByIds.Remove(id);
     }
 
     public void Remove(int id)

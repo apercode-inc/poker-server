@@ -16,6 +16,7 @@ public class RoomPokerSettingsConfig
     [JsonProperty("delay_showdown")] public float DelayShowdown;
     [JsonProperty("delay_cleanup")] public float DelayCleanup;
     [JsonProperty("delay_before_next_dealing_cards")] public float DelayBeforeNextDealingCards;
+    [JsonProperty("away_player_time")] public float AwayPlayerTime;
     [JsonProperty("seat_counts")] public List<int> SeatCounts;
     [JsonProperty("bets")] public List<RoomPokerBetsConfig> Bets;
 }

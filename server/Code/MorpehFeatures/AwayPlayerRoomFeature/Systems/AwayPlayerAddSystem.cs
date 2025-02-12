@@ -1,8 +1,11 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
+using server.Code.MorpehFeatures.ConfigsFeature.Constants;
+using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.AwayPlayerRoomFeature.Systems;
@@ -16,6 +19,7 @@ public class AwayPlayerAddSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private RoomPokerService _roomPokerService;
+    [Injectable] private ConfigsService _configsService;
 
     private Filter _filter;
     
@@ -33,8 +37,19 @@ public class AwayPlayerAddSystem : ISystem
     {
         foreach (var playerEntity in _filter)
         {
-            _playerAway.Set(playerEntity);
             _playerAwayAdd.Remove(playerEntity);
+
+            if (_playerAway.Has(playerEntity))
+            {
+                continue;
+            }
+            
+            var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
+            
+            _playerAway.Set(playerEntity, new PlayerAway
+            {
+                Timer = config.AwayPlayerTime,
+            });
 
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(playerRoomPoker.RoomEntity);

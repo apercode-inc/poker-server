@@ -2,7 +2,7 @@ using Scellecs.Morpeh;
 
 namespace server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 
-public struct PlayerAway : IComponent
+public struct PlayerAwayRejoinRoom : IComponent
 {
-    public float Timer;
+    public int NewId;
 }

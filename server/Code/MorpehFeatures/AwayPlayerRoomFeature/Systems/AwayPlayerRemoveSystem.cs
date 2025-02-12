@@ -1,5 +1,4 @@
 using Scellecs.Morpeh;
-using Scellecs.Morpeh.Collections;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -12,6 +11,7 @@ public class AwayPlayerRemoveSystem : ISystem
     [Injectable] private Stash<PlayerAwayRemove> _playerAwayRemove;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
+    [Injectable] private Stash<PlayerAway> _playerAway;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     
@@ -39,6 +39,7 @@ public class AwayPlayerRemoveSystem : ISystem
             roomPokerPlayers.MarkedPlayersBySeat.Add(playerSeat.SeatIndex, playerEntity);
             roomPokerPlayers.AwayPlayers.Remove(playerEntity);
             
+            _playerAway.Remove(playerEntity);
             _playerAwayRemove.Remove(playerEntity);
         }
     }

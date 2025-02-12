@@ -61,13 +61,16 @@ public class RoomPokerService : IInitializer
 
         _markersByPlayer.Clear();
         
-        roomPokerPlayers.AwayPlayers.Remove(playerLeave); //todo удаление протом будет происходить иначе
+        roomPokerPlayers.AwayPlayers.Remove(playerLeave);
         
         var totalPlayersCount = awayPlayers.Count + markedPlayersBySeat.Count;
 
         SetPlayerFoldForPotModels(playerLeave, playerPotModels);
         RemoveFromMarkedPlayers(roomEntity, playerLeave, markedPlayersBySeat);
         CleanupPlayer(roomEntity, playerLeave, totalPlayersCount);
+        
+        var dataframe = new RoomPokerLocalPlayerLeaveDataframe();
+        _server.Send(ref dataframe, playerLeave);
     }
 
     public void RemoveAwayPlayer(Entity roomEntity, Entity awayPlayer)
