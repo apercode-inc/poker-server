@@ -37,11 +37,9 @@ public class AwayPlayerTimerTickSystem : ISystem
             {
                 continue;
             }
-            
             Logger.Error("До свидания!!!");
 
             ref var playerId = ref _playerId.Get(playerEntity);
-            //todo похоже нужно ещё отправить это на клиент, тому кого удаляем! На клиенте RoomPokerLocalPlayerLeaveSystem
             
             _playerStorage.Remove(playerId.Id);
         }

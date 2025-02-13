@@ -73,7 +73,7 @@ public class RoomPokerService : IInitializer
         _server.Send(ref dataframe, playerLeave);
     }
 
-    public void RemoveAwayPlayer(Entity roomEntity, Entity awayPlayer)
+    public void RemoveForAwayPlayer(Entity roomEntity, Entity awayPlayer)
     {
         _markersByPlayer.Clear();
         
@@ -86,8 +86,7 @@ public class RoomPokerService : IInitializer
     public void DropCards(Entity roomEntity, Entity playerEntity, bool isNextTurn = true)
     {
         ref var playerId = ref _playerId.Get(playerEntity);
-        ref var playerSeat = ref _playerSeat.Get(playerEntity);
-                
+
         _playerCards.Set(playerEntity, new PlayerCards
         {
             CardsState = CardsState.Empty,
@@ -110,6 +109,8 @@ public class RoomPokerService : IInitializer
         {
             return;
         }
+        
+        ref var playerSeat = ref _playerSeat.Get(playerEntity);
         
         var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
 
