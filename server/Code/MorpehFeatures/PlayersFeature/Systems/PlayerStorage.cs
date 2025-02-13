@@ -121,6 +121,12 @@ public class PlayerStorage : IInitializer
             return;
         }
 
+        if (!_playerRoomPoker.Has(player))
+        {
+            Remove(id);
+            return;
+        }
+        
         _playerAwayAdd.Set(player);
         _playersByIds.Remove(id);
     }
