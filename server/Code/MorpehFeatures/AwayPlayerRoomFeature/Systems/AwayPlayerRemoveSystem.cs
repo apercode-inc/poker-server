@@ -37,8 +37,7 @@ public class AwayPlayerRemoveSystem : ISystem
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(playerRoomPoker.RoomEntity);
 
             roomPokerPlayers.MarkedPlayersBySeat.Add(playerSeat.SeatIndex, playerEntity);
-            roomPokerPlayers.AwayPlayers.Remove(playerEntity);
-            
+
             _playerAway.Remove(playerEntity);
             _playerAwayRemove.Remove(playerEntity);
         }

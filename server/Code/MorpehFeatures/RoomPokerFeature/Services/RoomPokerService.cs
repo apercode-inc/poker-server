@@ -56,31 +56,16 @@ public class RoomPokerService : IInitializer
     {
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
-        var awayPlayers = roomPokerPlayers.AwayPlayers;
         var playerPotModels = roomPokerPlayers.PlayerPotModels;
 
         _markersByPlayer.Clear();
-        
-        roomPokerPlayers.AwayPlayers.Remove(playerLeave);
-        
-        var totalPlayersCount = awayPlayers.Count + markedPlayersBySeat.Count;
 
         SetPlayerFoldForPotModels(playerLeave, playerPotModels);
         RemoveFromMarkedPlayers(roomEntity, playerLeave, markedPlayersBySeat);
-        CleanupPlayer(roomEntity, playerLeave, totalPlayersCount);
+        CleanupPlayer(roomEntity, playerLeave, markedPlayersBySeat.Count);
         
         var dataframe = new RoomPokerLocalPlayerLeaveDataframe();
         _server.Send(ref dataframe, playerLeave);
-    }
-
-    public void RemoveForAwayPlayer(Entity roomEntity, Entity awayPlayer)
-    {
-        _markersByPlayer.Clear();
-        
-        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-        var markedPlayersBySeat = roomPokerPlayers.MarkedPlayersBySeat;
-        
-        RemoveFromMarkedPlayers(roomEntity, awayPlayer, markedPlayersBySeat);
     }
 
     public void DropCards(Entity roomEntity, Entity playerEntity, bool isNextTurn = true)

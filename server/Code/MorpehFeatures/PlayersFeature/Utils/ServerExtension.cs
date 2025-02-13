@@ -20,11 +20,6 @@ public static class ServerExtension
         {
             server.Send(ref dataframe, playerBySeat.Value);
         }
-
-        foreach (var player in roomPokerPlayers.AwayPlayers)
-        {
-            server.Send(ref dataframe, player);
-        }
     }
 
     public static void SendInRoomExcept<T>(this NetFrameServer server, ref T dataframe, Entity roomEntity,
@@ -42,16 +37,6 @@ public static class ServerExtension
             }
             
             server.Send(ref dataframe, playerEntity);
-        }
-        
-        foreach (var player in roomPokerPlayers.AwayPlayers)
-        {
-            if (player == exceptPlayer)
-            {
-                continue;
-            }
-            
-            server.Send(ref dataframe, player);
         }
     }
 }

@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -12,6 +13,8 @@ public class RoomPokerGameCheckStartSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerGameStartTimer> _roomPokerGameStartTimer;
+
+    [Injectable] private Stash<PlayerAway> _playerAway;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private ConfigsService _configsService;
@@ -36,7 +39,21 @@ public class RoomPokerGameCheckStartSystem : ISystem
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            if (roomPokerPlayers.MarkedPlayersBySeat.Count < 2)
+            var activePlayersCount = 0;
+
+            foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
+            {
+                var player = markedPlayer.Value;
+
+                if (_playerAway.Has(player))
+                {
+                    continue;
+                }
+
+                activePlayersCount++;
+            }
+
+            if (activePlayersCount < 2)
             {
                 continue;
             }

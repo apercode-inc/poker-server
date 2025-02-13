@@ -41,6 +41,7 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
+    [Injectable] private Stash<PlayerAway> _playerAway;
 
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -110,6 +111,12 @@ public class RoomPokerCleanupGameSystem : ISystem
             var dataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();
             _server.Send(ref dataframe, player);
 
+            if (_playerAway.Has(player))
+            {
+                playersAwayCounter++;
+                continue;
+            }
+            
             ref var playerPokerContribution = ref _playerPokerContribution.Get(player);
             ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
 

@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -17,6 +18,7 @@ public class RoomPokerTickTimerTurnShowdownByPlayerSystem : ISystem
     [Injectable] private Stash<Destroy> _destroy;
     [Injectable] private Stash<PlayerTurnShowdownResetTimer> _playerTurnShowdownResetTimer;
     [Injectable] private Stash<PlayerDropCards> _playerDropCards;
+    [Injectable] private Stash<PlayerAway> _playerAway;
     
     [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
@@ -44,11 +46,8 @@ public class RoomPokerTickTimerTurnShowdownByPlayerSystem : ISystem
             ref var playerTurnShowdownTimer = ref _playerTurnShowdownTimer.Get(playerEntity);
 
             playerTurnShowdownTimer.TimeCurrent += deltaTime;
-            
-            ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
-            var roomEntity = playerRoomPoker.RoomEntity;
 
-            if (playerTurnShowdownTimer.TimeCurrent < playerTurnShowdownTimer.TimeMax)
+            if (playerTurnShowdownTimer.TimeCurrent < playerTurnShowdownTimer.TimeMax && !_playerAway.Has(playerEntity))
             {
                 continue;
             }

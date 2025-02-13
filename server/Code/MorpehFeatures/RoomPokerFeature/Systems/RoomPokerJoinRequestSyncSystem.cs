@@ -52,7 +52,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-        var totalPlayersCount = roomPokerPlayers.MarkedPlayersBySeat.Count + roomPokerPlayers.AwayPlayers.Count;
+        var totalPlayersCount = roomPokerPlayers.MarkedPlayersBySeat.Count;
         
         if (totalPlayersCount >= roomPokerStats.MaxPlayers)
         {

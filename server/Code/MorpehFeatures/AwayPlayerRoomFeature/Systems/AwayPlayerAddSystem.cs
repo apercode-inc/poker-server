@@ -4,7 +4,6 @@ using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
@@ -15,9 +14,6 @@ public class AwayPlayerAddSystem : ISystem
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
-    [Injectable] private Stash<PlayerDropCards> _playerDropCards; //todo пока что игрок сразу скидывает карты
-
-    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private RoomPokerService _roomPokerService;
     [Injectable] private ConfigsService _configsService;
@@ -51,15 +47,6 @@ public class AwayPlayerAddSystem : ISystem
             {
                 Timer = config.AwayPlayerTime,
             });
-
-            ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
-            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(playerRoomPoker.RoomEntity);
-            
-            //Сначала должна отработать RoomPokerDropCardsByPlayerSystem
-            //затем все остальное
-            _playerDropCards.Set(playerEntity);
-            roomPokerPlayers.AwayPlayers.Add(playerEntity);
-            _roomPokerService.RemoveForAwayPlayer(playerRoomPoker.RoomEntity, playerEntity);
         }
     }
     

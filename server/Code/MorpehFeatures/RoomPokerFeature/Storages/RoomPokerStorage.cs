@@ -86,7 +86,6 @@ public class RoomPokerStorage : IInitializer
         _roomPokerPlayers.Set(roomEntity, new RoomPokerPlayers
         {
             MarkedPlayersBySeat = markedPlayersBySeat,
-            AwayPlayers = new List<Entity>(),
             PlayerPotModels = new List<PlayerPotModel>(),
         });
         _roomPokerMaxBet.Set(roomEntity, new RoomPokerMaxBet

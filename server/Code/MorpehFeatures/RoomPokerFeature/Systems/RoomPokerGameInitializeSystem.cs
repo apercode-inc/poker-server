@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
@@ -27,6 +28,7 @@ public class RoomPokerGameInitializeSystem : ISystem
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
+    [Injectable] private Stash<PlayerAway> _playerAway;
 
     [Injectable] private RoomPokerCardDeskService _cardDeskService;
     [Injectable] private RoomPokerService _roomPokerService;
@@ -34,14 +36,11 @@ public class RoomPokerGameInitializeSystem : ISystem
     [Injectable] private NetFrameServer _server;
 
     private Filter _filter;
-    private Queue<Entity> _players;
 
     public World World { get; set; }
 
     public void OnAwake()
     {
-        _players = new Queue<Entity>();
-        
         _filter = World.Filter
             .With<RoomPokerPlayers>()
             .With<RoomPokerGameInitialize>()
@@ -96,16 +95,21 @@ public class RoomPokerGameInitializeSystem : ISystem
             _roomPokerService.SetDealerPlayerMarker(roomEntity, dealerPlayer);
 
             roomPokerPlayers.PlayerPotModels.Clear();
-            var playersEntity = new Queue<Entity>();
-            
+            var playersEntities = new Queue<Entity>();
+
             foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
             {
                 var playerEntity = playerBySeat.Value;
                 
                 ref var playerAuthData = ref _playerAuthData.Get(playerEntity);
                 ref var playerNickname = ref _playerNickname.Get(playerEntity);
+
+                if (_playerAway.Has(playerEntity))
+                {
+                    continue;
+                }
                 
-                playersEntity.Enqueue(playerEntity);
+                playersEntities.Enqueue(playerEntity);
                 roomPokerPlayers.PlayerPotModels.Add(new PlayerPotModel(playerAuthData.Guid, playerNickname.Value));
             }
             
@@ -113,7 +117,7 @@ public class RoomPokerGameInitializeSystem : ISystem
             
             _roomPokerDealingCardsToPlayer.Set(roomEntity, new RoomPokerDealingCardsToPlayer
             {
-                QueuePlayers = playersEntity,
+                QueuePlayers = playersEntities,
             });
             _roomPokerDealingCardsToPlayerSet.Set(roomEntity);
             _roomPokerCleanedGame.Remove(roomEntity);
@@ -124,6 +128,5 @@ public class RoomPokerGameInitializeSystem : ISystem
     public void Dispose()
     {
         _filter = null;
-        _players = null;
     }
 }

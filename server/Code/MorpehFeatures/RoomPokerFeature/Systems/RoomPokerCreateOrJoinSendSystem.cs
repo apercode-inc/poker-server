@@ -74,17 +74,6 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                 }
             }
 
-            foreach (var playerEntityFromRoom in roomPokerPlayers.AwayPlayers)
-            {
-                var addedPlayerNetworkModel = AddRoomPlayerNetworkModel(playerEntityFromRoom, requestingPlayer, 
-                    roomPokerStats, roomPlayerNetworkModels);
-                
-                if (playerEntityFromRoom == requestingPlayer)
-                {
-                    thisPlayerModel = addedPlayerNetworkModel;
-                }
-            }
-
             var cardsToTableNetworkModel = new List<RoomPokerCardNetworkModel>();
 
             foreach (var card in roomPokerCardsToTable.Cards)

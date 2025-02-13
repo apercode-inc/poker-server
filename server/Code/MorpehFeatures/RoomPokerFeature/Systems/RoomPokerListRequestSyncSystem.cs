@@ -71,7 +71,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
             responseDataframe.Rooms.Add(new RoomNetworkModel
             {
                 Id = roomPokerId.Value,
-                CurrentPlayers = (byte) (roomPokerPlayers.MarkedPlayersBySeat.Count + roomPokerPlayers.AwayPlayers.Count),
+                CurrentPlayers = (byte) roomPokerPlayers.MarkedPlayersBySeat.Count,
                 MaxPlayers = roomPokerStats.MaxPlayers,
                 SmallBet = roomPokerStats.BigBet / 2,
                 BigBet = roomPokerStats.BigBet,
