@@ -1,6 +1,8 @@
+using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Dataframes;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -14,9 +16,11 @@ public class AwayPlayerAddSystem : ISystem
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
+    [Injectable] private Stash<PlayerId> _playerId;
 
     [Injectable] private RoomPokerService _roomPokerService;
     [Injectable] private ConfigsService _configsService;
+    [Injectable] private NetFrameServer _server;
 
     private Filter _filter;
     
@@ -26,6 +30,7 @@ public class AwayPlayerAddSystem : ISystem
     {
         _filter = World.Filter
             .With<PlayerAwayAdd>()
+            .With<PlayerId>()
             .With<PlayerRoomPoker>()
             .Build();
     }
@@ -47,6 +52,16 @@ public class AwayPlayerAddSystem : ISystem
             {
                 Timer = config.AwayPlayerTime,
             });
+
+            ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
+            ref var playerId = ref _playerId.Get(playerEntity);
+
+            var dataframe = new AwayPlayerTimerDataframe
+            {
+                PlayerId = playerId.Id,
+                Time = config.AwayPlayerTime,
+            };
+            _server.SendInRoom(ref dataframe, playerRoomPoker.RoomEntity);
         }
     }
     

@@ -48,7 +48,7 @@ public class RoomPokerStorage : IInitializer
             .With<RoomPokerId>()
             .Build();
     }
-
+    
     public void CreateRoom(Entity createdPlayer, byte maxPlayers, CurrencyType currencyType, long contribution, 
         long minContribution, long bigBet, bool isFastTurn)
     {
