@@ -45,7 +45,6 @@ public class PlayerStorage : IInitializer
 
     public void Add(int id)
     {
-        Console.WriteLine($"New player connected: {id}");
         var newEntity = World.CreateEntity();
         _playerId.Set(newEntity, new PlayerId
         {
