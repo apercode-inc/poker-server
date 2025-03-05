@@ -54,12 +54,10 @@ public class PlayerStorage : IInitializer
         _playersByIds.Add(id, newEntity);
     }
 
-    public void AddAuth(Entity player, string guid, int playerId)
+    public void AddAuth(Entity player, string guid)
     {
         if (_playerByGuids.ContainsKey(guid))
         {
-            _server.Disconnect(playerId);
-            Remove(playerId);
             return;
         }
         

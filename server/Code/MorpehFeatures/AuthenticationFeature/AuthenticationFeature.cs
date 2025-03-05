@@ -38,6 +38,8 @@ public static class AuthenticationFeature
             systemsGroup.AddSystem(container.New<AuthenticationUserCreateSystem>());
         }
 
+        systemsGroup.AddSystem(container.New<AuthenticationDisconnectAlreadyConnectedSystem>());
+
         world.AddSystemsGroup(index++, systemsGroup);
     }
 }
