@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -52,6 +53,7 @@ public class AwayPlayerRejoinRoomSystem : ISystem
             _server.SendInRoom(ref dataframe, playerRoomPoker.RoomEntity);
 
             //todo логика которая переподключает к столу локального игрока + убирать экран загрузки и т.д
+            //Logger.DebugColor($"Игрок вернулся на стол room entity id:{playerRoomPoker.RoomEntity.ID}");
 
             _playerAwayRemove.Set(playerEntity);
             _playerAwayRejoinRoom.Remove(playerEntity);

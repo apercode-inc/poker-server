@@ -1,6 +1,8 @@
+using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AuthenticationFeature.Components;
 using server.Code.MorpehFeatures.AuthenticationFeature.SafeFilters;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -11,11 +13,14 @@ namespace server.Code.MorpehFeatures.AuthenticationFeature.Systems;
 public class AuthenticationAuthDataSetSystem : ISystem
 {
     [Injectable] private Stash<PlayerDbModelRequest> _playerDbModelRequest;
+    [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerAwayRejoinRoom> _playerAwayRejoinRoom;
-    
+    [Injectable] private Stash<AuthenticationDisconnectAlreadyConnected> _authenticationDisconnectAlreadyConnected;
+
     [Injectable] private ThreadSafeFilter<UserLoadCompleteSafeContainer> _loadCompleteSafeFilter;
 
     [Injectable] private PlayerStorage _playerStorage;
+    [Injectable] private NetFrameServer _server;
 
     public World World { get; set; }
 
@@ -27,7 +32,7 @@ public class AuthenticationAuthDataSetSystem : ISystem
     {
         foreach (var safeContainer in _loadCompleteSafeFilter)
         {
-            if (_playerStorage.TryGetPlayerByGuid(safeContainer.PlayerGuid, out var player))
+            if (_playerStorage.TryGetPlayerByGuid(safeContainer.PlayerGuid, out var player) && _playerAway.Has(player))
             {
                 _playerAwayRejoinRoom.Set(player, new PlayerAwayRejoinRoom
                 {
@@ -41,8 +46,9 @@ public class AuthenticationAuthDataSetSystem : ISystem
             {
                 continue;
             }
-            
+
             _playerStorage.AddAuth(player, safeContainer.PlayerGuid, safeContainer.PlayerId);
+            
             _playerDbModelRequest.Set(player);
         }
     }

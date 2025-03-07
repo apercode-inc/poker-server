@@ -37,7 +37,7 @@ public class AwayPlayerTimerTickSystem : ISystem
             {
                 continue;
             }
-            Logger.Error("До свидания!!!");
+            //Logger.Error("До свидания!!!");
 
             ref var playerId = ref _playerId.Get(playerEntity);
             

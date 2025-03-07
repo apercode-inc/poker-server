@@ -1,6 +1,8 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AuthenticationFeature.Components;
+using server.Code.MorpehFeatures.AuthenticationFeature.Dataframes;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
@@ -24,6 +26,7 @@ public class PlayerStorage : IInitializer
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
+    [Injectable] private Stash<AuthenticationDisconnectAlreadyConnected> _authenticationDisconnectAlreadyConnected;
     
     [Injectable] private NetFrameServer _server;
 
@@ -54,7 +57,7 @@ public class PlayerStorage : IInitializer
         
         _playersByIds.Add(id, newEntity);
     }
-
+    
     public void Replace(int oldId, int newId, Entity player)
     {
         _playersByIds.Remove(oldId);
@@ -77,8 +80,10 @@ public class PlayerStorage : IInitializer
     {
         if (_playerByGuids.ContainsKey(guid))
         {
-            _server.Disconnect(playerId);
-            Remove(playerId);
+            var dataframe = new AuthenticationPlayerAlreadyConnectedDataframe();
+            _server.Send(ref dataframe, player);
+            _authenticationDisconnectAlreadyConnected.Set(player);
+            
             return;
         }
         
