@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
@@ -24,6 +25,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
     [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
     [Injectable] private Stash<PlayerShowOrHideTimer> _playerShowOrHideTimer;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
+    [Injectable] private Stash<PlayerAway> _playerAway;
     
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
@@ -65,6 +67,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             {
                 var playerEntityFromRoom = playersBySeat.Value;
 
+                //todo нужно отправлять инфу о том что игрок ждет
                 var addedPlayerNetworkModel = AddRoomPlayerNetworkModel(playerEntityFromRoom, requestingPlayer, 
                     roomPokerStats, roomPlayerNetworkModels);
 
@@ -107,6 +110,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
                 RoomId = roomPokerId.Value,
                 PlayerModel = thisPlayerModel,
             };
+            //todo другим игрокам надо просто отправить инфу о том что он больше не ждет
             _server.SendInRoomExcept(ref joinDataframe, roomEntity, requestingPlayer);
             
             _playerRoomCreateSend.Remove(requestingPlayer);
@@ -129,6 +133,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
         ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntityFromRoom);
         ref var playerTurnTimer = ref _playerTurnTimer.Get(playerEntityFromRoom, out var turnTimerExist);
         ref var playerShowOrHideTimer = ref _playerShowOrHideTimer.Get(playerEntityFromRoom, out var playerShowOrHideExist);
+        ref var playerAway = ref _playerAway.Get(playerEntityFromRoom, out var playerAwayExist);
 
         var cardsModel = new List<RoomPokerCardNetworkModel>();
 
@@ -171,6 +176,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             CurrentBet = playerPokerCurrentBet.Value,
             TurnTimeCurrent = timeCurrent,
             TurnTimeMax = timeMax,
+            AwayTime = playerAwayExist ? playerAway.Timer : 0,
             CardsState = playerCards.CardsState,
             CardsModel = cardsModel,
         };
