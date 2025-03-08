@@ -12,11 +12,8 @@ public class AwayPlayerRemoveSystem : ISystem
 {
     [Injectable] private Stash<PlayerAwayRemove> _playerAwayRemove;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<PlayerSeat> _playerSeat;
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerId> _playerId;
-
-    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private NetFrameServer _server;
     
@@ -28,8 +25,8 @@ public class AwayPlayerRemoveSystem : ISystem
     {
         _filter = World.Filter
             .With<PlayerAwayRemove>()
+            .With<PlayerAway>()
             .With<PlayerRoomPoker>()
-            .With<PlayerSeat>()
             .With<PlayerId>()
             .Build();
     }
@@ -39,10 +36,6 @@ public class AwayPlayerRemoveSystem : ISystem
         foreach (var playerEntity in _filter)
         {
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
-            ref var playerSeat = ref _playerSeat.Get(playerEntity);
-            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(playerRoomPoker.RoomEntity);
-
-            roomPokerPlayers.MarkedPlayersBySeat.Add(playerSeat.SeatIndex, playerEntity);
 
             _playerAway.Remove(playerEntity);
             _playerAwayRemove.Remove(playerEntity);

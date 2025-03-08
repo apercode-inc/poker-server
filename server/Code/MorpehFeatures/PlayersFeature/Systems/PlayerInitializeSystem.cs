@@ -6,6 +6,7 @@ using server.Code.MorpehFeatures.CurrencyFeature.Dataframe;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Dataframes;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 namespace server.Code.MorpehFeatures.PlayersFeature.Systems;
 
@@ -18,6 +19,9 @@ public class PlayerInitializeSystem : ISystem
     [Injectable] private Stash<PlayerInitialize> _playerInitialize;
     [Injectable] private Stash<PlayerAdsDbCooldownModelRequest> _playerAdsDbCooldownModelRequest;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
+    [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
+
+    [Injectable] private Stash<RoomPokerId> _roomPokerId;
 
     [Injectable] private NetFrameServer _server;
     
@@ -75,6 +79,16 @@ public class PlayerInitializeSystem : ISystem
                 AvatarIndex = model.avatar_id,
             });
 
+            ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity, out var playerRoomPokerExist);
+
+            var roomPokerIdValue = -1;
+            
+            if (playerRoomPokerExist)
+            {
+                ref var roomPokerId = ref _roomPokerId.Get(playerRoomPoker.RoomEntity);
+                roomPokerIdValue = roomPokerId.Value;
+            }
+
             var playerInitializeDataframe = new PlayerInitializeDataframe
             {
                 Nickname = model.nickname,
@@ -83,6 +97,7 @@ public class PlayerInitializeSystem : ISystem
                 Level = model.level,
                 Experience = model.experience,
                 PlayerGuid = playerAuthData.Guid,
+                RoomPokerId = roomPokerIdValue,
             };
             _server.Send(ref playerInitializeDataframe, playerEntity);
 

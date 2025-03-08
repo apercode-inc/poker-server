@@ -49,6 +49,12 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
         {
             return;
         }
+        
+        if (dataframe.IsRejoin)
+        {
+            _playerRoomCreateSend.Set(player);
+            return;
+        }
 
         ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
@@ -89,8 +95,6 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
         roomPokerPlayers.MarkedPlayersBySeat.Add(seatIndex, player);
 
         _playerStorage.CreateForRoomAndSync(player, roomPokerStats.CurrencyType, roomPokerStats.Contribution, roomEntity, seatIndex);
-
-        _playerRoomCreateSend.Set(player);
     }
 
     public void Dispose()

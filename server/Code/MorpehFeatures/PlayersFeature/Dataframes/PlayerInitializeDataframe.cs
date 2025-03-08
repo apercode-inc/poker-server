@@ -11,6 +11,7 @@ public struct PlayerInitializeDataframe : INetworkDataframe
     public int Level;
     public int Experience;
     public string PlayerGuid;
+    public int RoomPokerId;
     
     public void Write(NetFrameWriter writer)
     {
@@ -20,6 +21,7 @@ public struct PlayerInitializeDataframe : INetworkDataframe
         writer.WriteInt(Level);
         writer.WriteInt(Experience);
         writer.WriteString(PlayerGuid);
+        writer.WriteInt(RoomPokerId);
     }
 
     public void Read(NetFrameReader reader)
@@ -30,5 +32,6 @@ public struct PlayerInitializeDataframe : INetworkDataframe
         Level = reader.ReadInt();
         Experience = reader.ReadInt();
         PlayerGuid = reader.ReadString();
+        RoomPokerId = reader.ReadInt();
     }
 }

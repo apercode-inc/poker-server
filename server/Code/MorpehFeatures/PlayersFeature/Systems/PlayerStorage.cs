@@ -62,12 +62,12 @@ public class PlayerStorage : IInitializer
     {
         _playersByIds.Remove(oldId);
         
-        if (!_playersByIds.TryGetValue(newId, out var oldPlayer))
+        if (!_playersByIds.TryGetValue(newId, out var replacePlayer))
         {
             return;
         }
 
-        _destroy.Set(oldPlayer);
+        _destroy.Set(replacePlayer);
         _playersByIds[newId] = player;
         
         _playerId.Set(player, new PlayerId

@@ -51,6 +51,8 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
     {
         foreach (var requestingPlayer in _filter)
         {
+            _playerRoomCreateSend.Remove(requestingPlayer);
+            
             ref var playerRoomPoker = ref _playerRoomPoker.Get(requestingPlayer);
             var roomEntity = playerRoomPoker.RoomEntity;
 
@@ -67,7 +69,6 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             {
                 var playerEntityFromRoom = playersBySeat.Value;
 
-                //todo нужно отправлять инфу о том что игрок ждет
                 var addedPlayerNetworkModel = AddRoomPlayerNetworkModel(playerEntityFromRoom, requestingPlayer, 
                     roomPokerStats, roomPlayerNetworkModels);
 
@@ -104,16 +105,13 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             _server.Send(ref createDataframe, requestingPlayer);
 
             thisPlayerModel.CardsModel?.Clear();
-            
+
             var joinDataframe = new RoomPokerJoinResponseDataframe
             {
                 RoomId = roomPokerId.Value,
                 PlayerModel = thisPlayerModel,
             };
-            //todo другим игрокам надо просто отправить инфу о том что он больше не ждет
             _server.SendInRoomExcept(ref joinDataframe, roomEntity, requestingPlayer);
-            
-            _playerRoomCreateSend.Remove(requestingPlayer);
         }
     }
 

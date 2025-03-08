@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -15,7 +14,8 @@ public class AwayPlayerRejoinRoomSystem : ISystem
     [Injectable] private Stash<PlayerAwayRemove> _playerAwayRemove;
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    
+    [Injectable] private Stash<PlayerDbModelRequest> _playerDbModelRequest;
+
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
 
@@ -27,6 +27,7 @@ public class AwayPlayerRejoinRoomSystem : ISystem
     {
         _filter = World.Filter
             .With<PlayerId>()
+            .With<PlayerAuthData>()
             .With<PlayerRoomPoker>()
             .With<PlayerAwayRejoinRoom>()
             .Build();
@@ -38,24 +39,24 @@ public class AwayPlayerRejoinRoomSystem : ISystem
         {
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
             ref var playerAwayRejoinRoom = ref _playerAwayRejoinRoom.Get(playerEntity);
+            
             ref var playerId = ref _playerId.Get(playerEntity);
             
             var newPlayerId = playerAwayRejoinRoom.NewId;
             var oldPlayerId = playerId.Id;
 
             _playerStorage.Replace(oldPlayerId, newPlayerId, playerEntity);
-            
+
             var dataframe = new PlayerChangeIdDataframe
             {
                 OldId = oldPlayerId,
                 NewId = newPlayerId,
             };
             _server.SendInRoom(ref dataframe, playerRoomPoker.RoomEntity);
-
-            //todo логика которая переподключает к столу локального игрока + убирать экран загрузки и т.д
-            //Logger.DebugColor($"Игрок вернулся на стол room entity id:{playerRoomPoker.RoomEntity.ID}");
-
+            
             _playerAwayRemove.Set(playerEntity);
+            _playerDbModelRequest.Set(playerEntity);
+            
             _playerAwayRejoinRoom.Remove(playerEntity);
         }
     }
