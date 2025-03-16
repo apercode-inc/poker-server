@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -51,6 +52,9 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
     {
         foreach (var requestingPlayer in _filter)
         {
+            ref var playerRoomCreateSend = ref _playerRoomCreateSend.Get(requestingPlayer);
+            var isRejoin = playerRoomCreateSend.IsRejoin;
+            
             _playerRoomCreateSend.Remove(requestingPlayer);
             
             ref var playerRoomPoker = ref _playerRoomPoker.Get(requestingPlayer);
@@ -106,6 +110,11 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
 
             thisPlayerModel.CardsModel?.Clear();
 
+            if (isRejoin)
+            {
+                continue;
+            }
+            
             var joinDataframe = new RoomPokerJoinResponseDataframe
             {
                 RoomId = roomPokerId.Value,
@@ -135,7 +144,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
 
         var cardsModel = new List<RoomPokerCardNetworkModel>();
 
-        if (thisPlayer || playerCards.CardsState == CardsState.Open)
+        if (playerCards.Cards != null && (thisPlayer || playerCards.CardsState == CardsState.Open))
         {
             foreach (var card in playerCards.Cards)
             {

@@ -52,7 +52,10 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
         
         if (dataframe.IsRejoin)
         {
-            _playerRoomCreateSend.Set(player);
+            _playerRoomCreateSend.Set(player, new PlayerRoomCreateSend
+            {
+                IsRejoin = true
+            });
             return;
         }
 

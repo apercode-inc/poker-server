@@ -4,4 +4,5 @@ namespace server.Code.MorpehFeatures.PlayersFeature.Components;
 
 public struct PlayerRoomCreateSend : IComponent
 {
+    public bool IsRejoin;
 }

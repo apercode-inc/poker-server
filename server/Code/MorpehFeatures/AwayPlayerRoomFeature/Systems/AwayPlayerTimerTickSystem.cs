@@ -30,13 +30,11 @@ public class AwayPlayerTimerTickSystem : ISystem
         {
             ref var playerAway = ref _playerAway.Get(playerEntity);
             playerAway.Timer -= deltaTime;
-
-            //Logger.DebugColor($"Ожидает: {playerAway.Timer}", ConsoleColor.Blue);
+            
             if (playerAway.Timer > 0)
             {
                 continue;
             }
-            //Logger.Error("До свидания!!!");
 
             ref var playerId = ref _playerId.Get(playerEntity);
             
