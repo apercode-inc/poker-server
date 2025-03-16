@@ -15,6 +15,7 @@ public class AwayPlayerRejoinRoomSystem : ISystem
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerDbModelRequest> _playerDbModelRequest;
+    [Injectable] private Stash<PlayerOffline> _playerOffline;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
@@ -57,6 +58,7 @@ public class AwayPlayerRejoinRoomSystem : ISystem
             _playerAwayRemove.Set(playerEntity);
             _playerDbModelRequest.Set(playerEntity);
             
+            _playerOffline.Remove(playerEntity);
             _playerAwayRejoinRoom.Remove(playerEntity);
         }
     }

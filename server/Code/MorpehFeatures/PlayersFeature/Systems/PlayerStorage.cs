@@ -26,6 +26,7 @@ public class PlayerStorage : IInitializer
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
+    [Injectable] private Stash<PlayerOffline> _playerOffline;
     [Injectable] private Stash<AuthenticationDisconnectAlreadyConnected> _authenticationDisconnectAlreadyConnected;
     
     [Injectable] private NetFrameServer _server;
@@ -119,7 +120,7 @@ public class PlayerStorage : IInitializer
         _playerRoomCreateSend.Set(createdPlayer);
     }
 
-    public void RemoveWithAway(int id)
+    public void RemoveWithAwayAtDisconnect(int id)
     {
         if (!_playersByIds.TryGetValue(id, out var player))
         {
@@ -132,6 +133,7 @@ public class PlayerStorage : IInitializer
             return;
         }
         
+        _playerOffline.Set(player);
         _playerAwayAdd.Set(player);
         _playersByIds.Remove(id);
     }

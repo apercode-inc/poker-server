@@ -3,6 +3,7 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 namespace server.Code.MorpehFeatures.AwayPlayerRoomFeature.Systems;
 
@@ -10,6 +11,10 @@ public class AwayPlayerTimerTickSystem : ISystem
 {
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerId> _playerId;
+    [Injectable] private Stash<PlayerOffline> _playerOffline;
+    [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
+
+    [Injectable] private Stash<RoomPokerPlayerLeft> _roomPokerPlayerLeft;
 
     [Injectable] private PlayerStorage _playerStorage;
     
@@ -20,6 +25,7 @@ public class AwayPlayerTimerTickSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
+            .With<PlayerRoomPoker>()
             .With<PlayerAway>()
             .Build();
     }
@@ -37,8 +43,20 @@ public class AwayPlayerTimerTickSystem : ISystem
             }
 
             ref var playerId = ref _playerId.Get(playerEntity);
-            
-            _playerStorage.Remove(playerId.Id);
+
+            if (_playerOffline.Has(playerEntity))
+            {
+                _playerStorage.Remove(playerId.Id);
+            }
+            else
+            {
+                ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
+                
+                _roomPokerPlayerLeft.Set(playerRoomPoker.RoomEntity, new RoomPokerPlayerLeft
+                {
+                    Player = playerEntity,
+                });
+            }
         }
     }
     

@@ -4,7 +4,6 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Dataframes;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 namespace server.Code.MorpehFeatures.AwayPlayerRoomFeature.Systems;
 
@@ -35,13 +34,12 @@ public class AwayPlayerRemoveSystem : ISystem
     {
         foreach (var playerEntity in _filter)
         {
-            ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
-
             _playerAway.Remove(playerEntity);
             _playerAwayRemove.Remove(playerEntity);
 
             ref var playerId = ref _playerId.Get(playerEntity);
-
+            ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
+            
             var dataframe = new AwayPlayerResetTimerDataframe
             {
                 PlayerId = playerId.Id,
