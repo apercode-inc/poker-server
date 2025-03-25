@@ -103,6 +103,8 @@ public class RoomPokerGameInitializeSystem : ISystem
                 
                 ref var playerAuthData = ref _playerAuthData.Get(playerEntity);
                 ref var playerNickname = ref _playerNickname.Get(playerEntity);
+                
+                roomPokerPlayers.PlayerPotModels.Add(new PlayerPotModel(playerAuthData.Guid, playerNickname.Value));
 
                 if (_playerAway.Has(playerEntity))
                 {
@@ -110,7 +112,6 @@ public class RoomPokerGameInitializeSystem : ISystem
                 }
                 
                 playersEntities.Enqueue(playerEntity);
-                roomPokerPlayers.PlayerPotModels.Add(new PlayerPotModel(playerAuthData.Guid, playerNickname.Value));
             }
             
             _roomPokerSetBlinds.Set(roomEntity, new RoomPokerSetBlinds());

@@ -6,6 +6,7 @@ using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Dataframes;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
@@ -17,7 +18,10 @@ public class AwayPlayerAddSystem : ISystem
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
     [Injectable] private Stash<PlayerId> _playerId;
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
 
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    
     [Injectable] private RoomPokerService _roomPokerService;
     [Injectable] private ConfigsService _configsService;
     [Injectable] private NetFrameServer _server;
@@ -32,6 +36,7 @@ public class AwayPlayerAddSystem : ISystem
             .With<PlayerAwayAdd>()
             .With<PlayerId>()
             .With<PlayerRoomPoker>()
+            .With<PlayerSeat>()
             .Build();
     }
 
@@ -55,13 +60,20 @@ public class AwayPlayerAddSystem : ISystem
 
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
             ref var playerId = ref _playerId.Get(playerEntity);
+            ref var playerSeat = ref _playerSeat.Get(playerEntity);
+
+            var roomEntity = playerRoomPoker.RoomEntity;
+
+            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+            roomPokerPlayers.MarkedPlayersBySeat.TryGetValueByMarkers(playerSeat.SeatIndex, out var playerByMarkedItem);
+            playerByMarkedItem.IsMoveIgnore = true;
 
             var dataframe = new AwayPlayerTimerDataframe
             {
                 PlayerId = playerId.Id,
                 Time = config.AwayPlayerTime,
             };
-            _server.SendInRoom(ref dataframe, playerRoomPoker.RoomEntity);
+            _server.SendInRoom(ref dataframe, roomEntity);
         }
     }
     

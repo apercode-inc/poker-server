@@ -215,7 +215,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
                 var nextIndex = i % _data.Length;
                 iterationCount++;
 
-                if (_data[nextIndex].Value == null)
+                if (_data[nextIndex].Value == null || _data[nextIndex].IsMoveIgnore)
                 {
                     continue;
                 }
@@ -291,7 +291,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
             }
             else
             {
-                if (MoveMarkerBackward(marker.Key, out newMarkedItem, index) && movedValuesByMarker != null)
+                if (MoveMarkerBackward(marker.Key, out newMarkedItem, index) && movedValuesByMarker != null) 
                 {
                     movedValuesByMarker.Add(marker.Key, newMarkedItem.Value);
                 }
@@ -314,7 +314,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
             currentIndex = (currentIndex - 1 + _data.Length) % _data.Length;
             iterationIndex++;
 
-            if (_data[currentIndex].Value == null)
+            if (_data[currentIndex].Value == null || _data[currentIndex].IsMoveIgnore)
             {
                 continue;
             }
@@ -339,7 +339,7 @@ public class MovingMarkersDictionary<T, TM> : IEnumerable<MarkedItem<T, TM>> whe
             var nextIndex = i % _data.Length;
             iterationCount++;
 
-            if (_data[nextIndex].Value == null)
+            if (_data[nextIndex].Value == null || _data[nextIndex].IsMoveIgnore)
             {
                 continue;
             }
@@ -390,10 +390,11 @@ public enum MarkerSettingType : byte
     MoveWithRemoveForwardDirection = 1,
 }
 
-public struct MarkedItem<T, TM> where TM : Enum
+public class MarkedItem<T, TM> where TM : Enum
 {
     public T Value { get; internal set; }
     public int Key { get; }
+    public bool IsMoveIgnore { get; set; }
     public Dictionary<TM, bool> Markers { get; }
 
     public MarkedItem(int key, Dictionary<TM, bool> markers)

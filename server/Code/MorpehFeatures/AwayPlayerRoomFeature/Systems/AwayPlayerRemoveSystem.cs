@@ -4,6 +4,7 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Dataframes;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 namespace server.Code.MorpehFeatures.AwayPlayerRoomFeature.Systems;
 
@@ -13,6 +14,9 @@ public class AwayPlayerRemoveSystem : ISystem
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerId> _playerId;
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
+    
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private NetFrameServer _server;
     
@@ -27,6 +31,7 @@ public class AwayPlayerRemoveSystem : ISystem
             .With<PlayerAway>()
             .With<PlayerRoomPoker>()
             .With<PlayerId>()
+            .With<PlayerSeat>()
             .Build();
     }
 
@@ -39,12 +44,19 @@ public class AwayPlayerRemoveSystem : ISystem
 
             ref var playerId = ref _playerId.Get(playerEntity);
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
+            ref var playerSeat = ref _playerSeat.Get(playerEntity);
+            
+            var roomEntity = playerRoomPoker.RoomEntity;
+            
+            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+            roomPokerPlayers.MarkedPlayersBySeat.TryGetValueByMarkers(playerSeat.SeatIndex, out var playerByMarkedItem);
+            playerByMarkedItem.IsMoveIgnore = false;
             
             var dataframe = new AwayPlayerResetTimerDataframe
             {
                 PlayerId = playerId.Id,
             };
-            _server.SendInRoom(ref dataframe, playerRoomPoker.RoomEntity);
+            _server.SendInRoom(ref dataframe, roomEntity);
         }
     }
     
