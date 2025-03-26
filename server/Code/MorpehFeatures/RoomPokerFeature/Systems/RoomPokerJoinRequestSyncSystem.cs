@@ -98,6 +98,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
         var playerBySeat = roomPokerPlayers.PlayersBySeat[randomIndex];
         playerBySeat.Player = player;
         playerBySeat.IsOccupied = true;
+        roomPokerPlayers.TotalPlayersCount++;
 
         _playerStorage.CreateForRoomAndSync(player, roomPokerStats.CurrencyType, roomPokerStats.Contribution, roomEntity, seatIndex);
     }

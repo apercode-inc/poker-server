@@ -62,6 +62,7 @@ public class RoomPokerService : IInitializer
         
         ref var playerSeat = ref _playerSeat.Get(playerLeave);
         roomPokerPlayers.PlayersBySeat[playerSeat.SeatIndex].IsOccupied = false;
+        roomPokerPlayers.TotalPlayersCount--;
         
         if (_playerActive.Has(playerLeave))
         {

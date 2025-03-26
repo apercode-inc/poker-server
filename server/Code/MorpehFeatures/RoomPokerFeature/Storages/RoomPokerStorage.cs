@@ -81,12 +81,19 @@ public class RoomPokerStorage : IInitializer
         });
 
         var playersBySeatModels = new PlayerSeatModel[maxPlayers];
+
+        for (var i = 0; i < playersBySeatModels.Length; i++)
+        {
+            playersBySeatModels[i] = new PlayerSeatModel();
+        }
+        
         var playerSeatModel = playersBySeatModels[seat];
         playerSeatModel.Player = createdPlayer;
         playerSeatModel.IsOccupied = true;
 
         _roomPokerPlayers.Set(roomEntity, new RoomPokerPlayers
         {
+            TotalPlayersCount = 1,
             PlayersBySeat = playersBySeatModels,
             PlayerPotModels = new List<PlayerPotModel>(),
         });

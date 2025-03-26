@@ -43,13 +43,13 @@ public class RoomPokerSetBlindsSystem : ISystem
             if (markedPlayers.TryGetValueByMarked(PokerPlayerMarkerType.ActivePlayer, out var nextPlayerByMarked))
             {
                 var smallBlindPlayer = nextPlayerByMarked.Value;
-
+            
                 _currencyPlayerService.TrySetBet(roomEntity, smallBlindPlayer, small);
-
+            
                 markedPlayers.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer, out nextPlayerByMarked);
-
+            
                 var bigBlindPlayer = nextPlayerByMarked.Value;
-
+            
                 _currencyPlayerService.TrySetBet(roomEntity, bigBlindPlayer, big);
             }
 

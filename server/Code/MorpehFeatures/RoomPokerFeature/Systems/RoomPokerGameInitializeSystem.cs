@@ -72,34 +72,39 @@ public class RoomPokerGameInitializeSystem : ISystem
 
             Entity dealerPlayer;
 
-            if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.DealerPlayer, 
-                    out var markedPlayer))
-            {
-                dealerPlayer = markedPlayer.Value;
-            }
-            else
-            {
-                markedPlayer = roomPokerPlayers.MarkedPlayersBySeat.GetFirst();
-                dealerPlayer = markedPlayer.Value;
-                roomPokerPlayers.MarkedPlayersBySeat.SetMarker(dealerPlayer, PokerPlayerMarkerType.DealerPlayer);
-            }
-
-            if (roomPokerPlayers.MarkedPlayersBySeat.TryGetNext(PokerPlayerMarkerType.DealerPlayer, out markedPlayer))
-            {
-                var playerEntity = markedPlayer.Value;
-                
-                roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.ActivePlayer);
-                roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.NextRoundActivePlayer);
-            }
+             if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.DealerPlayer, 
+                     out var markedPlayer))
+             {
+                 dealerPlayer = markedPlayer.Value;
+             }
+             else
+             {
+                 markedPlayer = roomPokerPlayers.MarkedPlayersBySeat.GetFirst();
+                 dealerPlayer = markedPlayer.Value;
+                 roomPokerPlayers.MarkedPlayersBySeat.SetMarker(dealerPlayer, PokerPlayerMarkerType.DealerPlayer);
+             }
+            
+             if (roomPokerPlayers.MarkedPlayersBySeat.TryGetNext(PokerPlayerMarkerType.DealerPlayer, out markedPlayer))
+             {
+                 var playerEntity = markedPlayer.Value;
+                 
+                 roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.ActivePlayer);
+                 roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.NextRoundActivePlayer);
+             }
             
             _roomPokerService.SetDealerPlayerMarker(roomEntity, dealerPlayer);
 
             roomPokerPlayers.PlayerPotModels.Clear();
             var playersEntities = new Queue<Entity>();
 
-            foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
+            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                var playerEntity = playerBySeat.Value;
+                if (!playerBySeat.IsOccupied)
+                {
+                    continue;
+                }
+                
+                var playerEntity = playerBySeat.Player;
                 
                 ref var playerAuthData = ref _playerAuthData.Get(playerEntity);
                 ref var playerNickname = ref _playerNickname.Get(playerEntity);
