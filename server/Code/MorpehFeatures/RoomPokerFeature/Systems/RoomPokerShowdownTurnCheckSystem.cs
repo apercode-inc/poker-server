@@ -44,9 +44,14 @@ public class RoomPokerShowdownTurnCheckSystem : ISystem
 
             var isSkipCleanup = false;
 
-            foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
+            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                var playerEntity = playerBySeat.Value;
+                if (!playerBySeat.IsOccupied)
+                {
+                    continue;
+                }
+                
+                var playerEntity = playerBySeat.Player;
 
                 ref var playerCards = ref _playerCards.Get(playerEntity);
 

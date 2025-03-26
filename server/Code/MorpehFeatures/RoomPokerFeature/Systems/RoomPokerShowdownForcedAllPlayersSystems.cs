@@ -31,9 +31,14 @@ public class RoomPokerShowdownForcedAllPlayersSystems : ISystem
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
+            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                var playerEntity = playerBySeat.Value;
+                if (!playerBySeat.IsOccupied)
+                {
+                    continue;
+                }
+                
+                var playerEntity = playerBySeat.Player;
                 
                 _playerShowdownForced.Set(playerEntity);
             }

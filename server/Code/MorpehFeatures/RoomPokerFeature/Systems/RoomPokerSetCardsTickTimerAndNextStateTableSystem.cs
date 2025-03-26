@@ -1,5 +1,4 @@
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -51,10 +50,13 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
                 continue;
             }
 
-            foreach (var markedPlayerForCompleteTurnReset in roomPokerPlayers.MarkedPlayersBySeat)
+            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                var player = markedPlayerForCompleteTurnReset.Value;
-                _playerTurnCompleteFlag.Remove(player);
+                if (!playerBySeat.IsOccupied)
+                {
+                    continue;
+                }
+                _playerTurnCompleteFlag.Remove(playerBySeat.Player);
             }
             
             var activePlayer = markedPlayer.Value;

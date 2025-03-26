@@ -11,10 +11,12 @@ public class RoomPokerCheckByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
+    [Injectable] private Stash<PlayerActive> _playerActive;
 
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
     
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
+    [Injectable] private Stash<RoomPokerTransferMove> _roomPokerTransferMove;
     
     private Filter _filter;
     
@@ -37,14 +39,15 @@ public class RoomPokerCheckByPlayerSystem : ISystem
             
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             
-            if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer,
-                    out var nextPlayerByMarked))
-            {
-                _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
-            }
-
-            _playerTurnCompleteFlag.Set(playerEntity);
             _playerPokerCheck.Remove(playerEntity);
+
+            if (!_playerActive.Has(playerEntity))
+            {
+                continue;
+            }
+            
+            _roomPokerTransferMove.Set(playerEntity); //todo там будет _playerSetPokerTurn.Set(player); на нужного игрока
+            _playerTurnCompleteFlag.Set(playerEntity); //todo думаю лучше сделать в системе RoomPokerTransferMoveSystem
         }
     }
 

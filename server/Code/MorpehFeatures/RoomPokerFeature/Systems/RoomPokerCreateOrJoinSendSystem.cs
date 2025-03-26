@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -69,9 +68,14 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             var roomPlayerNetworkModels = new List<RoomPlayerNetworkModel>();
             RoomPlayerNetworkModel thisPlayerModel = default;
             
-            foreach (var playersBySeat in roomPokerPlayers.MarkedPlayersBySeat)
+            foreach (var playersBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                var playerEntityFromRoom = playersBySeat.Value;
+                if (!playersBySeat.IsOccupied)
+                {
+                    continue;
+                }
+                
+                var playerEntityFromRoom = playersBySeat.Player;
 
                 var addedPlayerNetworkModel = AddRoomPlayerNetworkModel(playerEntityFromRoom, requestingPlayer, 
                     roomPokerStats, roomPlayerNetworkModels);

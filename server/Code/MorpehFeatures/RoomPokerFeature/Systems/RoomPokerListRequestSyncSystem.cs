@@ -17,6 +17,7 @@ public class RoomPokerListRequestSyncSystem : IInitializer
 
     [Injectable] private Stash<PlayerNickname> _playerNickname;
     [Injectable] private Stash<PlayerCards> _playerCards;
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
 
     [Injectable] private NetFrameServer _server;
 
@@ -58,20 +59,29 @@ public class RoomPokerListRequestSyncSystem : IInitializer
 
             var playersInRoom = new List<RoomPlayerNetworkModel>();
             
-            foreach (var playerBySeat in roomPokerPlayers.MarkedPlayersBySeat)
+            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                ref var playerNickname = ref _playerNickname.Get(playerBySeat.Value);
+                if (!playerBySeat.IsOccupied)
+                {
+                    continue;
+                }
+
+                var player = playerBySeat.Player;
+
+                ref var playerSeat = ref _playerSeat.Get(player);
+                ref var playerNickname = ref _playerNickname.Get(player);
+                
                 playersInRoom.Add(new RoomPlayerNetworkModel
                 {
                     Nickname = playerNickname.Value,
-                    Seat = (byte) playerBySeat.Key,
+                    Seat = playerSeat.SeatIndex,
                 });
             }
             
             responseDataframe.Rooms.Add(new RoomNetworkModel
             {
                 Id = roomPokerId.Value,
-                CurrentPlayers = (byte) roomPokerPlayers.MarkedPlayersBySeat.Count,
+                CurrentPlayers = (byte) roomPokerPlayers.TotalPlayersCount,
                 MaxPlayers = roomPokerStats.MaxPlayers,
                 SmallBet = roomPokerStats.BigBet / 2,
                 BigBet = roomPokerStats.BigBet,

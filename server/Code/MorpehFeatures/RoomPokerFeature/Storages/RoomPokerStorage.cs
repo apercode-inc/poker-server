@@ -79,13 +79,15 @@ public class RoomPokerStorage : IInitializer
             TurnTime = turnTime,
             TurnShowdownTime = turnShowdownTime,
         });
-        
-        var markedPlayersBySeat = _pokerSeatsFactory
-            .Create(maxPlayers, seat, createdPlayer);
+
+        var playersBySeatModels = new PlayerSeatModel[maxPlayers];
+        var playerSeatModel = playersBySeatModels[seat];
+        playerSeatModel.Player = createdPlayer;
+        playerSeatModel.IsOccupied = true;
 
         _roomPokerPlayers.Set(roomEntity, new RoomPokerPlayers
         {
-            MarkedPlayersBySeat = markedPlayersBySeat,
+            PlayersBySeat = playersBySeatModels,
             PlayerPotModels = new List<PlayerPotModel>(),
         });
         _roomPokerMaxBet.Set(roomEntity, new RoomPokerMaxBet

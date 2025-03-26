@@ -40,9 +40,14 @@ public class RoomPokerDetectCombinationSystem : ISystem
 
             var combinationMax = CombinationType.HighCard;
             
-            foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
+            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                var player = markedPlayer.Value;
+                if (!playerBySeat.IsOccupied)
+                {
+                    continue;
+                }
+                
+                var player = playerBySeat.Player;
 
                 ref var playerCards = ref _playerCards.Get(player);
 

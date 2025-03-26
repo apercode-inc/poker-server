@@ -42,7 +42,7 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
             
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            if (roomPokerPlayers.MarkedPlayersBySeat.Count == 1)
+            if (roomPokerPlayers.TotalPlayersCount == 1)
             {
                 continue;
             }
@@ -52,9 +52,14 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
             var isContinueBiddingRound = false;
             var allInCount = 0;
 
-            foreach (var markedPlayers in roomPokerPlayers.MarkedPlayersBySeat)
+            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                var otherPlayer = markedPlayers.Value;
+                if (!playerBySeat.IsOccupied)
+                {
+                    continue;
+                }
+                
+                var otherPlayer = playerBySeat.Player;
 
                 if (playerEntity != otherPlayer && _playerAllin.Has(otherPlayer))
                 {
@@ -87,7 +92,7 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
             ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
             var isCalled = playerPokerCurrentBet.Value >= roomPokerMaxBet.Value;
 
-            if (isCalled && allInCount >= roomPokerPlayers.MarkedPlayersBySeat.Count - 1)
+            if (isCalled && allInCount >= roomPokerPlayers.TotalPlayersCount - 1)
             {
                 if (!_roomPokerShowdownForcedAllPlayersDone.Has(roomEntity))
                 {
@@ -104,9 +109,14 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
 
             roomPokerMaxBet.Value = 0;
 
-            foreach (var markedPlayers in roomPokerPlayers.MarkedPlayersBySeat)
+            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                var player = markedPlayers.Value;
+                if (!playerBySeat.IsOccupied)
+                {
+                    continue;
+                }
+
+                var player = playerBySeat.Player;
                 ref var otherPlayerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
                 otherPlayerPokerCurrentBet.Value = 0;
             }

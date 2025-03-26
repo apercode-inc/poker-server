@@ -23,6 +23,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
     [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
+    [Injectable] private Stash<RoomPokerTransferMove> _roomPokerTransferMove;
     
     [Injectable] private NetFrameServer _server;
     
@@ -52,7 +53,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            if (roomPokerPlayers.MarkedPlayersBySeat.Count == 1)
+            if (roomPokerPlayers.TotalPlayersCount == 1)
             {
                 continue;
             }
@@ -64,12 +65,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
 
             if (playerCards.CardsState == CardsState.Empty || _playerAllin.Has(playerEntity))
             {
-                if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer,
-                        out var nextPlayerByMarked))
-                {
-                    _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
-                }
-                
+                _roomPokerTransferMove.Set(roomEntity);
                 continue;
             }
 

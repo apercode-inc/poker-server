@@ -34,7 +34,7 @@ public class RoomPokerCheckStopGameSystem : ISystem
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            if (roomPokerPlayers.MarkedPlayersBySeat.Count != 1)
+            if (roomPokerPlayers.TotalPlayersCount != 1)
             {
                 continue;
             }

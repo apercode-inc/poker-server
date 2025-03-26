@@ -42,6 +42,8 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
     [Injectable] private Stash<PlayerAway> _playerAway;
+    [Injectable] private Stash<PlayerActive> _playerActive;
+    [Injectable] private Stash<PlayerDealer> _playerDealer;
 
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
     [Injectable] private NetFrameServer _server;
@@ -77,13 +79,15 @@ public class RoomPokerCleanupGameSystem : ISystem
         roomPokerPlayers.PlayerPotModels.Clear();
 
         var playersAwayCounter = 0;
-        
-        roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer, 
-            PokerPlayerMarkerType.NextRoundActivePlayer);
 
-        foreach (var markedPlayer in roomPokerPlayers.MarkedPlayersBySeat)
+        foreach (var markedPlayer in roomPokerPlayers.PlayersBySeat)
         {
-            var player = markedPlayer.Value;
+            if (!markedPlayer.IsOccupied)
+            {
+                continue;
+            }
+            
+            var player = markedPlayer.Player;
 
             ref var playerId = ref _playerId.Get(player);
 
@@ -93,6 +97,8 @@ public class RoomPokerCleanupGameSystem : ISystem
             _playerTurnTimer.Remove(player);
             _playerTurnShowdownTimer.Remove(player);
             _playerSetPokerTurn.Remove(player);
+            _playerDealer.Remove(player);
+            _playerActive.Remove(player);
 
             ref var playerCards = ref _playerCards.Get(player);
             playerCards.CardsState = CardsState.Empty;
@@ -132,7 +138,7 @@ public class RoomPokerCleanupGameSystem : ISystem
             _server.Send(ref topUpOpenDataframe, player);
         }
 
-        if (playersAwayCounter >= roomPokerPlayers.MarkedPlayersBySeat.Count - 1)
+        if (playersAwayCounter >= roomPokerPlayers.TotalPlayersCount - 1)
         {
             _roomPokerActive.Remove(roomEntity);
         }

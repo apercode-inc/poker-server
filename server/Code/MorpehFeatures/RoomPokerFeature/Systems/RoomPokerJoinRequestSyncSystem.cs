@@ -1,7 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using Scellecs.Morpeh.Collections;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
@@ -61,9 +60,8 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-        var totalPlayersCount = roomPokerPlayers.MarkedPlayersBySeat.Count;
-        
-        if (totalPlayersCount >= roomPokerStats.MaxPlayers)
+
+        if (roomPokerPlayers.TotalPlayersCount >= roomPokerStats.MaxPlayers)
         {
             _notificationService.Show(player, RoomPokerLocalizationKeys.RoomPokerJoinNoFreeSpace, NotificationType.Error);
             return;
@@ -84,18 +82,22 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         var freeSeats = new FastList<byte>();
 
-        for (byte index = 0; index < roomPokerStats.MaxPlayers; index++)
+        for (byte index = 0; index < roomPokerPlayers.PlayersBySeat.Length; index++)
         {
-            if (!roomPokerPlayers.MarkedPlayersBySeat.ContainsKey(index))
+            if (roomPokerPlayers.PlayersBySeat[index].IsOccupied)
             {
-                freeSeats.Add(index);
+                continue;
             }
+
+            freeSeats.Add(index);
         }
-        
+
         var randomIndex = _random.Next(0, freeSeats.length);
         var seatIndex = freeSeats.data[randomIndex];
 
-        roomPokerPlayers.MarkedPlayersBySeat.Add(seatIndex, player);
+        var playerBySeat = roomPokerPlayers.PlayersBySeat[randomIndex];
+        playerBySeat.Player = player;
+        playerBySeat.IsOccupied = true;
 
         _playerStorage.CreateForRoomAndSync(player, roomPokerStats.CurrencyType, roomPokerStats.Contribution, roomEntity, seatIndex);
     }

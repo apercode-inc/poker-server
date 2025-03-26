@@ -113,7 +113,7 @@ public class RoomPokerPayOutPodsSystem : ISystem
 
                 ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-                if (roomPokerPlayers.MarkedPlayersBySeat.Count == 1)
+                if (roomPokerPlayers.TotalPlayersCount == 1)
                 {
                     _roomPokerActive.Remove(roomEntity);
                 }

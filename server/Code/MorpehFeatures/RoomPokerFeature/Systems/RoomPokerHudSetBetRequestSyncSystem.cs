@@ -18,6 +18,7 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerSetBet> _playerSetBet;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
+    [Injectable] private Stash<PlayerActive> _playerActive;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
@@ -49,12 +50,7 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
 
         var roomEntity = playerRoomPoker.RoomEntity;
 
-        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-        roomPokerPlayers.MarkedPlayersBySeat.TryGetValueByMarked(PokerPlayerMarkerType.ActivePlayer,
-            out var playerByMarker);
-
-        if (playerByMarker.Value != player)
+        if (!_playerActive.Has(player))
         {
             return;
         }

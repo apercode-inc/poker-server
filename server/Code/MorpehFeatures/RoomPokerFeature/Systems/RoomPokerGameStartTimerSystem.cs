@@ -33,7 +33,7 @@ public class RoomPokerGameStartTimerSystem : ISystem
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            if (roomPokerPlayers.MarkedPlayersBySeat.Count < 2)
+            if (roomPokerPlayers.TotalPlayersCount < 2)
             {
                 _roomPokerGameStartTimer.Remove(roomEntity);
                 

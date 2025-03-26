@@ -2,7 +2,6 @@ using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -13,6 +12,7 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
     [Injectable] private Stash<RoomPokerDealingCardsToPlayerSet> _roomPokerDealingCardsToPlayerSet;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
+    [Injectable] private Stash<PlayerActive> _playerActive;
 
     private Filter _filter;
 
@@ -41,10 +41,21 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.ActivePlayer,
-                    out var nextPlayerByMarked))
+            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                _playerSetPokerTurn.Set(nextPlayerByMarked.Value);
+                if (!playerBySeat.IsOccupied)
+                {
+                    continue;
+                }
+
+                var player = playerBySeat.Player;
+                
+                if (!_playerActive.Has(player))
+                {
+                    continue;
+                }
+                
+                _playerSetPokerTurn.Set(player);
             }
 
             _pokerDealingTimer.Remove(roomEntity);

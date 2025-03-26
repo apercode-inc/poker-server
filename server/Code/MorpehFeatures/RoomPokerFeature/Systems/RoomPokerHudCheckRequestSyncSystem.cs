@@ -12,12 +12,12 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerHudCheckRequestSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
 
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
     [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
+    [Injectable] private Stash<PlayerActive> _playerActive;
     
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
@@ -44,13 +44,8 @@ public class RoomPokerHudCheckRequestSyncSystem : IInitializer
         }
         
         var roomEntity = playerRoomPoker.RoomEntity;
-
-        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-        roomPokerPlayers.MarkedPlayersBySeat.TryGetValueByMarked(PokerPlayerMarkerType.ActivePlayer,
-            out var playerByMarker);
-
-        if (playerByMarker.Value != player)
+        
+        if (!_playerActive.Has(player))
         {
             return;
         }
@@ -65,7 +60,6 @@ public class RoomPokerHudCheckRequestSyncSystem : IInitializer
         
         _playerPokerCheck.Set(player);
         _playerTurnTimerReset.Set(player);
-
     }
 
     public void Dispose()
