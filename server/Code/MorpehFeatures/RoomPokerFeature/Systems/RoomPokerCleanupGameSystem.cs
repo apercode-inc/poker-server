@@ -42,7 +42,6 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
     [Injectable] private Stash<PlayerAway> _playerAway;
-    [Injectable] private Stash<PlayerActive> _playerActive;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
 
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
@@ -98,7 +97,6 @@ public class RoomPokerCleanupGameSystem : ISystem
             _playerTurnShowdownTimer.Remove(player);
             _playerSetPokerTurn.Remove(player);
             _playerDealer.Remove(player);
-            _playerActive.Remove(player);
 
             ref var playerCards = ref _playerCards.Get(player);
             playerCards.CardsState = CardsState.Empty;

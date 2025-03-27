@@ -94,6 +94,7 @@ public class RoomPokerStorage : IInitializer
         _roomPokerPlayers.Set(roomEntity, new RoomPokerPlayers
         {
             TotalPlayersCount = 1,
+            DealerSeatPointer = 0,
             PlayersBySeat = playersBySeatModels,
             PlayerPotModels = new List<PlayerPotModel>(),
         });

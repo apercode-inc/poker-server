@@ -34,12 +34,13 @@ public class RoomPokerSetBetByPlayerSystem : ISystem
         {
             ref var roomPokerSetBet = ref _playerSetBet.Get(playerEntity);
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
+            var bet = roomPokerSetBet.Bet;
 
             var roomEntity = playerRoomPoker.RoomEntity;
 
             _playerSetBet.Remove(playerEntity);
 
-            if (!_currencyPlayerService.TrySetBet(roomEntity, playerEntity, roomPokerSetBet.Bet))
+            if (!_currencyPlayerService.TrySetBet(roomEntity, playerEntity, bet))
             {
                 continue;
             }

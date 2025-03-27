@@ -4,14 +4,15 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerGameInitializeSystem : ISystem
+//todo может переименовать надо по нормальному, система выполняет роль инициализации и роль передвижения диллера
+public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
@@ -70,29 +71,8 @@ public class RoomPokerGameInitializeSystem : ISystem
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            Entity dealerPlayer;
-
-             if (roomPokerPlayers.MarkedPlayersBySeat.TryMoveMarker(PokerPlayerMarkerType.DealerPlayer, 
-                     out var markedPlayer))
-             {
-                 dealerPlayer = markedPlayer.Value;
-             }
-             else
-             {
-                 markedPlayer = roomPokerPlayers.MarkedPlayersBySeat.GetFirst();
-                 dealerPlayer = markedPlayer.Value;
-                 roomPokerPlayers.MarkedPlayersBySeat.SetMarker(dealerPlayer, PokerPlayerMarkerType.DealerPlayer);
-             }
-            
-             if (roomPokerPlayers.MarkedPlayersBySeat.TryGetNext(PokerPlayerMarkerType.DealerPlayer, out markedPlayer))
-             {
-                 var playerEntity = markedPlayer.Value;
-                 
-                 roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.ActivePlayer);
-                 roomPokerPlayers.MarkedPlayersBySeat.SetMarker(playerEntity, PokerPlayerMarkerType.NextRoundActivePlayer);
-             }
-            
-            _roomPokerService.SetDealerPlayerMarker(roomEntity, dealerPlayer);
+            var dealerPlayer = MoveDealerSeatPointer(ref roomPokerPlayers);
+            SetDealerPlayerMarker(roomEntity, dealerPlayer);
 
             roomPokerPlayers.PlayerPotModels.Clear();
             var playersEntities = new Queue<Entity>();
@@ -129,6 +109,44 @@ public class RoomPokerGameInitializeSystem : ISystem
             _roomPokerCleanedGame.Remove(roomEntity);
             _roomPokerGameInitialize.Remove(roomEntity);
         }
+    }
+    
+    private Entity MoveDealerSeatPointer(ref RoomPokerPlayers roomPokerPlayers)
+    {
+        var startIndexSeat = roomPokerPlayers.DealerSeatPointer;
+        var newDealerIndexSeat = startIndexSeat;
+        var playerCount = roomPokerPlayers.PlayersBySeat.Length;
+
+        for (var i = 1; i < playerCount; i++)
+        {
+            var nextIndexSeat = (startIndexSeat + i) % playerCount;
+            var nextPlayer = roomPokerPlayers.PlayersBySeat[nextIndexSeat];
+
+            if (!nextPlayer.IsOccupied || _playerAway.Has(nextPlayer.Player))
+            {
+                continue;
+            }
+
+            newDealerIndexSeat = nextIndexSeat;
+            break;
+        }
+
+        roomPokerPlayers.DealerSeatPointer = newDealerIndexSeat;
+        var dealerPlayer = roomPokerPlayers.PlayersBySeat[newDealerIndexSeat].Player;
+        return dealerPlayer;
+    }
+    
+    private void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
+    {
+        _playerDealer.Set(nextMarkedPlayer);
+        
+        ref var playerId = ref _playerId.Get(nextMarkedPlayer);
+        
+        var dataframe = new RoomPokerSetDealerDataframe
+        {
+            PlayerId = playerId.Id,
+        };
+        _server.SendInRoom(ref dataframe, roomEntity);
     }
 
     public void Dispose()

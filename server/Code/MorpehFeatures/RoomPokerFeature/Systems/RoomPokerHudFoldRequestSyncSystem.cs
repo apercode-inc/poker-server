@@ -19,7 +19,7 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
     [Injectable] private Stash<PlayerDropCards> _playerDropCards;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
-    [Injectable] private Stash<PlayerActive> _playerActive;
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
     
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
@@ -53,7 +53,10 @@ public class RoomPokerHudFoldRequestSyncSystem : IInitializer
             return;
         }
 
-        if (!_playerActive.Has(player))
+        ref var playerSeat = ref _playerSeat.Get(player);
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+
+        if (playerSeat.SeatIndex != roomPokerPlayers.MoverSeatPointer)
         {
             return;
         }

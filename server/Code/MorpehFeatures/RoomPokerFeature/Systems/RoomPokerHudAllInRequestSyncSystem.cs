@@ -3,6 +3,7 @@ using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Turn;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -13,7 +14,9 @@ public class RoomPokerHudAllInRequestSyncSystem : IInitializer
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
     [Injectable] private Stash<PlayerSetBet> _playerSetBet;
-    [Injectable] private Stash<PlayerActive> _playerActive;
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
+
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private PlayerStorage _playerStorage;
     [Injectable] private NetFrameServer _server;
@@ -32,12 +35,18 @@ public class RoomPokerHudAllInRequestSyncSystem : IInitializer
             return;
         }
 
-        if (!_playerRoomPoker.Has(player))
+        ref var playerRoomPoker = ref _playerRoomPoker.Get(player, out var playerRoomPokerExist);
+
+        if (!playerRoomPokerExist)
         {
             return;
         }
 
-        if (!_playerActive.Has(player))
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(playerRoomPoker.RoomEntity);
+
+        ref var playerSeat = ref _playerSeat.Get(player);
+
+        if (playerSeat.SeatIndex != roomPokerPlayers.MoverSeatPointer)
         {
             return;
         }

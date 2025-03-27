@@ -6,7 +6,8 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Components;
 public struct RoomPokerPlayers : IComponent
 {
     public int TotalPlayersCount;
-    public int DealerSeatCounter;
+    public int DealerSeatPointer;
+    public int MoverSeatPointer;
     public PlayerSeatModel[] PlayersBySeat;
     public List<PlayerPotModel> PlayerPotModels;
 }

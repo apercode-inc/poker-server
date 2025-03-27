@@ -13,12 +13,13 @@ public class RoomPokerHudCheckRequestSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
     [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
-    [Injectable] private Stash<PlayerActive> _playerActive;
-    
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
+
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
     
@@ -42,10 +43,13 @@ public class RoomPokerHudCheckRequestSyncSystem : IInitializer
         {
             return;
         }
+
+        ref var playerSeat = ref _playerSeat.Get(player);
         
         var roomEntity = playerRoomPoker.RoomEntity;
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         
-        if (!_playerActive.Has(player))
+        if (playerSeat.SeatIndex != roomPokerPlayers.MoverSeatPointer)
         {
             return;
         }

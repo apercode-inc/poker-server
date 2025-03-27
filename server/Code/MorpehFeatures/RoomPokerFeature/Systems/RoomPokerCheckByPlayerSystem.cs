@@ -11,7 +11,7 @@ public class RoomPokerCheckByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
-    [Injectable] private Stash<PlayerActive> _playerActive;
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
 
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
     
@@ -35,19 +35,21 @@ public class RoomPokerCheckByPlayerSystem : ISystem
         foreach (var playerEntity in _filter)
         {
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
+            ref var playerSeat = ref _playerSeat.Get(playerEntity);
             var roomEntity = playerRoomPoker.RoomEntity;
             
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
             
             _playerPokerCheck.Remove(playerEntity);
 
-            if (!_playerActive.Has(playerEntity))
+            if (playerSeat.SeatIndex != roomPokerPlayers.MoverSeatPointer)
             {
                 continue;
             }
             
-            _roomPokerTransferMove.Set(playerEntity); //todo там будет _playerSetPokerTurn.Set(player); на нужного игрока
+            _roomPokerTransferMove.Set(roomEntity);
             _playerTurnCompleteFlag.Set(playerEntity); //todo думаю лучше сделать в системе RoomPokerTransferMoveSystem
+
         }
     }
 

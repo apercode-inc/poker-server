@@ -38,7 +38,6 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<PlayerAllin> _playerAllin;
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
-    [Injectable] private Stash<PlayerActive> _playerActive;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
@@ -64,7 +63,7 @@ public class RoomPokerService : IInitializer
         roomPokerPlayers.PlayersBySeat[playerSeat.SeatIndex].IsOccupied = false;
         roomPokerPlayers.TotalPlayersCount--;
         
-        if (_playerActive.Has(playerLeave))
+        if (roomPokerPlayers.MoverSeatPointer == playerSeat.SeatIndex)
         {
             _roomPokerTransferMove.Set(roomEntity);
         }
@@ -76,9 +75,10 @@ public class RoomPokerService : IInitializer
         _server.Send(ref dataframe, playerLeave);
     }
 
-    public void DropCards(Entity roomEntity, Entity playerEntity, bool isNextTurn = true)
+    public void DropCards(Entity roomEntity, Entity playerEntity)
     {
         ref var playerId = ref _playerId.Get(playerEntity);
+        ref var playerSeat = ref _playerSeat.Get(playerEntity);
 
         _playerCards.Set(playerEntity, new PlayerCards
         {
@@ -97,29 +97,11 @@ public class RoomPokerService : IInitializer
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
         SetPlayerFoldForPotModels(playerEntity, roomPokerPlayers.PlayerPotModels);
-        
-        if (!isNextTurn)
-        {
-            return;
-        }
 
-        if (_playerActive.Has(playerEntity))
+        if (playerSeat.SeatIndex == roomPokerPlayers.MoverSeatPointer)
         {
             _roomPokerTransferMove.Set(roomEntity);
         }
-    }
-
-    public void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
-    {
-        _playerDealer.Set(nextMarkedPlayer);
-        
-        ref var playerId = ref _playerId.Get(nextMarkedPlayer);
-        
-        var dataframe = new RoomPokerSetDealerDataframe
-        {
-            PlayerId = playerId.Id,
-        };
-        _server.SendInRoom(ref dataframe, roomEntity);
     }
 
     private void SetPlayerFoldForPotModels(Entity playerEntity, List<PlayerPotModel> playerPotModels)
@@ -168,7 +150,6 @@ public class RoomPokerService : IInitializer
         _playerTurnTimer.Remove(playerLeave);
         _playerTurnCompleteFlag.Remove(playerLeave);
         _playerAllin.Remove(playerLeave);
-        _playerActive.Remove(playerLeave);
         _playerAway.Remove(playerLeave);
 
         if (totalPlayersCount != 0)

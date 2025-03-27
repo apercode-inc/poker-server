@@ -12,7 +12,7 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
     [Injectable] private Stash<RoomPokerDealingCardsToPlayerSet> _roomPokerDealingCardsToPlayerSet;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
-    [Injectable] private Stash<PlayerActive> _playerActive;
+    [Injectable] private Stash<PlayerSeat> _playerSeat;
 
     private Filter _filter;
 
@@ -49,8 +49,10 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
                 }
 
                 var player = playerBySeat.Player;
+
+                ref var playerSeat = ref _playerSeat.Get(player);
                 
-                if (!_playerActive.Has(player))
+                if (playerSeat.SeatIndex != roomPokerPlayers.MoverSeatPointer)
                 {
                     continue;
                 }

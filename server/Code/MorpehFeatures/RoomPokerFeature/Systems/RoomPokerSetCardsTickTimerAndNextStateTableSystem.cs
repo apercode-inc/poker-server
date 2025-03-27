@@ -2,7 +2,6 @@ using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -44,11 +43,11 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            if (!roomPokerPlayers.MarkedPlayersBySeat.TryGetValueByMarked(PokerPlayerMarkerType.NextRoundActivePlayer,
-                    out var markedPlayer))
-            {
-                continue;
-            }
+            // if (!roomPokerPlayers.MarkedPlayersBySeat.TryGetValueByMarked(PokerPlayerMarkerType.NextRoundActivePlayer,
+            //         out var markedPlayer))
+            // {
+            //     continue;
+            // }
 
             foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
@@ -59,12 +58,13 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
                 _playerTurnCompleteFlag.Remove(playerBySeat.Player);
             }
             
-            var activePlayer = markedPlayer.Value;
+            //todo вот 
+            //var activePlayer = markedPlayer.Value;
                 
-            roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer);
-            roomPokerPlayers.MarkedPlayersBySeat.SetMarker(activePlayer, PokerPlayerMarkerType.ActivePlayer);
-            
-            _playerSetPokerTurn.Set(activePlayer);
+            // roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer);
+            // roomPokerPlayers.MarkedPlayersBySeat.SetMarker(activePlayer, PokerPlayerMarkerType.ActivePlayer);
+            //
+            // _playerSetPokerTurn.Set(activePlayer);
         }
     }
 
