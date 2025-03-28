@@ -15,5 +15,4 @@ public struct RoomPokerPlayers : IComponent
 public class PlayerSeatModel
 {
     public Entity Player;
-    public bool IsOccupied;
 }

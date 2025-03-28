@@ -1,5 +1,4 @@
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
@@ -55,7 +54,7 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
 
             foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                if (!playerBySeat.IsOccupied)
+                if (playerBySeat.Player.IsNullOrDisposed())
                 {
                     continue;
                 }
@@ -77,7 +76,6 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
                 
                 if (!_playerTurnCompleteFlag.Has(otherPlayer))
                 {
-                    //Logger.LogWarning("isContinueBiddingRound = true [1]");
                     isContinueBiddingRound = true;
                 }
 
@@ -87,7 +85,6 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
                 {
                     continue;
                 }
-                //Logger.LogWarning("isContinueBiddingRound = true [2]");
                 isContinueBiddingRound = true;
             }
             
@@ -100,7 +97,6 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
                 {
                     _roomPokerShowdownForcedAllPlayers.Set(roomEntity);
                 }
-                //Logger.LogWarning("isContinueBiddingRound = false [1]");
                 isContinueBiddingRound = false;
             }
 
@@ -113,7 +109,7 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
 
             foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                if (!playerBySeat.IsOccupied)
+                if (playerBySeat.Player.IsNullOrDisposed())
                 {
                     continue;
                 }

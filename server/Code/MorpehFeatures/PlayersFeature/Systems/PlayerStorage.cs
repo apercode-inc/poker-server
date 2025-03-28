@@ -1,5 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
+using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AuthenticationFeature.Components;
 using server.Code.MorpehFeatures.AuthenticationFeature.Dataframes;
@@ -7,6 +8,7 @@ using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 
@@ -28,6 +30,8 @@ public class PlayerStorage : IInitializer
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
     [Injectable] private Stash<PlayerOffline> _playerOffline;
     [Injectable] private Stash<AuthenticationDisconnectAlreadyConnected> _authenticationDisconnectAlreadyConnected;
+
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     
     [Injectable] private NetFrameServer _server;
 
@@ -98,6 +102,8 @@ public class PlayerStorage : IInitializer
     public void CreateForRoomAndSync(Entity createdPlayer, CurrencyType currencyType, long contribution,
         Entity roomEntity, byte seat)
     {
+        ref var playerNickname = ref createdPlayer.GetComponent<PlayerNickname>();
+        Logger.DebugColor($"{playerNickname.Value} - seat: {seat}");
         _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker
         {
             RoomEntity = roomEntity,
@@ -126,6 +132,9 @@ public class PlayerStorage : IInitializer
         {
             return;
         }
+        
+        Remove(id); //todo временно вырубил пока что ожидание
+        return;
 
         if (!_playerRoomPoker.Has(player))
         {
@@ -154,7 +163,7 @@ public class PlayerStorage : IInitializer
                 {
                     _playerByGuids.Remove(playerAuthData.Guid);
                 }
-                
+
                 _destroy.Set(entity);
                 break;
             }

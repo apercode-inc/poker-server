@@ -49,7 +49,7 @@ public class RoomPokerTransferMoveSystem : ISystem
                 var nextIndexSeat = (startIndexSeat + i) % playerCount;
                 var nextPlayer = roomPokerPlayers.PlayersBySeat[nextIndexSeat];
 
-                if (!nextPlayer.IsOccupied || _playerAway.Has(nextPlayer.Player))
+                if (nextPlayer.Player.IsNullOrDisposed() || _playerAway.Has(nextPlayer.Player))
                 {
                     continue;
                 }

@@ -81,7 +81,7 @@ public class RoomPokerCleanupGameSystem : ISystem
 
         foreach (var markedPlayer in roomPokerPlayers.PlayersBySeat)
         {
-            if (!markedPlayer.IsOccupied)
+            if (markedPlayer.Player.IsNullOrDisposed())
             {
                 continue;
             }

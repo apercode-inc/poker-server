@@ -70,7 +70,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             
             foreach (var playersBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                if (!playersBySeat.IsOccupied)
+                if (playersBySeat.Player.IsNullOrDisposed())
                 {
                     continue;
                 }

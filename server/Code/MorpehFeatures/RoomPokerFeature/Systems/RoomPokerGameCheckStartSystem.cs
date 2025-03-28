@@ -43,7 +43,7 @@ public class RoomPokerGameCheckStartSystem : ISystem
 
             foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                if (!playerBySeat.IsOccupied)
+                if (playerBySeat.Player.IsNullOrDisposed())
                 {
                     continue;
                 }

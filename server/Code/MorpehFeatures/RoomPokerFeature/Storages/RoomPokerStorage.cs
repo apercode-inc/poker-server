@@ -89,7 +89,6 @@ public class RoomPokerStorage : IInitializer
         
         var playerSeatModel = playersBySeatModels[seat];
         playerSeatModel.Player = createdPlayer;
-        playerSeatModel.IsOccupied = true;
 
         _roomPokerPlayers.Set(roomEntity, new RoomPokerPlayers
         {

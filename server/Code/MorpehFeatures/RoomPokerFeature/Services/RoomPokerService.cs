@@ -60,7 +60,7 @@ public class RoomPokerService : IInitializer
         _markersByPlayer.Clear();
         
         ref var playerSeat = ref _playerSeat.Get(playerLeave);
-        roomPokerPlayers.PlayersBySeat[playerSeat.SeatIndex].IsOccupied = false;
+        roomPokerPlayers.PlayersBySeat[playerSeat.SeatIndex] = default;
         roomPokerPlayers.TotalPlayersCount--;
         
         if (roomPokerPlayers.MoverSeatPointer == playerSeat.SeatIndex)

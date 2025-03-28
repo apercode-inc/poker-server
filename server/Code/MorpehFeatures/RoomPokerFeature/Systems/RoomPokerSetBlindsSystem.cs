@@ -59,7 +59,7 @@ public class RoomPokerSetBlindsSystem : ISystem
                 var nextBySeatPlayer = roomPokerPlayers.PlayersBySeat[nextSeatIndex];
                 var playerEntity = nextBySeatPlayer.Player;
 
-                if (!nextBySeatPlayer.IsOccupied || _playerAway.Has(playerEntity))
+                if (nextBySeatPlayer.Player.IsNullOrDisposed() || _playerAway.Has(playerEntity))
                 {
                     continue;
                 }

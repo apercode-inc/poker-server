@@ -83,7 +83,7 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
 
             foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
-                if (!playerBySeat.IsOccupied)
+                if (playerBySeat.Player.IsNullOrDisposed())
                 {
                     continue;
                 }
@@ -128,7 +128,7 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
             var nextIndexSeat = (startIndexSeat + i) % playerCount;
             var nextPlayer = roomPokerPlayers.PlayersBySeat[nextIndexSeat];
 
-            if (!nextPlayer.IsOccupied || _playerAway.Has(nextPlayer.Player))
+            if (nextPlayer.Player.IsNullOrDisposed() || _playerAway.Has(nextPlayer.Player))
             {
                 continue;
             }
