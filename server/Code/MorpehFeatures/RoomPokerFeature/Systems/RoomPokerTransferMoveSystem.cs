@@ -1,5 +1,4 @@
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -32,10 +31,14 @@ public class RoomPokerTransferMoveSystem : ISystem
     {
         foreach (var roomEntity in _filter)
         {
-            Logger.DebugColor("call RoomPokerTransferMoveSystem");
             _roomPokerTransferMove.Remove(roomEntity);
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
+
+            if (roomPokerPlayers.TotalPlayersCount <= 1)
+            {
+                continue;
+            }
 
             var startIndexSeat = roomPokerPlayers.MoverSeatPointer;
             var newMoverIndexSeat = startIndexSeat;

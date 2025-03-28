@@ -46,6 +46,13 @@ public class RoomPokerSetBlindsSystem : ISystem
             var startSeatIndex = roomPokerPlayers.DealerSeatPointer;
             var playerCount = roomPokerPlayers.PlayersBySeat.Length;
 
+            _roomPokerSetBlinds.Remove(roomEntity);
+            
+            if (roomPokerPlayers.TotalPlayersCount <= 1)
+            {
+                continue;
+            }
+
             for (int i = 1, playerCounter = 0; playerCounter < 3; i++)
             {
                 var nextSeatIndex = (startSeatIndex + i) % playerCount;
@@ -71,8 +78,6 @@ public class RoomPokerSetBlindsSystem : ISystem
             }
 
             roomPokerMaxBet.Value = roomPokerStats.BigBet;
-            
-            _roomPokerSetBlinds.Remove(roomEntity);
         }
     }
 

@@ -52,9 +52,15 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
     {
         foreach (var roomEntity in _filter)
         {
-            _roomPokerActive.Set(roomEntity);
-            _roomPokerBank.Set(roomEntity);
+            _roomPokerGameInitialize.Remove(roomEntity);
+            
+            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
+            if (roomPokerPlayers.TotalPlayersCount <= 1)
+            {
+                continue;
+            }
+            
             if (!_roomPokerCardDesk.Has(roomEntity))
             {
                 _roomPokerCardDesk.Set(roomEntity, new RoomPokerCardDesk
@@ -68,8 +74,6 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
 
                 _cardDeskService.FillTheDesk(roomPokerCardDesk.CardDesk);
             }
-
-            ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
             var dealerPlayer = MoveDealerSeatPointer(ref roomPokerPlayers);
             SetDealerPlayerMarker(roomEntity, dealerPlayer);
@@ -107,7 +111,9 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
             });
             _roomPokerDealingCardsToPlayerSet.Set(roomEntity);
             _roomPokerCleanedGame.Remove(roomEntity);
-            _roomPokerGameInitialize.Remove(roomEntity);
+            
+            _roomPokerActive.Set(roomEntity);
+            _roomPokerBank.Set(roomEntity);
         }
     }
     

@@ -1,5 +1,6 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
@@ -12,6 +13,7 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
     
     [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
     [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
+    [Injectable] private Stash<PlayerAway> _playerAway;
 
     private Filter _filter;
     
@@ -43,12 +45,6 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            // if (!roomPokerPlayers.MarkedPlayersBySeat.TryGetValueByMarked(PokerPlayerMarkerType.NextRoundActivePlayer,
-            //         out var markedPlayer))
-            // {
-            //     continue;
-            // }
-
             foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
             {
                 if (!playerBySeat.IsOccupied)
@@ -58,13 +54,26 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
                 _playerTurnCompleteFlag.Remove(playerBySeat.Player);
             }
             
-            //todo вот 
-            //var activePlayer = markedPlayer.Value;
-                
-            // roomPokerPlayers.MarkedPlayersBySeat.ResetMarkers(PokerPlayerMarkerType.ActivePlayer);
-            // roomPokerPlayers.MarkedPlayersBySeat.SetMarker(activePlayer, PokerPlayerMarkerType.ActivePlayer);
-            //
-            // _playerSetPokerTurn.Set(activePlayer);
+            var startIndexSeat = roomPokerPlayers.DealerSeatPointer;
+            var nextMoverIndexSeat = startIndexSeat;
+            var playerCount = roomPokerPlayers.PlayersBySeat.Length;
+
+            for (var i = 1; i < playerCount; i++)
+            {
+                var nextIndexSeat = (startIndexSeat + i) % playerCount;
+                var nextPlayer = roomPokerPlayers.PlayersBySeat[nextIndexSeat];
+
+                if (!nextPlayer.IsOccupied || _playerAway.Has(nextPlayer.Player))
+                {
+                    continue;
+                }
+
+                nextMoverIndexSeat = nextIndexSeat;
+                break;
+            }
+            var nextMoverPlayer = roomPokerPlayers.PlayersBySeat[nextMoverIndexSeat].Player;
+            
+            _playerSetPokerTurn.Set(nextMoverPlayer);
         }
     }
 
