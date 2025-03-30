@@ -44,12 +44,10 @@ public class RoomPokerService : IInitializer
     [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
 
     public World World { get; set; }
-
-    private Dictionary<PokerPlayerMarkerType, Entity> _markersByPlayer;
+    
 
     public void OnAwake()
     {
-        _markersByPlayer = new Dictionary<PokerPlayerMarkerType, Entity>();
     }
 
     public void RemovePlayerFromRoom(Entity roomEntity, Entity playerLeave)
@@ -57,8 +55,6 @@ public class RoomPokerService : IInitializer
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         var playerPotModels = roomPokerPlayers.PlayerPotModels;
 
-        _markersByPlayer.Clear();
-        
         ref var playerSeat = ref _playerSeat.Get(playerLeave);
         roomPokerPlayers.PlayersBySeat[playerSeat.SeatIndex] = default;
         roomPokerPlayers.TotalPlayersCount--;
@@ -164,6 +160,5 @@ public class RoomPokerService : IInitializer
 
     public void Dispose()
     {
-        _markersByPlayer = null;
     }
 }

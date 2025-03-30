@@ -26,8 +26,7 @@ public class RoomPokerStorage : IInitializer
     [Injectable] private Stash<RoomPokerReadyDestroy> _roomPokerReadyDestroy;
 
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-
-    [Injectable] private RoomPokerSeatsFactory _pokerSeatsFactory;
+    
     [Injectable] private PlayerStorage _playerStorage;
     [Injectable] private ConfigsService _configsService;
     
