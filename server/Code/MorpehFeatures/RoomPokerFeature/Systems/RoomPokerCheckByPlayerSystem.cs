@@ -2,7 +2,6 @@ using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -48,7 +47,7 @@ public class RoomPokerCheckByPlayerSystem : ISystem
             }
             
             _roomPokerTransferMove.Set(roomEntity);
-            _playerTurnCompleteFlag.Set(playerEntity); //todo думаю лучше сделать в системе RoomPokerTransferMoveSystem
+            _playerTurnCompleteFlag.Set(playerEntity);
 
         }
     }

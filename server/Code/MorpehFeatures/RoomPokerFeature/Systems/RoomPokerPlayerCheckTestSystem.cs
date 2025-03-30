@@ -53,7 +53,7 @@ public class RoomPokerPlayerCheckTestSystem : ISystem
                 //sb.Append($" p:{x} s:{y} |");
             }
 
-            Logger.LogWarning($"total:{roomPokerPlayers.TotalPlayersCount} ---> {sb}");
+            //Logger.LogWarning($"total:{roomPokerPlayers.TotalPlayersCount} ---> {sb}");
         }
     }
 }

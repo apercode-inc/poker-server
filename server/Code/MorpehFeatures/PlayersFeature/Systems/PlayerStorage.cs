@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AuthenticationFeature.Components;
 using server.Code.MorpehFeatures.AuthenticationFeature.Dataframes;
@@ -102,8 +101,6 @@ public class PlayerStorage : IInitializer
     public void CreateForRoomAndSync(Entity createdPlayer, CurrencyType currencyType, long contribution,
         Entity roomEntity, byte seat)
     {
-        ref var playerNickname = ref createdPlayer.GetComponent<PlayerNickname>();
-        Logger.DebugColor($"{playerNickname.Value} - seat: {seat}");
         _playerRoomPoker.Set(createdPlayer, new PlayerRoomPoker
         {
             RoomEntity = roomEntity,

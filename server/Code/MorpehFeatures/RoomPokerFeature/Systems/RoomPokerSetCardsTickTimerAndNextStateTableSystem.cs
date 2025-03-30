@@ -72,6 +72,7 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
                 break;
             }
             var nextMoverPlayer = roomPokerPlayers.PlayersBySeat[nextMoverIndexSeat].Player;
+            roomPokerPlayers.MoverSeatPointer = nextMoverIndexSeat;
             
             _playerSetPokerTurn.Set(nextMoverPlayer);
         }
