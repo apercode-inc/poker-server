@@ -50,14 +50,13 @@ public class RoomPokerDropCardsByPlayerSystem : ISystem
             
             var playersWithCardsPlayersCount = 0;
         
-            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+            foreach (var player in roomPokerPlayers.PlayersBySeat)
             {
-                if (playerBySeat.Player.IsNullOrDisposed())
+                if (player.IsNullOrDisposed())
                 {
                     continue;
                 }
                 
-                var player = playerBySeat.Player;
                 ref var playerCards = ref _playerCards.Get(player);
             
                 if (playerCards.CardsState != CardsState.Empty)

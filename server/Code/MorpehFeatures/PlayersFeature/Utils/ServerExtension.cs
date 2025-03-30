@@ -16,14 +16,14 @@ public static class ServerExtension
     {
         ref var roomPokerPlayers = ref roomEntity.GetComponent<RoomPokerPlayers>();
         
-        foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+        foreach (var playerEntity in roomPokerPlayers.PlayersBySeat)
         {
-            if (playerBySeat.Player.IsNullOrDisposed())
+            if (playerEntity.IsNullOrDisposed())
             {
                 continue;
             }
             
-            server.Send(ref dataframe, playerBySeat.Player);
+            server.Send(ref dataframe, playerEntity);
         }
     }
 
@@ -32,14 +32,12 @@ public static class ServerExtension
     {
         ref var roomPokerPlayers = ref roomEntity.GetComponent<RoomPokerPlayers>();
         
-        foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+        foreach (var playerEntity in roomPokerPlayers.PlayersBySeat)
         {
-            if (playerBySeat.Player.IsNullOrDisposed())
+            if (playerEntity.IsNullOrDisposed())
             {
                 continue;
             }
-            
-            var playerEntity = playerBySeat.Player;
 
             if (playerEntity == exceptPlayer)
             {

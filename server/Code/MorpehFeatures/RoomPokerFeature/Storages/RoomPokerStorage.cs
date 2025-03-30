@@ -80,21 +80,14 @@ public class RoomPokerStorage : IInitializer
             TurnShowdownTime = turnShowdownTime,
         });
 
-        var playersBySeatModels = new PlayerSeatModel[maxPlayers];
-
-        for (var i = 0; i < playersBySeatModels.Length; i++)
-        {
-            playersBySeatModels[i] = new PlayerSeatModel();
-        }
-        
-        var playerSeatModel = playersBySeatModels[seat];
-        playerSeatModel.Player = createdPlayer;
+        var playersBySeat = new Entity[maxPlayers];
+        playersBySeat[seat] = createdPlayer;
 
         _roomPokerPlayers.Set(roomEntity, new RoomPokerPlayers
         {
             TotalPlayersCount = 1,
             DealerSeatPointer = 0,
-            PlayersBySeat = playersBySeatModels,
+            PlayersBySeat = playersBySeat,
             PlayerPotModels = new List<PlayerPotModel>(),
         });
         _roomPokerMaxBet.Set(roomEntity, new RoomPokerMaxBet

@@ -56,21 +56,20 @@ public class RoomPokerSetBlindsSystem : ISystem
             for (int i = 1, playerCounter = 0; playerCounter < 3; i++)
             {
                 var nextSeatIndex = (startSeatIndex + i) % playerCount;
-                var nextBySeatPlayer = roomPokerPlayers.PlayersBySeat[nextSeatIndex];
-                var playerEntity = nextBySeatPlayer.Player;
+                var nextPlayerEntity = roomPokerPlayers.PlayersBySeat[nextSeatIndex];
 
-                if (nextBySeatPlayer.Player.IsNullOrDisposed() || _playerAway.Has(playerEntity))
+                if (nextPlayerEntity.IsNullOrDisposed() || _playerAway.Has(nextPlayerEntity))
                 {
                     continue;
                 }
 
                 if (playerCounter < 2)
                 {
-                    _currencyPlayerService.TrySetBet(roomEntity, playerEntity, playerCounter == 0 ? small : big);
+                    _currencyPlayerService.TrySetBet(roomEntity, nextPlayerEntity, playerCounter == 0 ? small : big);
                 }
                 else
                 {
-                    ref var playerSeat = ref _playerSeat.Get(playerEntity);
+                    ref var playerSeat = ref _playerSeat.Get(nextPlayerEntity);
                     roomPokerPlayers.MoverSeatPointer = playerSeat.SeatIndex;
                 }
                 

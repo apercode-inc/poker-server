@@ -52,14 +52,12 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
             var isContinueBiddingRound = false;
             var allInCount = 0;
 
-            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+            foreach (var otherPlayer in roomPokerPlayers.PlayersBySeat)
             {
-                if (playerBySeat.Player.IsNullOrDisposed())
+                if (otherPlayer.IsNullOrDisposed())
                 {
                     continue;
                 }
-                
-                var otherPlayer = playerBySeat.Player;
 
                 if (playerEntity != otherPlayer && _playerAllin.Has(otherPlayer))
                 {
@@ -107,14 +105,13 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
 
             roomPokerMaxBet.Value = 0;
 
-            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+            foreach (var player in roomPokerPlayers.PlayersBySeat)
             {
-                if (playerBySeat.Player.IsNullOrDisposed())
+                if (player.IsNullOrDisposed())
                 {
                     continue;
                 }
-
-                var player = playerBySeat.Player;
+                
                 ref var otherPlayerPokerCurrentBet = ref _playerPokerCurrentBet.Get(player);
                 otherPlayerPokerCurrentBet.Value = 0;
             }

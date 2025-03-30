@@ -44,16 +44,14 @@ public class RoomPokerShowdownTurnCheckSystem : ISystem
 
             var isSkipCleanup = false;
 
-            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+            foreach (var player in roomPokerPlayers.PlayersBySeat)
             {
-                if (playerBySeat.Player.IsNullOrDisposed())
+                if (player.IsNullOrDisposed())
                 {
                     continue;
                 }
-                
-                var playerEntity = playerBySeat.Player;
 
-                ref var playerCards = ref _playerCards.Get(playerEntity);
+                ref var playerCards = ref _playerCards.Get(player);
 
                 if (playerCards.CardsState != CardsState.Close)
                 {
@@ -61,7 +59,7 @@ public class RoomPokerShowdownTurnCheckSystem : ISystem
                 }
                 
                 isSkipCleanup = true;
-                _playerPokerShowdownTurnRequest.Set(playerEntity);
+                _playerPokerShowdownTurnRequest.Set(player);
                     
                 break;
             }

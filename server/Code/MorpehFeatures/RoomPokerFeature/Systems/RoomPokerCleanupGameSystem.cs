@@ -79,14 +79,12 @@ public class RoomPokerCleanupGameSystem : ISystem
 
         var playersAwayCounter = 0;
 
-        foreach (var markedPlayer in roomPokerPlayers.PlayersBySeat)
+        foreach (var player in roomPokerPlayers.PlayersBySeat)
         {
-            if (markedPlayer.Player.IsNullOrDisposed())
+            if (player.IsNullOrDisposed())
             {
                 continue;
             }
-            
-            var player = markedPlayer.Player;
 
             ref var playerId = ref _playerId.Get(player);
 

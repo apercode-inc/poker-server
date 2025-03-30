@@ -8,11 +8,6 @@ public struct RoomPokerPlayers : IComponent
     public int TotalPlayersCount;
     public int DealerSeatPointer;
     public int MoverSeatPointer;
-    public PlayerSeatModel[] PlayersBySeat;
+    public Entity[] PlayersBySeat;
     public List<PlayerPotModel> PlayerPotModels;
-}
-
-public class PlayerSeatModel
-{
-    public Entity Player;
 }

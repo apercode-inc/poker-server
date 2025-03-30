@@ -84,7 +84,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
 
         for (byte index = 0; index < roomPokerPlayers.PlayersBySeat.Length; index++)
         {
-            if (!roomPokerPlayers.PlayersBySeat[index].Player.IsNullOrDisposed())
+            if (!roomPokerPlayers.PlayersBySeat[index].IsNullOrDisposed())
             {
                 continue;
             }
@@ -95,8 +95,7 @@ public class RoomPokerJoinRequestSyncSystem : IInitializer
         var randomIndex = _random.Next(0, freeSeats.length);
         var seatIndex = freeSeats.data[randomIndex];
 
-        var playerBySeat = roomPokerPlayers.PlayersBySeat[seatIndex];
-        playerBySeat.Player = player;
+        roomPokerPlayers.PlayersBySeat[seatIndex] = player;
         roomPokerPlayers.TotalPlayersCount++;
 
         _playerStorage.CreateForRoomAndSync(player, roomPokerStats.CurrencyType, roomPokerStats.Contribution, roomEntity, seatIndex);

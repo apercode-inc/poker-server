@@ -43,14 +43,12 @@ public class RoomPokerSetStrengthHandSystem : ISystem
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            foreach (var markedPlayer in roomPokerPlayers.PlayersBySeat)
+            foreach (var player in roomPokerPlayers.PlayersBySeat)
             {
-                if (markedPlayer.Player.IsNullOrDisposed())
+                if (player.IsNullOrDisposed())
                 {
                     continue;
                 }
-                
-                var player = markedPlayer.Player;
 
                 ref var playerPokerCombination = ref _playerPokerCombination.Get(player, out var combinationExist);
 

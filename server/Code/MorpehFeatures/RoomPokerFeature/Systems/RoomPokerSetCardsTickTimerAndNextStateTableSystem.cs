@@ -45,13 +45,13 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+            foreach (var player in roomPokerPlayers.PlayersBySeat)
             {
-                if (playerBySeat.Player.IsNullOrDisposed())
+                if (player.IsNullOrDisposed())
                 {
                     continue;
                 }
-                _playerTurnCompleteFlag.Remove(playerBySeat.Player);
+                _playerTurnCompleteFlag.Remove(player);
             }
             
             var startIndexSeat = roomPokerPlayers.DealerSeatPointer;
@@ -63,7 +63,7 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
                 var nextIndexSeat = (startIndexSeat + i) % playerCount;
                 var nextPlayer = roomPokerPlayers.PlayersBySeat[nextIndexSeat];
 
-                if (nextPlayer.Player.IsNullOrDisposed() || _playerAway.Has(nextPlayer.Player))
+                if (nextPlayer.IsNullOrDisposed() || _playerAway.Has(nextPlayer))
                 {
                     continue;
                 }
@@ -71,7 +71,7 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
                 nextMoverIndexSeat = nextIndexSeat;
                 break;
             }
-            var nextMoverPlayer = roomPokerPlayers.PlayersBySeat[nextMoverIndexSeat].Player;
+            var nextMoverPlayer = roomPokerPlayers.PlayersBySeat[nextMoverIndexSeat];
             roomPokerPlayers.MoverSeatPointer = nextMoverIndexSeat;
             
             _playerSetPokerTurn.Set(nextMoverPlayer);

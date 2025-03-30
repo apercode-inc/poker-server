@@ -41,14 +41,12 @@ public class RoomPokerGameCheckStartSystem : ISystem
 
             var activePlayersCount = 0;
 
-            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+            foreach (var player in roomPokerPlayers.PlayersBySeat)
             {
-                if (playerBySeat.Player.IsNullOrDisposed())
+                if (player.IsNullOrDisposed())
                 {
                     continue;
                 }
-                
-                var player = playerBySeat.Player;
 
                 if (_playerAway.Has(player))
                 {

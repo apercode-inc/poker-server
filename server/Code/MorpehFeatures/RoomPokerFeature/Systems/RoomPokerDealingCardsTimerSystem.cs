@@ -41,14 +41,12 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+            foreach (var player in roomPokerPlayers.PlayersBySeat)
             {
-                if (playerBySeat.Player.IsNullOrDisposed())
+                if (player.IsNullOrDisposed())
                 {
                     continue;
                 }
-
-                var player = playerBySeat.Player;
 
                 ref var playerSeat = ref _playerSeat.Get(player);
                 

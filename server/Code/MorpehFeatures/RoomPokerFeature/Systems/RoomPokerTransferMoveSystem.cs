@@ -49,7 +49,7 @@ public class RoomPokerTransferMoveSystem : ISystem
                 var nextIndexSeat = (startIndexSeat + i) % playerCount;
                 var nextPlayer = roomPokerPlayers.PlayersBySeat[nextIndexSeat];
 
-                if (nextPlayer.Player.IsNullOrDisposed() || _playerAway.Has(nextPlayer.Player))
+                if (nextPlayer.IsNullOrDisposed() || _playerAway.Has(nextPlayer))
                 {
                     continue;
                 }
@@ -59,7 +59,7 @@ public class RoomPokerTransferMoveSystem : ISystem
             }
 
             roomPokerPlayers.MoverSeatPointer = newMoverIndexSeat;
-            var moverPlayer = roomPokerPlayers.PlayersBySeat[newMoverIndexSeat].Player;
+            var moverPlayer = roomPokerPlayers.PlayersBySeat[newMoverIndexSeat];
             
             _playerSetPokerTurn.Set(moverPlayer);
         }

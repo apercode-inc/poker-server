@@ -47,7 +47,7 @@ public class RoomPokerPlayerCheckTestSystem : ISystem
             for (var index = 0; index < roomPokerPlayers.PlayersBySeat.Length; index++)
             {
                 var playerBySeat = roomPokerPlayers.PlayersBySeat[index];
-                var x = playerBySeat.Player.IsNullOrDisposed() ? 0 : 1;
+                var x = playerBySeat.IsNullOrDisposed() ? 0 : 1;
                 //var y = playerBySeat.IsOccupied ? 1 : 0;
                 sb.Append($" p:{x} |");
                 //sb.Append($" p:{x} s:{y} |");

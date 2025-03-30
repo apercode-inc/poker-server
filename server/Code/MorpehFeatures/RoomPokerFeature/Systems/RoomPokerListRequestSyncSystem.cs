@@ -59,14 +59,12 @@ public class RoomPokerListRequestSyncSystem : IInitializer
 
             var playersInRoom = new List<RoomPlayerNetworkModel>();
             
-            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+            foreach (var player in roomPokerPlayers.PlayersBySeat)
             {
-                if (playerBySeat.Player.IsNullOrDisposed())
+                if (player.IsNullOrDisposed())
                 {
                     continue;
                 }
-
-                var player = playerBySeat.Player;
 
                 ref var playerSeat = ref _playerSeat.Get(player);
                 ref var playerNickname = ref _playerNickname.Get(player);

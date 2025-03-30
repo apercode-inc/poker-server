@@ -68,19 +68,17 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             var roomPlayerNetworkModels = new List<RoomPlayerNetworkModel>();
             RoomPlayerNetworkModel thisPlayerModel = default;
             
-            foreach (var playersBySeat in roomPokerPlayers.PlayersBySeat)
+            foreach (var player in roomPokerPlayers.PlayersBySeat)
             {
-                if (playersBySeat.Player.IsNullOrDisposed())
+                if (player.IsNullOrDisposed())
                 {
                     continue;
                 }
-                
-                var playerEntityFromRoom = playersBySeat.Player;
 
-                var addedPlayerNetworkModel = AddRoomPlayerNetworkModel(playerEntityFromRoom, requestingPlayer, 
+                var addedPlayerNetworkModel = AddRoomPlayerNetworkModel(player, requestingPlayer, 
                     roomPokerStats, roomPlayerNetworkModels);
 
-                if (playerEntityFromRoom == requestingPlayer)
+                if (player == requestingPlayer)
                 {
                     thisPlayerModel = addedPlayerNetworkModel;
                 }

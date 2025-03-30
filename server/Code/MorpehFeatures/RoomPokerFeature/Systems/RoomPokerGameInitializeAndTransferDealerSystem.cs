@@ -81,26 +81,24 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
             roomPokerPlayers.PlayerPotModels.Clear();
             var playersEntities = new Queue<Entity>();
 
-            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+            foreach (var player in roomPokerPlayers.PlayersBySeat)
             {
-                if (playerBySeat.Player.IsNullOrDisposed())
+                if (player.IsNullOrDisposed())
                 {
                     continue;
                 }
                 
-                var playerEntity = playerBySeat.Player;
-                
-                ref var playerAuthData = ref _playerAuthData.Get(playerEntity);
-                ref var playerNickname = ref _playerNickname.Get(playerEntity);
+                ref var playerAuthData = ref _playerAuthData.Get(player);
+                ref var playerNickname = ref _playerNickname.Get(player);
                 
                 roomPokerPlayers.PlayerPotModels.Add(new PlayerPotModel(playerAuthData.Guid, playerNickname.Value));
 
-                if (_playerAway.Has(playerEntity))
+                if (_playerAway.Has(player))
                 {
                     continue;
                 }
                 
-                playersEntities.Enqueue(playerEntity);
+                playersEntities.Enqueue(player);
             }
             
             _roomPokerSetBlinds.Set(roomEntity, new RoomPokerSetBlinds());
@@ -128,7 +126,7 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
             var nextIndexSeat = (startIndexSeat + i) % playerCount;
             var nextPlayer = roomPokerPlayers.PlayersBySeat[nextIndexSeat];
 
-            if (nextPlayer.Player.IsNullOrDisposed() || _playerAway.Has(nextPlayer.Player))
+            if (nextPlayer.IsNullOrDisposed() || _playerAway.Has(nextPlayer))
             {
                 continue;
             }
@@ -138,8 +136,7 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
         }
 
         roomPokerPlayers.DealerSeatPointer = newDealerIndexSeat;
-        var dealerPlayer = roomPokerPlayers.PlayersBySeat[newDealerIndexSeat].Player;
-        return dealerPlayer;
+        return roomPokerPlayers.PlayersBySeat[newDealerIndexSeat];
     }
     
     private void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)

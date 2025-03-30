@@ -31,16 +31,14 @@ public class RoomPokerShowdownForcedAllPlayersSystems : ISystem
         {
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
 
-            foreach (var playerBySeat in roomPokerPlayers.PlayersBySeat)
+            foreach (var player in roomPokerPlayers.PlayersBySeat)
             {
-                if (playerBySeat.Player.IsNullOrDisposed())
+                if (player.IsNullOrDisposed())
                 {
                     continue;
                 }
-                
-                var playerEntity = playerBySeat.Player;
-                
-                _playerShowdownForced.Set(playerEntity);
+
+                _playerShowdownForced.Set(player);
             }
             
             _roomPokerShowdownForcedAllPlayersDone.Set(roomEntity);
