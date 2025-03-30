@@ -12,8 +12,6 @@ public class RoomPokerCheckByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerMoveCompleteFlag> _playerMoveCompleteFlag;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
 
-    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
-    
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerTransferMove> _roomPokerTransferMove;
     

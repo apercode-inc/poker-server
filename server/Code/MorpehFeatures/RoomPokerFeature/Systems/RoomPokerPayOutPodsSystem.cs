@@ -1,7 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.CurrencyFeature.Enums;
 using server.Code.MorpehFeatures.CurrencyFeature.Services;
 using server.Code.MorpehFeatures.DataBaseFeature.Utils;
@@ -17,18 +16,15 @@ public class RoomPokerPayOutPodsSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPaidOutToPlayers> _roomPokerPaidOutToPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
-    [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
     [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
-
-    [Injectable] private Stash<PlayerNickname> _playerNickname;
+    
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerShowdownForced> _playerShowdownForced;
     [Injectable] private Stash<PlayerSendWinCombination> _playerSendWinCombination;
-
-    [Injectable] private ConfigsService _configsService;
+    
     [Injectable] private PlayerStorage _playerStorage;
     [Injectable] private CurrencyPlayerService _currencyPlayerService;
     [Injectable] private PlayerDbService _playerDbService;

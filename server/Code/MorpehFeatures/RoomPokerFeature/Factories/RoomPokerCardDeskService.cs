@@ -1,8 +1,5 @@
 using Scellecs.Morpeh;
 using server.Code.GlobalUtils.CustomCollections;
-using server.Code.Injection;
-using server.Code.MorpehFeatures.PlayersFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 
@@ -10,10 +7,6 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 
 public class RoomPokerCardDeskService : IInitializer
 {
-    [Injectable] private Stash<PlayerCards> _playerCards;
-    [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
-    [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
-    
     public World World { get; set; }
 
     private RandomList<CardModel> _cardDeskPokerStandard;

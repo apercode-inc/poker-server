@@ -5,7 +5,6 @@ using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.StartTimer;
-using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -19,7 +18,6 @@ public class RoomPokerStartTimerSetSyncSystem : IInitializer
     [Injectable] private NetFrameServer _server;
 
     [Injectable] private PlayerStorage _playerStorage;
-    [Injectable] private RoomPokerStorage _roomPokerStorage;
     
     public World World { get; set; }
 

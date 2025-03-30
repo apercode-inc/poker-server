@@ -21,7 +21,6 @@ public class RoomPokerCleanupGameSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerCleanup> _roomPokerCleanup;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
-    [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerNextDealingTimer> _roomPokerNextDealingTimer;
     [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
@@ -43,8 +42,7 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
-
-    [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
+    
     [Injectable] private NetFrameServer _server;
     [Injectable] private ConfigsService _configsService;
 

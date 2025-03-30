@@ -8,8 +8,6 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerDealingCardsTimerSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerDealingTimer> _pokerDealingTimer;
-    [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
-    [Injectable] private Stash<RoomPokerDealingCardsToPlayerSet> _roomPokerDealingCardsToPlayerSet;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerSeat> _playerSeat;

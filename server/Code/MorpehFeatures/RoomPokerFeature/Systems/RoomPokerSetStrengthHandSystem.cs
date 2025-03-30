@@ -1,7 +1,6 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
-using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
@@ -19,8 +18,6 @@ public class RoomPokerSetStrengthHandSystem : ISystem
     
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
-
-    [Injectable] private PlayerStorage _playerStorage;
 
     private Filter _filter;
 

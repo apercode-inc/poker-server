@@ -7,11 +7,10 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
-using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-//todo может переименовать надо по нормальному, система выполняет роль инициализации и роль передвижения диллера
+//todo может переименовать надо по нормальному или разбить на две, система выполняет роль инициализации и роль передвижения диллера
 public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
@@ -27,13 +26,11 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
     [Injectable] private Stash<PlayerDealer> _playerDealer;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerNickname> _playerNickname;
-    [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerAway> _playerAway;
 
     [Injectable] private RoomPokerCardDeskService _cardDeskService;
-    [Injectable] private RoomPokerService _roomPokerService;
-    
+
     [Injectable] private NetFrameServer _server;
 
     private Filter _filter;

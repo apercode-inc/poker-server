@@ -9,7 +9,6 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerPlayerLeftSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerPlayerLeft> _roomPokerPlayerLeft;
-    [Injectable] private RoomPokerStorage _roomPokerStorage;
     [Injectable] private RoomPokerService _roomPokerService; 
 
     private Filter _filter;

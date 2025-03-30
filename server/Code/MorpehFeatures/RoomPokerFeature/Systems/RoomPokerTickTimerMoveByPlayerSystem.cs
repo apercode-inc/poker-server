@@ -2,11 +2,9 @@ using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
-using server.Code.MorpehFeatures.CleanupDestroyFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
-using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -14,20 +12,15 @@ public class RoomPokerTickTimerMoveByPlayerSystem : ISystem
 {
     [Injectable] private Stash<PlayerMoveTimer> _playerMoveTimer;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
-    [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerMoveTimerReset> _playerMoveTimerReset;
     [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
     [Injectable] private Stash<PlayerDropCards> _playerDropCards;
     [Injectable] private Stash<PlayerAway> _playerAway;
-    [Injectable] private Stash<Destroy> _destroy;
     
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
-    [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
 
     [Injectable] private NetFrameServer _server;
-    [Injectable] private RoomPokerService _roomPokerService;
     
     private Filter _filter;
     

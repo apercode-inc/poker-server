@@ -6,7 +6,6 @@ using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
-using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
@@ -16,10 +15,7 @@ public class RoomPokerService : IInitializer
 {
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerId> _roomPokerId;
-    [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
     [Injectable] private Stash<RoomPokerShowOrHideCardsActivate> _roomPokerShowOrHideCardsActivate;
-    [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
-    [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
     [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
     [Injectable] private Stash<RoomPokerTransferMove> _roomPokerTransferMove;
 
@@ -30,7 +26,6 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<PlayerSeat> _playerSeat;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
-    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerMoveTimer> _playerMoveTimer;
     [Injectable] private Stash<PlayerShowOrHideTimer> _playerShowOrHideTimer;
     [Injectable] private Stash<PlayerMoveCompleteFlag> _playerMoveCompleteFlag;
@@ -41,7 +36,6 @@ public class RoomPokerService : IInitializer
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
-    [Injectable] private RoomPokerCardDeskService _roomPokerCardDeskService;
 
     public World World { get; set; }
     
@@ -91,13 +85,13 @@ public class RoomPokerService : IInitializer
         _server.SendInRoom(ref dataframe, roomEntity);
         
         ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
-
-        SetPlayerFoldForPotModels(playerEntity, roomPokerPlayers.PlayerPotModels);
-
+        
         if (playerSeat.SeatIndex == roomPokerPlayers.MoverSeatPointer)
         {
             _roomPokerTransferMove.Set(roomEntity);
         }
+
+        SetPlayerFoldForPotModels(playerEntity, roomPokerPlayers.PlayerPotModels);
     }
 
     private void SetPlayerFoldForPotModels(Entity playerEntity, List<PlayerPotModel> playerPotModels)

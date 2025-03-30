@@ -5,7 +5,6 @@ using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
-using server.Code.MorpehFeatures.RoomPokerFeature.Storages;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -16,12 +15,9 @@ public class RoomPokerListRequestSyncSystem : IInitializer
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private Stash<PlayerNickname> _playerNickname;
-    [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
 
     [Injectable] private NetFrameServer _server;
-
-    [Injectable] private RoomPokerStorage _roomPokerStorage;
 
     private Filter _filter;
     

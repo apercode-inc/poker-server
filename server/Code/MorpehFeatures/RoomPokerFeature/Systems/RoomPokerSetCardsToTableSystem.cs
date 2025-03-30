@@ -28,13 +28,8 @@ public class RoomPokerSetCardsToTableSystem : ISystem
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
     [Injectable] private Stash<RoomPokerSetCardsTickTimer> _roomPokerSetCardsTickTimer;
     [Injectable] private Stash<RoomPokerDetectCombination> _roomPokerDetectCombination;
-    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
-
-    [Injectable] private Stash<PlayerCards> _playerCards;
-
-    [Injectable] private RoomPokerService _roomPokerService;
-    [Injectable] private RoomPokerCardDeskService _cardDeskService;
+    
     [Injectable] private NetFrameServer _server;
     [Injectable] private ConfigsService _configsService;
 

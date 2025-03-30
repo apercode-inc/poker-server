@@ -14,7 +14,6 @@ public class RoomPokerPlayerDestroySystem : ILateSystem
     [Injectable] private RoomPokerStorage _roomPokerStorage;
     [Injectable] private RoomPokerService _roomPokerService; 
     
-
     private Filter _filter;
 
     public World World { get; set; }

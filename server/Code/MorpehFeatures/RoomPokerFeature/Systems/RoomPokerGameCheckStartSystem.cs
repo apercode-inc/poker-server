@@ -15,8 +15,7 @@ public class RoomPokerGameCheckStartSystem : ISystem
     [Injectable] private Stash<RoomPokerGameStartTimer> _roomPokerGameStartTimer;
 
     [Injectable] private Stash<PlayerAway> _playerAway;
-
-    [Injectable] private NetFrameServer _server;
+    
     [Injectable] private ConfigsService _configsService;
     
     public World World { get; set; }

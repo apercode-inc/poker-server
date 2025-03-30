@@ -14,8 +14,6 @@ public class RoomPokerShowdownMoveCheckSystem : ISystem
     [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerCleanupTimer> _roomPokerCleanupTimer;
-    [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
-    [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerPokerShowdownMoveRequest> _playerPokerShowdownMoveRequest;

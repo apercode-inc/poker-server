@@ -26,15 +26,17 @@ public class RoomPokerLeftRequestSyncSystem : IInitializer
 
     private void DataframeHandler(RoomPokerLeftRequestDataframe dataframe, int id)
     {
-        if (_playerStorage.TryGetPlayerById(id, out var player))
+        if (!_playerStorage.TryGetPlayerById(id, out var player))
         {
-            if (_roomPokerStorage.TryGetById(dataframe.RoomId, out var room))
+            return;
+        }
+        
+        if (_roomPokerStorage.TryGetById(dataframe.RoomId, out var room))
+        {
+            _roomPokerPlayerLeft.Set(room, new RoomPokerPlayerLeft
             {
-                _roomPokerPlayerLeft.Set(room, new RoomPokerPlayerLeft
-                {
-                    Player = player,
-                });
-            }
+                Player = player,
+            });
         }
     }
 

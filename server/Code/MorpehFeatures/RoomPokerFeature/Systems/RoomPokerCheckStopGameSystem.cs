@@ -12,7 +12,6 @@ public class RoomPokerCheckStopGameSystem : ISystem
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
     [Injectable] private Stash<RoomPokerBank> _roomPokerBank;
-    [Injectable] private Stash<RoomPokerCardsToTable> _roomPokerCardsToTable;
 
     [Injectable] private NetFrameServer _server;
     

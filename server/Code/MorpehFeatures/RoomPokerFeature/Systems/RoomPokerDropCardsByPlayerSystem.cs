@@ -72,7 +72,6 @@ public class RoomPokerDropCardsByPlayerSystem : ISystem
         
             _roomPokerOnePlayerRoundGame.Set(roomEntity);
             _roomPokerSetCardsToTable.Set(roomEntity);
-            
             _roomPokerPayoutWinnings.Set(roomEntity);
         }
     }

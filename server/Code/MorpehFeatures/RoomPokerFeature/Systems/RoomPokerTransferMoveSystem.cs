@@ -13,7 +13,6 @@ public class RoomPokerTransferMoveSystem : ISystem
 
     [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerAway> _playerAway;
-    [Injectable] private Stash<PlayerSeat> _playerSeat;
 
     private Filter _filter;
     
