@@ -2,6 +2,6 @@ using Scellecs.Morpeh;
 
 namespace server.Code.MorpehFeatures.PlayersFeature.Components;
 
-public struct PlayerSetPokerTurn : IComponent
+public struct PlayerSetPokerMove : IComponent
 {
 }

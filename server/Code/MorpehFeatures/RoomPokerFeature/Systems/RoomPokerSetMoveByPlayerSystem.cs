@@ -8,15 +8,15 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerSetTurnByPlayerSystem : ISystem
+public class RoomPokerSetMoveByPlayerSystem : ISystem
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
+    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
-    [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
+    [Injectable] private Stash<PlayerMoveTimer> _playerMoveTimer;
     [Injectable] private Stash<PlayerAllin> _playerAllin;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
@@ -37,7 +37,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             .With<PlayerPokerCurrentBet>()
             .With<PlayerRoomPoker>()
             .With<PlayerPokerContribution>()
-            .With<PlayerSetPokerTurn>()
+            .With<PlayerSetPokerMove>()
             .Build();
     }
 
@@ -45,7 +45,7 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
     {
         foreach (var playerEntity in _filter)
         {
-            _playerSetPokerTurn.Remove(playerEntity);
+            _playerSetPokerMove.Remove(playerEntity);
             
             ref var playerCards = ref _playerCards.Get(playerEntity);
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
@@ -80,40 +80,40 @@ public class RoomPokerSetTurnByPlayerSystem : ISystem
             var requiredBet = roomPokerMaxBet.Value - playerPokerCurrentBet.Value;
             var remainderAfterCall = playerPokerContribution.Value - requiredBet;
 
-            PokerPlayerTurnType turnType;
+            PokerPlayerMoveType moveType;
             
             if (requiredBet <= 0)
             {
-                turnType = PokerPlayerTurnType.CheckPossible;
+                moveType = PokerPlayerMoveType.CheckPossible;
             }
             else if (remainderAfterCall > 0)
             {
-                turnType = PokerPlayerTurnType.OnlyCallOrRaise;
+                moveType = PokerPlayerMoveType.OnlyCallOrRaise;
             }
             else
             {
-                turnType = PokerPlayerTurnType.OnlyAllIn;
+                moveType = PokerPlayerMoveType.OnlyAllIn;
                 requiredBet -= playerPokerContribution.Value;
             }
            
-            var dataframe = new RoomPokerPlayerTurnRequestDataframe
+            var dataframe = new RoomPokerPlayerMoveRequestDataframe
             {
-                TurnType = turnType,
+                MoveType = moveType,
                 RequiredBet = requiredBet,
             };
             _server.Send(ref dataframe, playerEntity);
 
-            var timeDataframe = new RoomPokerSetTimerTurnDataframe
+            var timeDataframe = new RoomPokerSetTimerMoveDataframe
             {
                 PlayerId = playerId.Id,
-                Time = roomPokerStats.TurnTime,
+                Time = roomPokerStats.MoveTime,
             };
             _server.SendInRoom(ref timeDataframe, roomEntity);
             
-            _playerTurnTimer.Set(playerEntity, new PlayerTurnTimer
+            _playerMoveTimer.Set(playerEntity, new PlayerMoveTimer
             {
                 TimeCurrent = 0,
-                TimeMax = roomPokerStats.TurnTime,
+                TimeMax = roomPokerStats.MoveTime,
             });
         }
     }

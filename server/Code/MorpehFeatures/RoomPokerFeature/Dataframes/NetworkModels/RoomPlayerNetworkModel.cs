@@ -15,8 +15,8 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
     public long ContributionBalance;
     public long AllBalance;
     public long CurrentBet;
-    public float TurnTimeCurrent;
-    public float TurnTimeMax;
+    public float MoveTimeCurrent;
+    public float MoveTimeMax;
     public float AwayTime;
     public CardsState CardsState;
     public List<RoomPokerCardNetworkModel> CardsModel;
@@ -32,8 +32,8 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
         writer.WriteLong(ContributionBalance);
         writer.WriteLong(AllBalance);
         writer.WriteLong(CurrentBet);
-        writer.WriteFloat(TurnTimeCurrent);
-        writer.WriteFloat(TurnTimeMax);
+        writer.WriteFloat(MoveTimeCurrent);
+        writer.WriteFloat(MoveTimeMax);
         writer.WriteFloat(AwayTime);
         writer.WriteByte((byte) CardsState);
         
@@ -59,8 +59,8 @@ public struct RoomPlayerNetworkModel : IWriteable, IReadable
         ContributionBalance = reader.ReadLong();
         AllBalance = reader.ReadLong();
         CurrentBet = reader.ReadLong();
-        TurnTimeCurrent = reader.ReadFloat();
-        TurnTimeMax = reader.ReadFloat();
+        MoveTimeCurrent = reader.ReadFloat();
+        MoveTimeMax = reader.ReadFloat();
         AwayTime = reader.ReadFloat();
         CardsState = (CardsState)reader.ReadByte();
         

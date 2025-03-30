@@ -5,7 +5,7 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Turn;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Move;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -13,7 +13,7 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
+    [Injectable] private Stash<PlayerMoveTimerReset> _playerMoveTimerReset;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerSetBet> _playerSetBet;
@@ -69,7 +69,7 @@ public class RoomPokerHudSetBetRequestSyncSystem : IInitializer
         {
             Bet = dataframe.Bet,
         });
-        _playerTurnTimerReset.Set(player);
+        _playerMoveTimerReset.Set(player);
     }
 
     private bool IsPlayerBetValid(Entity playerEntity, Entity roomEntity, long playerBet)

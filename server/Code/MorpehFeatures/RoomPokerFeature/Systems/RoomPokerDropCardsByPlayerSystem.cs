@@ -11,7 +11,7 @@ public class RoomPokerDropCardsByPlayerSystem : ISystem
 {
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerDropCards> _playerDropCards;
-    [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
+    [Injectable] private Stash<PlayerMoveCompleteFlag> _playerMoveCompleteFlag;
     [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
     [Injectable] private Stash<RoomPokerPayoutWinnings> _roomPokerPayoutWinnings;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
@@ -43,7 +43,7 @@ public class RoomPokerDropCardsByPlayerSystem : ISystem
             
             _roomPokerService.DropCards(roomEntity, playerEntity);
             
-            _playerTurnCompleteFlag.Set(playerEntity);
+            _playerMoveCompleteFlag.Set(playerEntity);
             _playerDropCards.Remove(playerEntity);
 
             ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);

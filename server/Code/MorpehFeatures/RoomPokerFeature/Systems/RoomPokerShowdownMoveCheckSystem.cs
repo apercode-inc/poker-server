@@ -9,7 +9,7 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerShowdownTurnCheckSystem : ISystem
+public class RoomPokerShowdownMoveCheckSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
@@ -18,7 +18,7 @@ public class RoomPokerShowdownTurnCheckSystem : ISystem
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
-    [Injectable] private Stash<PlayerPokerShowdownTurnRequest> _playerPokerShowdownTurnRequest;
+    [Injectable] private Stash<PlayerPokerShowdownMoveRequest> _playerPokerShowdownMoveRequest;
 
     [Injectable] private ConfigsService _configsService;
 
@@ -59,7 +59,7 @@ public class RoomPokerShowdownTurnCheckSystem : ISystem
                 }
                 
                 isSkipCleanup = true;
-                _playerPokerShowdownTurnRequest.Set(player);
+                _playerPokerShowdownMoveRequest.Set(player);
                     
                 break;
             }

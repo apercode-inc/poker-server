@@ -2,6 +2,6 @@ using Scellecs.Morpeh;
 
 namespace server.Code.MorpehFeatures.PlayersFeature.Components;
 
-public struct PlayerTurnCompleteFlag : IComponent
+public struct PlayerMoveCompleteFlag : IComponent
 {
 }

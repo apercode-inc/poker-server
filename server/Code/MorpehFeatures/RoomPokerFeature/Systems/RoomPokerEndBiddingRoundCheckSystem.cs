@@ -8,10 +8,10 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
 public class RoomPokerEndBiddingRoundCheckSystem : ISystem
 {
-    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
+    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
-    [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
+    [Injectable] private Stash<PlayerMoveCompleteFlag> _playerMoveCompleteFlag;
     [Injectable] private Stash<PlayerAllin> _playerAllin;
     [Injectable] private Stash<PlayerCards> _playerCards;
     
@@ -29,7 +29,7 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
     {
         _filter = World.Filter
             .With<PlayerRoomPoker>()
-            .With<PlayerSetPokerTurn>()
+            .With<PlayerSetPokerMove>()
             .Build();
     }
 
@@ -72,7 +72,7 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
                     continue;
                 }
                 
-                if (!_playerTurnCompleteFlag.Has(otherPlayer))
+                if (!_playerMoveCompleteFlag.Has(otherPlayer))
                 {
                     isContinueBiddingRound = true;
                 }
@@ -116,7 +116,7 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
                 otherPlayerPokerCurrentBet.Value = 0;
             }
             
-            _playerSetPokerTurn.Remove(playerEntity);
+            _playerSetPokerMove.Remove(playerEntity);
             _roomPokerSetCardsToTable.Set(roomEntity);
         }
     }

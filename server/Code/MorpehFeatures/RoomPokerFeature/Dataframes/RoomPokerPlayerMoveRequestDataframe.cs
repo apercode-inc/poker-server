@@ -4,20 +4,20 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
-public struct RoomPokerPlayerTurnRequestDataframe : INetworkDataframe
+public struct RoomPokerPlayerMoveRequestDataframe : INetworkDataframe
 {
-    public PokerPlayerTurnType TurnType;
+    public PokerPlayerMoveType MoveType;
     public long RequiredBet;
 
     public void Write(NetFrameWriter writer)
     {
-        writer.WriteInt((int)TurnType);
+        writer.WriteInt((int)MoveType);
         writer.WriteLong(RequiredBet);
     }
 
     public void Read(NetFrameReader reader)
     {
-        TurnType = (PokerPlayerTurnType)reader.ReadInt();
+        MoveType = (PokerPlayerMoveType)reader.ReadInt();
         RequiredBet = reader.ReadLong();
     }
 }

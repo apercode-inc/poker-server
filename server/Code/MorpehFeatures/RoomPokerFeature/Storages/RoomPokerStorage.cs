@@ -50,7 +50,7 @@ public class RoomPokerStorage : IInitializer
     }
     
     public void CreateRoom(Entity createdPlayer, byte maxPlayers, CurrencyType currencyType, long contribution, 
-        long minContribution, long bigBet, bool isFastTurn)
+        long minContribution, long bigBet, bool isFastMove)
     {
         if (_playerRoomPoker.Has(createdPlayer))
         {
@@ -62,8 +62,8 @@ public class RoomPokerStorage : IInitializer
         var seat = (byte) _random.Next(0, maxPlayers);
         
         var config = _configsService.GetConfig<RoomPokerSettingsConfig>(ConfigsPath.RoomPokerSettings);
-        var turnTime = isFastTurn ? config.PlayerTurnTimeFast : config.PlayerTurnTime;
-        var turnShowdownTime = isFastTurn ? config.PlayerTurnShowdownTimeFast : config.PlayerTurnShowdownTime;
+        var moveTime = isFastMove ? config.PlayerMoveTimeFast : config.PlayerMoveTime;
+        var moveShowdownTime = isFastMove ? config.PlayerMoveShowdownTimeFast : config.PlayerMoveShowdownTime;
 
         _roomPokerId.Set(roomEntity, new RoomPokerId
         {
@@ -76,8 +76,8 @@ public class RoomPokerStorage : IInitializer
             Contribution = contribution,
             MinContribution = minContribution,
             BigBet = bigBet,
-            TurnTime = turnTime,
-            TurnShowdownTime = turnShowdownTime,
+            MoveTime = moveTime,
+            MoveShowdownTime = moveShowdownTime,
         });
 
         var playersBySeat = new Entity[maxPlayers];

@@ -22,7 +22,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerCurrency> _playerCurrency;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
-    [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
+    [Injectable] private Stash<PlayerMoveTimer> _playerMoveTimer;
     [Injectable] private Stash<PlayerShowOrHideTimer> _playerShowOrHideTimer;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
     [Injectable] private Stash<PlayerAway> _playerAway;
@@ -140,7 +140,7 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
         ref var playerCurrency = ref _playerCurrency.Get(playerEntityFromRoom);
         ref var playerCards = ref _playerCards.Get(playerEntityFromRoom);
         ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntityFromRoom);
-        ref var playerTurnTimer = ref _playerTurnTimer.Get(playerEntityFromRoom, out var turnTimerExist);
+        ref var playerMoveTimer = ref _playerMoveTimer.Get(playerEntityFromRoom, out var moveTimerExist);
         ref var playerShowOrHideTimer = ref _playerShowOrHideTimer.Get(playerEntityFromRoom, out var playerShowOrHideExist);
         ref var playerAway = ref _playerAway.Get(playerEntityFromRoom, out var playerAwayExist);
 
@@ -161,10 +161,10 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
         float timeCurrent = 0;
         float timeMax = 0;
 
-        if (turnTimerExist)
+        if (moveTimerExist)
         {
-            timeCurrent = playerTurnTimer.TimeCurrent;
-            timeMax = playerTurnTimer.TimeMax;
+            timeCurrent = playerMoveTimer.TimeCurrent;
+            timeMax = playerMoveTimer.TimeMax;
         }
         else if (playerShowOrHideExist)
         {
@@ -183,8 +183,8 @@ public class RoomPokerCreateOrJoinSendSystem : ISystem
             ContributionBalance = playerPokerContribution.Value,
             AllBalance = playerCurrency.CurrencyByType[roomPokerStats.CurrencyType],
             CurrentBet = playerPokerCurrentBet.Value,
-            TurnTimeCurrent = timeCurrent,
-            TurnTimeMax = timeMax,
+            MoveTimeCurrent = timeCurrent,
+            MoveTimeMax = timeMax,
             AwayTime = playerAwayExist ? playerAway.Timer : 0,
             CardsState = playerCards.CardsState,
             CardsModel = cardsModel,

@@ -3,14 +3,14 @@ using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
-using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Turn;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Move;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
 public class RoomPokerHudShowCardsRequestSyncSystem : IInitializer
 {
     [Injectable] private Stash<PlayerShowdownForced> _playerShowdownForced;
-    [Injectable] private Stash<PlayerTurnShowdownResetTimer> _playerTurnShowdownResetTimer;
+    [Injectable] private Stash<PlayerMoveShowdownResetTimer> _playerMoveShowdownResetTimer;
     
     [Injectable] private NetFrameServer _server;
     [Injectable] private PlayerStorage _playerStorage;
@@ -30,7 +30,7 @@ public class RoomPokerHudShowCardsRequestSyncSystem : IInitializer
         }
         
         _playerShowdownForced.Set(playerEntity);
-        _playerTurnShowdownResetTimer.Set(playerEntity);
+        _playerMoveShowdownResetTimer.Set(playerEntity);
     }
 
     public void Dispose()

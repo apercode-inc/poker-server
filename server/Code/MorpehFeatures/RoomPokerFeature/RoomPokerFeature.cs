@@ -33,7 +33,7 @@ public static class RoomPokerFeature
         systemsGroup.AddInitializer(container.New<RoomPokerLeftRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerStartTimerSetSyncSystem>());
         
-        //Player turn
+        //Player move
         systemsGroup.AddInitializer(container.New<RoomPokerHudSetBetRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerHudAllInRequestSyncSystem>());
         systemsGroup.AddInitializer(container.New<RoomPokerHudFoldRequestSyncSystem>());
@@ -60,9 +60,9 @@ public static class RoomPokerFeature
 
         systemsGroup.AddSystem(container.New<RoomPokerTransferMoveSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerEndBiddingRoundCheckSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerSetTurnByPlayerSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerTickTimerTurnByPlayerSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerResetTimerTurnByPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerSetMoveByPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerTickTimerMoveByPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerResetTimerMoveByPlayerSystem>());
 
         systemsGroup.AddSystem(container.New<RoomPokerSetCardsToTableSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerSetCardsTickTimerAndNextStateTableSystem>());
@@ -71,11 +71,11 @@ public static class RoomPokerFeature
         systemsGroup.AddSystem(container.New<RoomPokerCalculatePayoutWinningsSystem>());
         systemsGroup.AddSystem(container.New<RoomPokerPayOutPodsSystem>());
         
-        //Showdown player turn
-        systemsGroup.AddSystem(container.New<RoomPokerShowdownTurnCheckSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerShowdownTurnRequestByPlayerSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerTickTimerTurnShowdownByPlayerSystem>());
-        systemsGroup.AddSystem(container.New<RoomPokerResetTimerTurnShowdownByPlayerSystem>());
+        //Showdown player move
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownMoveCheckSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerShowdownMoveRequestByPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerTickTimerMoveShowdownByPlayerSystem>());
+        systemsGroup.AddSystem(container.New<RoomPokerResetTimerMoveShowdownByPlayerSystem>());
 
         systemsGroup.AddSystem(container.New<RoomPokerShowdownForcedAllPlayersSystems>());
         systemsGroup.AddSystem(container.New<RoomPokerShowdownForcedByPlayerSystem>());

@@ -11,7 +11,7 @@ public class RoomPokerTransferMoveSystem : ISystem
     [Injectable] private Stash<RoomPokerTransferMove> _roomPokerTransferMove;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
-    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
+    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
 
@@ -61,7 +61,7 @@ public class RoomPokerTransferMoveSystem : ISystem
             roomPokerPlayers.MoverSeatPointer = newMoverIndexSeat;
             var moverPlayer = roomPokerPlayers.PlayersBySeat[newMoverIndexSeat];
             
-            _playerSetPokerTurn.Set(moverPlayer);
+            _playerSetPokerMove.Set(moverPlayer);
         }
     }
     

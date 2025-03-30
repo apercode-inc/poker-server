@@ -4,7 +4,7 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Systems;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Turn;
+using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Move;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
@@ -15,7 +15,7 @@ public class RoomPokerHudCheckRequestSyncSystem : IInitializer
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
-    [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
+    [Injectable] private Stash<PlayerMoveTimerReset> _playerMoveTimerReset;
     [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
 
@@ -62,7 +62,7 @@ public class RoomPokerHudCheckRequestSyncSystem : IInitializer
         }
         
         _playerPokerCheck.Set(player);
-        _playerTurnTimerReset.Set(player);
+        _playerMoveTimerReset.Set(player);
     }
 
     public void Dispose()

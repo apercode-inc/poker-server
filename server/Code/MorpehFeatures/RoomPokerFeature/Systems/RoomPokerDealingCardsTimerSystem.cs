@@ -11,7 +11,7 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayerSet> _roomPokerDealingCardsToPlayerSet;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
-    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
+    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
 
     private Filter _filter;
@@ -55,7 +55,7 @@ public class RoomPokerDealingCardsTimerSystem : ISystem
                     continue;
                 }
                 
-                _playerSetPokerTurn.Set(player);
+                _playerSetPokerMove.Set(player);
             }
 
             _pokerDealingTimer.Remove(roomEntity);

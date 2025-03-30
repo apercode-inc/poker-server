@@ -6,10 +6,10 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerResetTimerTurnByPlayerSystem : ISystem
+public class RoomPokerResetTimerMoveByPlayerSystem : ISystem
 {
-    [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
-    [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
+    [Injectable] private Stash<PlayerMoveTimer> _playerMoveTimer;
+    [Injectable] private Stash<PlayerMoveTimerReset> _playerMoveTimerReset;
     
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
@@ -23,7 +23,7 @@ public class RoomPokerResetTimerTurnByPlayerSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
-            .With<PlayerTurnTimerReset>()
+            .With<PlayerMoveTimerReset>()
             .Build();
     }
 
@@ -31,9 +31,9 @@ public class RoomPokerResetTimerTurnByPlayerSystem : ISystem
     {
         foreach (var entity in _filter)
         {
-            _playerTurnTimerReset.Remove(entity);
+            _playerMoveTimerReset.Remove(entity);
 
-            if (!_playerTurnTimer.Has(entity))
+            if (!_playerMoveTimer.Has(entity))
             {
                 continue;
             }
@@ -41,13 +41,13 @@ public class RoomPokerResetTimerTurnByPlayerSystem : ISystem
             ref var playerId = ref _playerId.Get(entity);
             ref var playerRoom = ref _playerRoomPoker.Get(entity);
             
-            var dataframe = new RoomPokerResetTurnTimerDataframe
+            var dataframe = new RoomPokerResetMoveTimerDataframe
             {
                 PlayerId = playerId.Id,
             };
             _server.SendInRoom(ref dataframe, playerRoom.RoomEntity);
 
-            _playerTurnTimer.Remove(entity);
+            _playerMoveTimer.Remove(entity);
         }
     }
 

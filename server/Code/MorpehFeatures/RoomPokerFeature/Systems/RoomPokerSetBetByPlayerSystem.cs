@@ -10,7 +10,7 @@ public class RoomPokerSetBetByPlayerSystem : ISystem
 {
     [Injectable] private Stash<PlayerSetBet> _playerSetBet;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
+    [Injectable] private Stash<PlayerMoveCompleteFlag> _playerMoveCompleteFlag;
     
     [Injectable] private Stash<RoomPokerTransferMove> _roomPokerTransferMove;
     
@@ -46,7 +46,7 @@ public class RoomPokerSetBetByPlayerSystem : ISystem
             }
             
             _roomPokerTransferMove.Set(roomEntity);
-            _playerTurnCompleteFlag.Set(playerEntity);
+            _playerMoveCompleteFlag.Set(playerEntity);
         }
     }
 

@@ -11,7 +11,7 @@ public struct RoomPokerCreateRequestDataframe : INetworkDataframe
     public long Contribution;
     public long MinContribution;
     public long BigBet;
-    public bool IsFastTurn;
+    public bool IsFastMove;
 
     public void Write(NetFrameWriter writer)
     {
@@ -20,7 +20,7 @@ public struct RoomPokerCreateRequestDataframe : INetworkDataframe
         writer.WriteLong(Contribution);
         writer.WriteLong(MinContribution);
         writer.WriteLong(BigBet);
-        writer.WriteBool(IsFastTurn);
+        writer.WriteBool(IsFastMove);
     }
 
     public void Read(NetFrameReader reader)
@@ -30,6 +30,6 @@ public struct RoomPokerCreateRequestDataframe : INetworkDataframe
         Contribution = reader.ReadLong();
         MinContribution = reader.ReadLong();
         BigBet = reader.ReadLong();
-        IsFastTurn = reader.ReadBool();
+        IsFastMove = reader.ReadBool();
     }
 }

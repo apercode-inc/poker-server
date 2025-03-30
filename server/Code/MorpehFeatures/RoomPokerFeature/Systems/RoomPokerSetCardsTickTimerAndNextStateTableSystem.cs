@@ -11,8 +11,8 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
     [Injectable] private Stash<RoomPokerSetCardsTickTimer> _roomPokerSetCardsTickTimer;
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     
-    [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
-    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
+    [Injectable] private Stash<PlayerMoveCompleteFlag> _playerMoveCompleteFlag;
+    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerAway> _playerAway;
 
     private Filter _filter;
@@ -51,7 +51,7 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
                 {
                     continue;
                 }
-                _playerTurnCompleteFlag.Remove(player);
+                _playerMoveCompleteFlag.Remove(player);
             }
             
             var startIndexSeat = roomPokerPlayers.DealerSeatPointer;
@@ -74,7 +74,7 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
             var nextMoverPlayer = roomPokerPlayers.PlayersBySeat[nextMoverIndexSeat];
             roomPokerPlayers.MoverSeatPointer = nextMoverIndexSeat;
             
-            _playerSetPokerTurn.Set(nextMoverPlayer);
+            _playerSetPokerMove.Set(nextMoverPlayer);
         }
     }
 

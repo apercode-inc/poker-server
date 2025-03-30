@@ -30,14 +30,14 @@ public class RoomPokerService : IInitializer
     [Injectable] private Stash<PlayerSeat> _playerSeat;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
-    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
-    [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
+    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
+    [Injectable] private Stash<PlayerMoveTimer> _playerMoveTimer;
     [Injectable] private Stash<PlayerShowOrHideTimer> _playerShowOrHideTimer;
-    [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
+    [Injectable] private Stash<PlayerMoveCompleteFlag> _playerMoveCompleteFlag;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerAllin> _playerAllin;
     [Injectable] private Stash<PlayerAway> _playerAway;
-    [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
+    [Injectable] private Stash<PlayerMoveShowdownTimer> _playerMoveShowdownTimer;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private RoomPokerStorage _roomPokerStorage;
@@ -127,9 +127,9 @@ public class RoomPokerService : IInitializer
             _playerShowOrHideTimer.Remove(playerLeave);
         }
         
-        if (_playerTurnShowdownTimer.Has(playerLeave))
+        if (_playerMoveShowdownTimer.Has(playerLeave))
         {
-            _playerTurnShowdownTimer.Remove(playerLeave);
+            _playerMoveShowdownTimer.Remove(playerLeave);
             _roomPokerShowdownChoiceCheck.Set(roomEntity);
         }
 
@@ -147,8 +147,8 @@ public class RoomPokerService : IInitializer
         _playerSeat.Remove(playerLeave);
         _playerPokerContribution.Remove(playerLeave);
         _playerPokerCurrentBet.Remove(playerLeave);
-        _playerTurnTimer.Remove(playerLeave);
-        _playerTurnCompleteFlag.Remove(playerLeave);
+        _playerMoveTimer.Remove(playerLeave);
+        _playerMoveCompleteFlag.Remove(playerLeave);
         _playerAllin.Remove(playerLeave);
         _playerAway.Remove(playerLeave);
 

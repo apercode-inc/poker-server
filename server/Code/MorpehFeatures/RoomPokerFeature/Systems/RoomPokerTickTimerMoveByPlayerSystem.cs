@@ -10,14 +10,14 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
+public class RoomPokerTickTimerMoveByPlayerSystem : ISystem
 {
-    [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
+    [Injectable] private Stash<PlayerMoveTimer> _playerMoveTimer;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
-    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
+    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
     [Injectable] private Stash<PlayerCards> _playerCards;
-    [Injectable] private Stash<PlayerTurnTimerReset> _playerTurnTimerReset;
+    [Injectable] private Stash<PlayerMoveTimerReset> _playerMoveTimerReset;
     [Injectable] private Stash<PlayerPokerCheck> _playerPokerCheck;
     [Injectable] private Stash<PlayerDropCards> _playerDropCards;
     [Injectable] private Stash<PlayerAway> _playerAway;
@@ -38,7 +38,7 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
         _filter = World.Filter
             .With<PlayerId>()
             .With<PlayerRoomPoker>()
-            .With<PlayerTurnTimer>()
+            .With<PlayerMoveTimer>()
             .Build();
     }
 
@@ -46,14 +46,14 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
     {
         foreach (var playerEntity in _filter)
         {
-            ref var playerTurnTimer = ref _playerTurnTimer.Get(playerEntity);
+            ref var playerMoveTimer = ref _playerMoveTimer.Get(playerEntity);
 
-            playerTurnTimer.TimeCurrent += deltaTime;
+            playerMoveTimer.TimeCurrent += deltaTime;
 
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
             var roomEntity = playerRoomPoker.RoomEntity;
 
-            if (playerTurnTimer.TimeCurrent < playerTurnTimer.TimeMax && !_playerAway.Has(playerEntity))
+            if (playerMoveTimer.TimeCurrent < playerMoveTimer.TimeMax && !_playerAway.Has(playerEntity))
             {
                 continue;
             }
@@ -74,7 +74,7 @@ public class RoomPokerTickTimerTurnByPlayerSystem : ISystem
             var dataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();
             _server.Send(ref dataframe, playerEntity);
 
-            _playerTurnTimerReset.Set(playerEntity);
+            _playerMoveTimerReset.Set(playerEntity);
         }
     }
 

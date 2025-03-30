@@ -31,14 +31,14 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
 
     [Injectable] private Stash<PlayerId> _playerId;
-    [Injectable] private Stash<PlayerTurnCompleteFlag> _playerTurnCompleteFlag;
+    [Injectable] private Stash<PlayerMoveCompleteFlag> _playerMoveCompleteFlag;
     [Injectable] private Stash<PlayerPokerCombination> _playerPokerCombination;
     [Injectable] private Stash<PlayerAllin> _playerAllin;
     [Injectable] private Stash<PlayerCards> _playerCards;
-    [Injectable] private Stash<PlayerTurnTimer> _playerTurnTimer;
-    [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
+    [Injectable] private Stash<PlayerMoveTimer> _playerMoveTimer;
+    [Injectable] private Stash<PlayerMoveShowdownTimer> _playerMoveShowdownTimer;
     [Injectable] private Stash<PlayerPokerCurrentBet> _playerPokerCurrentBet;
-    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
+    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
     [Injectable] private Stash<PlayerAway> _playerAway;
@@ -88,12 +88,12 @@ public class RoomPokerCleanupGameSystem : ISystem
 
             ref var playerId = ref _playerId.Get(player);
 
-            _playerTurnCompleteFlag.Remove(player);
+            _playerMoveCompleteFlag.Remove(player);
             _playerPokerCombination.Remove(player);
             _playerAllin.Remove(player);
-            _playerTurnTimer.Remove(player);
-            _playerTurnShowdownTimer.Remove(player);
-            _playerSetPokerTurn.Remove(player);
+            _playerMoveTimer.Remove(player);
+            _playerMoveShowdownTimer.Remove(player);
+            _playerSetPokerMove.Remove(player);
             _playerDealer.Remove(player);
 
             ref var playerCards = ref _playerCards.Get(player);

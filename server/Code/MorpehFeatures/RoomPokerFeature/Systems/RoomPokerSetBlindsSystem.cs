@@ -14,7 +14,7 @@ public class RoomPokerSetBlindsSystem : ISystem
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<PlayerAway> _playerAway;
-    [Injectable] private Stash<PlayerSetPokerTurn> _playerSetPokerTurn;
+    [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerSeat> _playerSeat;
 
     [Injectable] private CurrencyPlayerService _currencyPlayerService;

@@ -10,13 +10,13 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Services;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerTickTimerTurnShowdownByPlayerSystem : ISystem
+public class RoomPokerTickTimerMoveShowdownByPlayerSystem : ISystem
 {
-    [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
+    [Injectable] private Stash<PlayerMoveShowdownTimer> _playerMoveShowdownTimer;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<Destroy> _destroy;
-    [Injectable] private Stash<PlayerTurnShowdownResetTimer> _playerTurnShowdownResetTimer;
+    [Injectable] private Stash<PlayerMoveShowdownResetTimer> _playerMoveShowdownResetTimer;
     [Injectable] private Stash<PlayerDropCards> _playerDropCards;
     [Injectable] private Stash<PlayerAway> _playerAway;
     
@@ -33,7 +33,7 @@ public class RoomPokerTickTimerTurnShowdownByPlayerSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
-            .With<PlayerTurnShowdownTimer>()
+            .With<PlayerMoveShowdownTimer>()
             .With<PlayerRoomPoker>()
             .With<PlayerId>()
             .Build();
@@ -43,11 +43,11 @@ public class RoomPokerTickTimerTurnShowdownByPlayerSystem : ISystem
     {
         foreach (var playerEntity in  _filter)
         {
-            ref var playerTurnShowdownTimer = ref _playerTurnShowdownTimer.Get(playerEntity);
+            ref var playerMoveShowdownTimer = ref _playerMoveShowdownTimer.Get(playerEntity);
 
-            playerTurnShowdownTimer.TimeCurrent += deltaTime;
+            playerMoveShowdownTimer.TimeCurrent += deltaTime;
 
-            if (playerTurnShowdownTimer.TimeCurrent < playerTurnShowdownTimer.TimeMax && !_playerAway.Has(playerEntity))
+            if (playerMoveShowdownTimer.TimeCurrent < playerMoveShowdownTimer.TimeMax && !_playerAway.Has(playerEntity))
             {
                 continue;
             }
@@ -57,7 +57,7 @@ public class RoomPokerTickTimerTurnShowdownByPlayerSystem : ISystem
             var closeActivePanelDataframe = new RoomPokerPlayerActiveHudPanelCloseDataframe();
             _server.Send(ref closeActivePanelDataframe, playerEntity);
 
-            _playerTurnShowdownResetTimer.Set(playerEntity);
+            _playerMoveShowdownResetTimer.Set(playerEntity);
         }
     }
 

@@ -1,9 +1,9 @@
 using NetFrame;
 using NetFrame.WriteAndRead;
 
-namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Turn;
+namespace server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.Move;
 
-public struct RoomPokerHudAllInRequestDataframe : INetworkDataframe
+public struct RoomPokerHudHideCardsRequestDataframe : INetworkDataframe
 {
     public void Write(NetFrameWriter writer)
     {

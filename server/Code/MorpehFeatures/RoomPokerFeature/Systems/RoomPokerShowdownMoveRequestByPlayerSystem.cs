@@ -8,12 +8,12 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerShowdownTurnRequestByPlayerSystem : ISystem
+public class RoomPokerShowdownMoveRequestByPlayerSystem : ISystem
 {
-    [Injectable] private Stash<PlayerPokerShowdownTurnRequest> _playerPokerShowdownTurnRequest;
+    [Injectable] private Stash<PlayerPokerShowdownMoveRequest> _playerPokerShowdownMoveRequest;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerId> _playerId;
-    [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
+    [Injectable] private Stash<PlayerMoveShowdownTimer> _playerMoveShowdownTimer;
 
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
 
@@ -26,7 +26,7 @@ public class RoomPokerShowdownTurnRequestByPlayerSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
-            .With<PlayerPokerShowdownTurnRequest>()
+            .With<PlayerPokerShowdownMoveRequest>()
             .With<PlayerRoomPoker>()
             .With<PlayerId>()
             .Build();
@@ -36,9 +36,9 @@ public class RoomPokerShowdownTurnRequestByPlayerSystem : ISystem
     {
         foreach (var playerEntity in _filter)
         {
-            var dataframe = new RoomPokerPlayerTurnRequestDataframe
+            var dataframe = new RoomPokerPlayerMoveRequestDataframe
             {
-                TurnType = PokerPlayerTurnType.Showdown,
+                MoveType = PokerPlayerMoveType.Showdown,
             };
             _server.Send(ref dataframe, playerEntity);
 
@@ -48,20 +48,20 @@ public class RoomPokerShowdownTurnRequestByPlayerSystem : ISystem
             var roomEntity = playerRoomPoker.RoomEntity;
             ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
                 
-            var timeDataframe = new RoomPokerSetTimerTurnDataframe
+            var timeDataframe = new RoomPokerSetTimerMoveDataframe
             {
                 PlayerId = playerId.Id,
-                Time = roomPokerStats.TurnShowdownTime,
+                Time = roomPokerStats.MoveShowdownTime,
             };
             _server.SendInRoom(ref timeDataframe, roomEntity);
             
-            _playerTurnShowdownTimer.Set(playerEntity, new PlayerTurnShowdownTimer
+            _playerMoveShowdownTimer.Set(playerEntity, new PlayerMoveShowdownTimer
             {
                 TimeCurrent = 0,
-                TimeMax = roomPokerStats.TurnShowdownTime,
+                TimeMax = roomPokerStats.MoveShowdownTime,
             });
             
-            _playerPokerShowdownTurnRequest.Remove(playerEntity);
+            _playerPokerShowdownMoveRequest.Remove(playerEntity);
         }
     }
     

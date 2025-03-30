@@ -6,10 +6,10 @@ namespace server.Code.MorpehFeatures.RoomPokerFeature.Configs;
 public class RoomPokerSettingsConfig
 {
     [JsonProperty("start_game_time")] public float StartGameTime;
-    [JsonProperty("player_turn_time")] public float PlayerTurnTime;
-    [JsonProperty("player_turn_fast_time")] public float PlayerTurnTimeFast;
-    [JsonProperty("player_turn_showdown_time")] public float PlayerTurnShowdownTime;
-    [JsonProperty("player_turn_showdown_fast_time")] public float PlayerTurnShowdownTimeFast;
+    [JsonProperty("player_move_time")] public float PlayerMoveTime;
+    [JsonProperty("player_move_fast_time")] public float PlayerMoveTimeFast;
+    [JsonProperty("player_move_showdown_time")] public float PlayerMoveShowdownTime;
+    [JsonProperty("player_move_showdown_fast_time")] public float PlayerMoveShowdownTimeFast;
     [JsonProperty("dealing_cards_time")] public float DealingCardsTime;
     [JsonProperty("dealing_card_time_to_table")] public float DealingCardTimeToTable;
     [JsonProperty("delay_pay_out")] public float DelayPayOut;

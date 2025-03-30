@@ -7,11 +7,11 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-public class RoomPokerResetTimerTurnShowdownByPlayerSystem : ISystem
+public class RoomPokerResetTimerMoveShowdownByPlayerSystem : ISystem
 {
-    [Injectable] private Stash<PlayerTurnShowdownResetTimer> _playerTurnShowdownResetTimer;
+    [Injectable] private Stash<PlayerMoveShowdownResetTimer> _playerMoveShowdownResetTimer;
     [Injectable] private Stash<PlayerId> _playerId;
-    [Injectable] private Stash<PlayerTurnShowdownTimer> _playerTurnShowdownTimer;
+    [Injectable] private Stash<PlayerMoveShowdownTimer> _playerMoveShowdownTimer;
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     
     [Injectable] private Stash<RoomPokerShowdownChoiceCheck> _roomPokerShowdownChoiceCheck;
@@ -25,9 +25,9 @@ public class RoomPokerResetTimerTurnShowdownByPlayerSystem : ISystem
     public void OnAwake()
     {
         _filter = World.Filter
-            .With<PlayerTurnShowdownResetTimer>()
+            .With<PlayerMoveShowdownResetTimer>()
             .With<PlayerRoomPoker>()
-            .With<PlayerTurnShowdownTimer>()
+            .With<PlayerMoveShowdownTimer>()
             .Build();
     }
 
@@ -39,17 +39,17 @@ public class RoomPokerResetTimerTurnShowdownByPlayerSystem : ISystem
             var roomEntity = playerRoomPoker.RoomEntity;
             
             _roomPokerShowdownChoiceCheck.Set(roomEntity);
-            _playerTurnShowdownTimer.Remove(playerEntity);
+            _playerMoveShowdownTimer.Remove(playerEntity);
         
             ref var playerId = ref _playerId.Get(playerEntity);
         
-            var dataframe = new RoomPokerResetTurnTimerDataframe
+            var dataframe = new RoomPokerResetMoveTimerDataframe
             {
                 PlayerId = playerId.Id,
             };
             _server.SendInRoom(ref dataframe, roomEntity);
             
-            _playerTurnShowdownResetTimer.Remove(playerEntity);
+            _playerMoveShowdownResetTimer.Remove(playerEntity);
         }
     }
 
