@@ -129,9 +129,6 @@ public class PlayerStorage : IInitializer
         {
             return;
         }
-        
-        Remove(id); //todo временно вырубил пока что ожидание
-        return;
 
         if (!_playerRoomPoker.Has(player))
         {

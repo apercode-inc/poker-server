@@ -51,6 +51,7 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
 
             var isContinueBiddingRound = false;
             var allInCount = 0;
+            var withCardsCount = 0;
 
             foreach (var otherPlayer in roomPokerPlayers.PlayersBySeat)
             {
@@ -58,20 +59,25 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
                 {
                     continue;
                 }
+                
+                ref var playerCards = ref _playerCards.Get(otherPlayer);
+                
+                if (playerCards.CardsState != CardsState.Empty)
+                {
+                    withCardsCount++;
+                }
 
                 if (playerEntity != otherPlayer && _playerAllin.Has(otherPlayer))
                 {
                     allInCount++;
                     continue;
                 }
-                
-                ref var playerCards = ref _playerCards.Get(otherPlayer);
 
                 if (_playerAllin.Has(otherPlayer) || playerCards.CardsState == CardsState.Empty)
                 {
                     continue;
                 }
-                
+
                 if (!_playerMoveCompleteFlag.Has(otherPlayer))
                 {
                     isContinueBiddingRound = true;
@@ -89,7 +95,9 @@ public class RoomPokerEndBiddingRoundCheckSystem : ISystem
             ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
             var isCalled = playerPokerCurrentBet.Value >= roomPokerMaxBet.Value;
 
-            if (isCalled && allInCount >= roomPokerPlayers.TotalPlayersCount - 1)
+            var withCardsCountWithoutOne = withCardsCount - 1;
+            
+            if (isCalled && withCardsCountWithoutOne != 0 && allInCount >= withCardsCountWithoutOne)
             {
                 if (!_roomPokerShowdownForcedAllPlayersDone.Has(roomEntity))
                 {

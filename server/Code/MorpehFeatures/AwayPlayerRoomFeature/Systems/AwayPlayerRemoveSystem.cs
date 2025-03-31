@@ -4,7 +4,6 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Dataframes;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
 namespace server.Code.MorpehFeatures.AwayPlayerRoomFeature.Systems;
 
@@ -14,8 +13,6 @@ public class AwayPlayerRemoveSystem : ISystem
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerId> _playerId;
-
-    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private NetFrameServer _server;
     
