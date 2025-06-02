@@ -1,7 +1,6 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
@@ -19,14 +18,12 @@ public class RoomPokerSetMoveByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerMoveTimer> _playerMoveTimer;
     [Injectable] private Stash<PlayerAllin> _playerAllin;
-    [Injectable] private Stash<PlayerAway> _playerAway;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
     [Injectable] private Stash<RoomPokerMaxBet> _roomPokerMaxBet;
     [Injectable] private Stash<RoomPokerOnePlayerRoundGame> _roomPokerOnePlayerRoundGame;
     [Injectable] private Stash<RoomPokerTransferMove> _roomPokerTransferMove;
-    [Injectable] private Stash<RoomPokerSetCardsToTable> _roomPokerSetCardsToTable;
     
     [Injectable] private NetFrameServer _server;
     
@@ -58,27 +55,6 @@ public class RoomPokerSetMoveByPlayerSystem : ISystem
 
             if (roomPokerPlayers.TotalPlayersCount == 1)
             {
-                continue;
-            }
-            
-            var playersAwayCounter = 0;
-            
-            foreach (var player in roomPokerPlayers.PlayersBySeat)
-            {
-                if (player.IsNullOrDisposed())
-                {
-                    continue;
-                }
-                
-                if (_playerAway.Has(player))
-                {
-                    playersAwayCounter++;
-                }
-            }
-
-            if (roomPokerPlayers.TotalPlayersCount - playersAwayCounter == 1)
-            {
-                _roomPokerSetCardsToTable.Set(roomEntity);
                 continue;
             }
 
