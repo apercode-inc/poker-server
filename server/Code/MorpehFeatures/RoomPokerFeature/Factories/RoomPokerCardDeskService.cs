@@ -84,20 +84,7 @@ public class RoomPokerCardDeskService : IInitializer
         
         return newCardDesk;
     }
-
-    public void FillTheDesk(RandomList<CardModel> cardDesk)
-    {
-        while (cardDesk.Count > 0)
-        {
-            cardDesk.TryRandomRemove(out _);
-        }
-
-        foreach (var card in _cardDeskPokerStandard)
-        {
-            cardDesk.Add(card);
-        }
-    }
-
+    
     public void Dispose()
     {
         _cardDeskPokerStandard = null;

@@ -1,17 +1,14 @@
-using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
-using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Factories;
 using server.Code.MorpehFeatures.RoomPokerFeature.Models;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
 
-//todo может переименовать надо по нормальному или разбить на две, система выполняет роль инициализации и роль передвижения диллера
-public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
+public class RoomPokerGameInitializeSystem : ISystem
 {
     [Injectable] private Stash<RoomPokerGameInitialize> _roomPokerGameInitialize;
     [Injectable] private Stash<RoomPokerActive> _roomPokerActive;
@@ -21,17 +18,14 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
     [Injectable] private Stash<RoomPokerDealingCardsToPlayer> _roomPokerDealingCardsToPlayer;
     [Injectable] private Stash<RoomPokerDealingCardsToPlayerSet> _roomPokerDealingCardsToPlayerSet;
     [Injectable] private Stash<RoomPokerSetBlinds> _roomPokerSetBlinds;
+    [Injectable] private Stash<RoomPokerTransferDealer> _roomPokerTransferDealer;
     [Injectable] private Stash<RoomPokerCleanedGame> _roomPokerCleanedGame;
     
-    [Injectable] private Stash<PlayerDealer> _playerDealer;
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerNickname> _playerNickname;
-    [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerAway> _playerAway;
 
     [Injectable] private RoomPokerCardDeskService _cardDeskService;
-
-    [Injectable] private NetFrameServer _server;
 
     private Filter _filter;
 
@@ -58,22 +52,10 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
                 continue;
             }
             
-            if (!_roomPokerCardDesk.Has(roomEntity))
+            _roomPokerCardDesk.Set(roomEntity, new RoomPokerCardDesk
             {
-                _roomPokerCardDesk.Set(roomEntity, new RoomPokerCardDesk
-                {
-                    CardDesk = _cardDeskService.CreateCardDeskPokerStandard()
-                });
-            }
-            else
-            {
-                ref var roomPokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
-
-                _cardDeskService.FillTheDesk(roomPokerCardDesk.CardDesk);
-            }
-
-            var dealerPlayer = MoveDealerSeatPointer(ref roomPokerPlayers);
-            SetDealerPlayerMarker(roomEntity, dealerPlayer);
+                CardDesk = _cardDeskService.CreateCardDeskPokerStandard()
+            });
 
             roomPokerPlayers.PlayerPotModels.Clear();
             var playersEntities = new Queue<Entity>();
@@ -97,9 +79,7 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
                 
                 playersEntities.Enqueue(player);
             }
-            
-            _roomPokerSetBlinds.Set(roomEntity, new RoomPokerSetBlinds());
-            
+
             _roomPokerDealingCardsToPlayer.Set(roomEntity, new RoomPokerDealingCardsToPlayer
             {
                 QueuePlayers = playersEntities,
@@ -107,46 +87,11 @@ public class RoomPokerGameInitializeAndTransferDealerSystem : ISystem
             _roomPokerDealingCardsToPlayerSet.Set(roomEntity);
             _roomPokerCleanedGame.Remove(roomEntity);
             
+            _roomPokerSetBlinds.Set(roomEntity);
             _roomPokerActive.Set(roomEntity);
             _roomPokerBank.Set(roomEntity);
+            _roomPokerTransferDealer.Set(roomEntity);
         }
-    }
-    
-    private Entity MoveDealerSeatPointer(ref RoomPokerPlayers roomPokerPlayers)
-    {
-        var startIndexSeat = roomPokerPlayers.DealerSeatPointer;
-        var newDealerIndexSeat = startIndexSeat;
-        var playerCount = roomPokerPlayers.PlayersBySeat.Length;
-
-        for (var i = 1; i < playerCount; i++)
-        {
-            var nextIndexSeat = (startIndexSeat + i) % playerCount;
-            var nextPlayer = roomPokerPlayers.PlayersBySeat[nextIndexSeat];
-
-            if (nextPlayer.IsNullOrDisposed() || _playerAway.Has(nextPlayer))
-            {
-                continue;
-            }
-
-            newDealerIndexSeat = nextIndexSeat;
-            break;
-        }
-
-        roomPokerPlayers.DealerSeatPointer = newDealerIndexSeat;
-        return roomPokerPlayers.PlayersBySeat[newDealerIndexSeat];
-    }
-    
-    private void SetDealerPlayerMarker(Entity roomEntity, Entity nextMarkedPlayer)
-    {
-        _playerDealer.Set(nextMarkedPlayer);
-        
-        ref var playerId = ref _playerId.Get(nextMarkedPlayer);
-        
-        var dataframe = new RoomPokerSetDealerDataframe
-        {
-            PlayerId = playerId.Id,
-        };
-        _server.SendInRoom(ref dataframe, roomEntity);
     }
 
     public void Dispose()
