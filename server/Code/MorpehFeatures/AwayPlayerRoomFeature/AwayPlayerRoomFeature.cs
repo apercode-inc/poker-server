@@ -9,6 +9,8 @@ public static class AwayPlayerRoomFeature
     public static void Add(World world, ref int index, SimpleDImple container)
     {
         var systemsGroup = world.CreateSystemsGroup();
+        
+        systemsGroup.AddInitializer(container.New<AwayPlayerRequestSyncSystem>());
 
         systemsGroup.AddSystem(container.New<AwayPlayerRejoinRoomSystem>());
         systemsGroup.AddSystem(container.New<AwayPlayerAddSystem>());

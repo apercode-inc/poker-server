@@ -1,6 +1,5 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
-using server.Code.GlobalUtils;
 using server.Code.Injection;
 using server.Code.MorpehFeatures.NotificationFeature.Enums;
 using server.Code.MorpehFeatures.NotificationFeature.Systems;
