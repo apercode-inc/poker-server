@@ -123,14 +123,24 @@ public class PlayerStorage : IInitializer
         _playerRoomCreateSend.Set(createdPlayer);
     }
 
-    public void RemoveWithAwayAtDisconnect(int id)
+    public void RemoveWithAwayAtDisconnect(int id)  
     {
         if (!_playersByIds.TryGetValue(id, out var player))
         {
             return;
         }
 
-        if (!_playerRoomPoker.Has(player))
+        ref var playerRoomPoker = ref _playerRoomPoker.Get(player, out var playerRoomPokerExist);
+
+        if (!playerRoomPokerExist)
+        {
+            Remove(id);
+            return;
+        }
+        
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(playerRoomPoker.RoomEntity);
+
+        if (roomPokerPlayers.TotalPlayersCount <= 1)
         {
             Remove(id);
             return;
