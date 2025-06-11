@@ -20,6 +20,7 @@ public class RoomPokerGameInitializeSystem : ISystem
     [Injectable] private Stash<RoomPokerSetBlinds> _roomPokerSetBlinds;
     [Injectable] private Stash<RoomPokerTransferDealer> _roomPokerTransferDealer;
     [Injectable] private Stash<RoomPokerCleanedGame> _roomPokerCleanedGame;
+    [Injectable] private Stash<RoomPokerCleanup> _roomPokerCleanup;
     
     [Injectable] private Stash<PlayerAuthData> _playerAuthData;
     [Injectable] private Stash<PlayerNickname> _playerNickname;
@@ -78,6 +79,13 @@ public class RoomPokerGameInitializeSystem : ISystem
                 }
                 
                 playersEntities.Enqueue(player);
+            }
+
+            if (playersEntities.Count < 2)
+            {
+                _roomPokerActive.Remove(roomEntity);
+                _roomPokerCleanup.Set(roomEntity);
+                continue;
             }
 
             _roomPokerDealingCardsToPlayer.Set(roomEntity, new RoomPokerDealingCardsToPlayer
