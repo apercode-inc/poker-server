@@ -20,4 +20,8 @@
       <PackageReference Include="SqlKata.Execution" Version="3.0.0-beta" />
     </ItemGroup>
 
+    <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+        <DefineConstants>$(DefineConstants);_WINDOWS</DefineConstants>
+    </PropertyGroup>
+
 </Project>
