@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
@@ -18,6 +19,7 @@ public class RoomPokerSetMoveByPlayerSystem : ISystem
     [Injectable] private Stash<PlayerId> _playerId;
     [Injectable] private Stash<PlayerMoveTimer> _playerMoveTimer;
     [Injectable] private Stash<PlayerAllin> _playerAllin;
+    [Injectable] private Stash<PlayerAway> _playerAway;
 
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
@@ -68,6 +70,19 @@ public class RoomPokerSetMoveByPlayerSystem : ISystem
                 _roomPokerTransferMove.Set(roomEntity);
                 continue;
             }
+            
+            ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
+            
+            _playerMoveTimer.Set(playerEntity, new PlayerMoveTimer
+            {
+                TimeCurrent = 0,
+                TimeMax = roomPokerStats.MoveTime,
+            });
+
+            if (_playerAway.Has(playerEntity))
+            {
+                continue;
+            }
 
             ref var playerPokerCurrentBet = ref _playerPokerCurrentBet.Get(playerEntity);
             
@@ -75,7 +90,6 @@ public class RoomPokerSetMoveByPlayerSystem : ISystem
             ref var playerId = ref _playerId.Get(playerEntity);
             
             ref var roomPokerMaxBet = ref _roomPokerMaxBet.Get(roomEntity);
-            ref var roomPokerStats = ref _roomPokerStats.Get(roomEntity);
 
             var requiredBet = roomPokerMaxBet.Value - playerPokerCurrentBet.Value;
             var remainderAfterCall = playerPokerContribution.Value - requiredBet;
@@ -109,12 +123,6 @@ public class RoomPokerSetMoveByPlayerSystem : ISystem
                 Time = roomPokerStats.MoveTime,
             };
             _server.SendInRoom(ref timeDataframe, roomEntity);
-            
-            _playerMoveTimer.Set(playerEntity, new PlayerMoveTimer
-            {
-                TimeCurrent = 0,
-                TimeMax = roomPokerStats.MoveTime,
-            });
         }
     }
 

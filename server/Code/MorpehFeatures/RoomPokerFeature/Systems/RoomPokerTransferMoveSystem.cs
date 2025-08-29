@@ -1,6 +1,5 @@
 using Scellecs.Morpeh;
 using server.Code.Injection;
-using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
 using server.Code.MorpehFeatures.RoomPokerFeature.Components;
 
@@ -12,7 +11,6 @@ public class RoomPokerTransferMoveSystem : ISystem
     [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
-    [Injectable] private Stash<PlayerAway> _playerAway;
 
     private Filter _filter;
     

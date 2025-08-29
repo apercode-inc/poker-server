@@ -10,6 +10,9 @@ public static class AwayPlayerRoomFeature
     {
         var systemsGroup = world.CreateSystemsGroup();
 
+        systemsGroup.AddInitializer(container.New<AwayPlayerAddRequestSyncSystem>());
+        systemsGroup.AddInitializer(container.New<AwayPlayerRemoveRequestSyncSystem>());
+
         systemsGroup.AddSystem(container.New<AwayPlayerRejoinRoomSystem>());
         systemsGroup.AddSystem(container.New<AwayPlayerAddSystem>());
         systemsGroup.AddSystem(container.New<AwayPlayerTimerTickSystem>());
