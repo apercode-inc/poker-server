@@ -11,6 +11,7 @@ using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.NetworkModels;
 using server.Code.MorpehFeatures.RoomPokerFeature.Dataframes.StartTimer;
 using server.Code.MorpehFeatures.RoomPokerFeature.Enums;
+using server.Code.MorpehFeatures.TopUpFeature.Components;
 using server.Code.MorpehFeatures.TopUpFeature.Dataframes;
 
 namespace server.Code.MorpehFeatures.RoomPokerFeature.Systems;
@@ -38,6 +39,7 @@ public class RoomPokerCleanupGameSystem : ISystem
     [Injectable] private Stash<PlayerSetPokerMove> _playerSetPokerMove;
     [Injectable] private Stash<PlayerPokerContribution> _playerPokerContribution;
     [Injectable] private Stash<PlayerAwayAdd> _playerAwayAdd;
+    [Injectable] private Stash<PlayerTopUpState> _playerTopUpState;
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerDealer> _playerDealer;
     
@@ -125,6 +127,7 @@ public class RoomPokerCleanupGameSystem : ISystem
             
             playersAwayCounter++;
             _playerAwayAdd.Set(player);
+            _playerTopUpState.Set(player);
                 
             var topUpOpenDataframe = new TopUpOpenRequestDataframe();
             _server.Send(ref topUpOpenDataframe, player);

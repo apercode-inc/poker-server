@@ -34,8 +34,7 @@ public class AwayPlayerAddRequestSyncSystem : IInitializer
         {
             return;
         }
-
-        Console.WriteLine("Adding player away");
+        
         _playerAwayAdd.Set(player);
     }
 

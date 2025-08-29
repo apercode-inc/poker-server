@@ -17,6 +17,7 @@ public class TopUpPlayerSystem : ISystem
     [Injectable] private Stash<PlayerCurrency> _playerCurrency;
     [Injectable] private Stash<PlayerAwayRemove> _playerAwayRemove;
     [Injectable] private Stash<PlayerId> _playerId;
+    [Injectable] private Stash<PlayerTopUpState> _playerTopUpState;
 
     [Injectable] private Stash<RoomPokerStats> _roomPokerStats;
 
@@ -91,7 +92,8 @@ public class TopUpPlayerSystem : ISystem
                 ContributionBalance = playerTopUpValue,
             };
             _server.SendInRoom(ref dataframe, roomEntity);
-            
+
+            _playerTopUpState.Remove(playerEntity);
             _playerAwayRemove.Set(playerEntity);
         }
     }

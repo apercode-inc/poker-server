@@ -4,6 +4,7 @@ using server.Code.Injection;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Dataframes;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
+using server.Code.MorpehFeatures.TopUpFeature.Components;
 
 namespace server.Code.MorpehFeatures.AwayPlayerRoomFeature.Systems;
 
@@ -13,6 +14,7 @@ public class AwayPlayerRemoveSystem : ISystem
     [Injectable] private Stash<PlayerRoomPoker> _playerRoomPoker;
     [Injectable] private Stash<PlayerAway> _playerAway;
     [Injectable] private Stash<PlayerId> _playerId;
+    [Injectable] private Stash<PlayerTopUpState> _playerTopUpState;
 
     [Injectable] private NetFrameServer _server;
     
@@ -34,8 +36,14 @@ public class AwayPlayerRemoveSystem : ISystem
     {
         foreach (var playerEntity in _filter)
         {
-            _playerAway.Remove(playerEntity);
             _playerAwayRemove.Remove(playerEntity);
+            
+            if (_playerTopUpState.Has(playerEntity))
+            {
+                continue;
+            }
+            
+            _playerAway.Remove(playerEntity);
 
             ref var playerId = ref _playerId.Get(playerEntity);
             ref var playerRoomPoker = ref _playerRoomPoker.Get(playerEntity);
