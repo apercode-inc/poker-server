@@ -73,6 +73,16 @@ public class RoomPokerSetCardsTickTimerAndNextStateTableSystem : ISystem
             }
             var nextMoverPlayer = roomPokerPlayers.PlayersBySeat[nextMoverIndexSeat];
             roomPokerPlayers.MoverSeatPointer = nextMoverIndexSeat;
+
+            if (nextMoverPlayer.IsNullOrDisposed())
+            {
+                //todo по какой то причине nextMoverPlayer становиться нулловым,
+                //пока что обнаружено когда все игроки покинули стол почти одновременно
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"playerCount: {playerCount}, nextMoverIndexSeat: {nextMoverIndexSeat}");
+                Console.ResetColor();
+                continue;
+            }
             
             _playerSetPokerMove.Set(nextMoverPlayer);
         }
