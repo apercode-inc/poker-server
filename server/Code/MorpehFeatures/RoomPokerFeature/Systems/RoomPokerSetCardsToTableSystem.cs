@@ -96,17 +96,21 @@ public class RoomPokerSetCardsToTableSystem : ISystem
             if (roomPokerCardDesk.CardDesk.TryRandomRemove(out var cardModel))
             {
                 cards.Enqueue(cardModel);
-                cardsNetworkModels.Add(new RoomPokerCardNetworkModel
-                {
-                    Rank = cardModel.Rank,
-                    Suit = cardModel.Suit,
-                });
             }
             else
             {
                 ref var roomPokerId = ref _roomPokerId.Get(roomEntity);
                 throw new Exception($"[RoomPokerSetCardsToTableSystem.SetCards] No cards in deck, roomId = {roomPokerId.Value}");
             }
+        }
+
+        foreach (var cardModel in cards)
+        {
+            cardsNetworkModels.Add(new RoomPokerCardNetworkModel
+            {
+                Rank = cardModel.Rank,
+                Suit = cardModel.Suit,
+            });
         }
 
         SetBankAndSendDataframe(roomEntity, cardToTableState, cardsNetworkModels);
