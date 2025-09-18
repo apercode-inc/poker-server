@@ -1,6 +1,7 @@
 using NetFrame.Server;
 using Scellecs.Morpeh;
 using server.Code.Injection;
+using server.Code.MorpehFeatures.AwayPlayerRoomFeature.Components;
 using server.Code.MorpehFeatures.ConfigsFeature.Constants;
 using server.Code.MorpehFeatures.ConfigsFeature.Services;
 using server.Code.MorpehFeatures.PlayersFeature.Components;
@@ -21,9 +22,11 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
     [Injectable] private Stash<RoomPokerDealingCardsToPlayerSet> _roomPokerDealingCardsToPlayerSet;
     [Injectable] private Stash<RoomPokerCardDesk> _roomPokerCardDesk;
     [Injectable] private Stash<RoomPokerDealingTimer> _roomPokerDealingTimer;
+    [Injectable] private Stash<RoomPokerPlayers> _roomPokerPlayers;
 
     [Injectable] private Stash<PlayerCards> _playerCards;
     [Injectable] private Stash<PlayerId> _playerId;
+    [Injectable] private Stash<PlayerAway> _playerAway;
 
     [Injectable] private NetFrameServer _server;
     [Injectable] private ConfigsService _configsService;
@@ -67,9 +70,10 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
     private void DealingCardsAllPlayers(Entity roomEntity, float dealingCardsTime)
     {
         ref var roomPokerDealingCardsToPlayer = ref _roomPokerDealingCardsToPlayer.Get(roomEntity);
+        ref var roomPokerPlayers = ref _roomPokerPlayers.Get(roomEntity);
         ref var pokerCardDesk = ref _roomPokerCardDesk.Get(roomEntity);
 
-        foreach (var playerEntity in roomPokerDealingCardsToPlayer.QueuePlayers)
+        foreach (var playerEntity in roomPokerPlayers.PlayersBySeat)
         {
             if (playerEntity.IsNullOrDisposed())
             {
@@ -79,25 +83,28 @@ public class RoomPokerDealingCardsToPlayerSystem : ISystem
             _networkCardsModel.Clear();
             var cardsModel = new Queue<CardModel>();
 
-            for (var i = 0; i < HOLDEM_CARD_COUNT; i++)
+            if (!_playerAway.Has(playerEntity))
             {
-                if (!pokerCardDesk.CardDesk.TryRandomRemove(out var cardModel))
+                for (var i = 0; i < HOLDEM_CARD_COUNT; i++)
                 {
-                    continue;
-                }
+                    if (!pokerCardDesk.CardDesk.TryRandomRemove(out var cardModel))
+                    {
+                        continue;
+                    }
                 
-                cardsModel.Enqueue(cardModel);
+                    cardsModel.Enqueue(cardModel);
 
-                _networkCardsModel.Add(new RoomPokerCardNetworkModel
-                {
-                    Rank = cardModel.Rank,
-                    Suit = cardModel.Suit,
-                });
+                    _networkCardsModel.Add(new RoomPokerCardNetworkModel
+                    {
+                        Rank = cardModel.Rank,
+                        Suit = cardModel.Suit,
+                    });
+                }
             }
-
+            
             _playerCards.Set(playerEntity, new PlayerCards
             {
-                CardsState = CardsState.Close,
+                CardsState = _playerAway.Has(playerEntity) ? CardsState.Empty : CardsState.Close,
                 Cards = cardsModel,
             });
 
